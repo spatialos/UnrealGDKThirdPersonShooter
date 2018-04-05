@@ -29,7 +29,7 @@ Once you have downloaded the sample game in this repository, follow these instru
 1. Download and set up the SpatialOS Unreal engine from [https://github.com/improbable/UnrealEngine/tree/UnrealEngine417_NUF](https://github.com/improbable/UnrealEngine/tree/UnrealEngine417_NUF). 
 	* Make sure that you download the `UnrealEngine417_NUF` branch to get the correct version.
 	* Look at the [readme](https://github.com/improbable/UnrealEngine/blob/UnrealEngine417_NUF/README.md) file for guidance on setting up the SpatialOS Unreal engine and follow steps 1 to 4 in the `UnrealEngine417_NUF` readme.
-2. Download the Unreal SpatialGDK module and Unreal Editor plugin from [https://github.com/improbable/native-unr](https://github.com/improbable/native-unreal-framework)[eal-framework](https://github.com/improbable/native-unreal-framework).
+2. Download the Unreal SpatialGDK module and Unreal Editor plugin from [https://github.com/improbable/unreal-gdk](https://github.com/improbable/unreal-gdk).
 3. Create `UNREAL_HOME` environment variable and set to the location of the SpatialOS Unreal engine you have just downloaded.
 4. Initialise the project: from the root directory of your project, run `spatial worker codegen`.
 5. Create a link between your sample game directory and the Unreal SpatialGDK: run `create_spatialGDK_symlink.bat <Unreal SpatialGDK path>`.

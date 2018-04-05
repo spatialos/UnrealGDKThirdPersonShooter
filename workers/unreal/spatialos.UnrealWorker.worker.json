@@ -55,7 +55,7 @@
         "+linkProtocol",
         "RakNet",
         "-abslog=${IMPROBABLE_LOG_FILE}",
-		"-NoVerifyGC"
+        "-NoVerifyGC"
       ]
     },
     "linux": {
@@ -78,7 +78,7 @@
         "+linkProtocol",
         "RakNet",
         "-abslog=${IMPROBABLE_LOG_FILE}",
-		"-NoVerifyGC"
+        "-NoVerifyGC"
       ]
     }
   },
@@ -90,21 +90,21 @@
         "arguments": [
           "${IMPROBABLE_WORKER_DIR}/Game/SampleGame.uproject",
           "-server",
-		  "+workerType",
-		  "UnrealWorker",		  
-		  "-stdout",
-		  "-nowrite",
-		  "-unattended",
-		  "-nologtimes",
-		  "-nopause",
-		  "-noin",
-		  "-messaging",
-		  "-SaveToUserDir",
-		  "-abslog=${IMPROBABLE_LOG_FILE}",
-		  "-NoVerifyGC",
-		  "-windowed",
-		  "-ResX=400",
-		  "-ResY=300"	
+          "+workerType",
+          "UnrealWorker",         
+          "-stdout",
+          "-nowrite",
+          "-unattended",
+          "-nologtimes",
+          "-nopause",
+          "-noin",
+          "-messaging",
+          "-SaveToUserDir",
+          "-abslog=${IMPROBABLE_LOG_FILE}",
+          "-NoVerifyGC",
+          "-windowed",
+          "-ResX=400",
+          "-ResY=300"   
         ]
       }
     }

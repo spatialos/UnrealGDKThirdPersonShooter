@@ -36,18 +36,18 @@
             "-game",
             "+workerType",
             "UnrealClient",
-			"-stdout",
-			"-nowrite",
-			"-unattended",
-			"-nologtimes",
-			"-nopause",
-			"-noin",
-			"-messaging",
-			"-abslog=${IMPROBABLE_LOG_FILE}",
+            "-stdout",
+            "-nowrite",
+            "-unattended",
+            "-nologtimes",
+            "-nopause",
+            "-noin",
+            "-messaging",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
             "-NoVerifyGC",
-			"-windowed",
-			"-ResX=800",
-			"-ResY=600"
+            "-windowed",
+            "-ResX=800",
+            "-ResY=600"
         ]
       }
     }
