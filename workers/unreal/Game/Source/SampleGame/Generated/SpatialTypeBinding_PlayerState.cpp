@@ -28,8 +28,8 @@ const FRepHandlePropertyMap& USpatialTypeBinding_PlayerState::GetRepHandleProper
 		HandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(2, FRepHandleData(Class, {"bReplicateMovement"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(3, FRepHandleData(Class, {"bTearOff"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(4, FRepHandleData(Class, {"RemoteRole"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(5, FRepHandleData(Class, {"Owner"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(4, FRepHandleData(Class, {"bCanBeDamaged"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(5, FRepHandleData(Class, {"RemoteRole"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(6, FRepHandleData(Class, {"ReplicatedMovement"}, COND_SimulatedOrPhysics, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(7, FRepHandleData(Class, {"AttachmentReplication", "AttachParent"}, COND_Custom, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(8, FRepHandleData(Class, {"AttachmentReplication", "LocationOffset"}, COND_Custom, REPNOTIFY_OnChanged));
@@ -37,20 +37,20 @@ const FRepHandlePropertyMap& USpatialTypeBinding_PlayerState::GetRepHandleProper
 		HandleToPropertyMap.Add(10, FRepHandleData(Class, {"AttachmentReplication", "RotationOffset"}, COND_Custom, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(11, FRepHandleData(Class, {"AttachmentReplication", "AttachSocket"}, COND_Custom, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(12, FRepHandleData(Class, {"AttachmentReplication", "AttachComponent"}, COND_Custom, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(13, FRepHandleData(Class, {"Role"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(14, FRepHandleData(Class, {"bCanBeDamaged"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(16, FRepHandleData(Class, {"Score"}, COND_None, REPNOTIFY_OnChanged));
 		HandleToPropertyMap.Add(17, FRepHandleData(Class, {"Ping"}, COND_SkipOwner, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(18, FRepHandleData(Class, {"PlayerName"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(19, FRepHandleData(Class, {"PlayerId"}, COND_InitialOnly, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(20, FRepHandleData(Class, {"bFromPreviousLevel"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(21, FRepHandleData(Class, {"bIsABot"}, COND_InitialOnly, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(22, FRepHandleData(Class, {"bIsInactive"}, COND_InitialOnly, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(23, FRepHandleData(Class, {"bIsSpectator"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(24, FRepHandleData(Class, {"bOnlySpectator"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(25, FRepHandleData(Class, {"StartTime"}, COND_None, REPNOTIFY_OnChanged));
-		HandleToPropertyMap.Add(26, FRepHandleData(Class, {"UniqueId"}, COND_InitialOnly, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(18, FRepHandleData(Class, {"PlayerId"}, COND_InitialOnly, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(19, FRepHandleData(Class, {"bFromPreviousLevel"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(20, FRepHandleData(Class, {"bIsABot"}, COND_InitialOnly, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(21, FRepHandleData(Class, {"bIsInactive"}, COND_InitialOnly, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(22, FRepHandleData(Class, {"bIsSpectator"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(23, FRepHandleData(Class, {"bOnlySpectator"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(24, FRepHandleData(Class, {"StartTime"}, COND_None, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(25, FRepHandleData(Class, {"UniqueId"}, COND_InitialOnly, REPNOTIFY_OnChanged));
+		HandleToPropertyMap.Add(26, FRepHandleData(Class, {"PlayerNamePrivate"}, COND_None, REPNOTIFY_OnChanged));
 	}
 	return HandleToPropertyMap;
 }
@@ -352,34 +352,18 @@ void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* 
 			OutUpdate.set_field_btearoff(Value);
 			break;
 		}
-		case 4: // field_remoterole
+		case 4: // field_bcanbedamaged
+		{
+			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
+
+			OutUpdate.set_field_bcanbedamaged(Value);
+			break;
+		}
+		case 5: // field_remoterole
 		{
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(Data));
 
 			OutUpdate.set_field_remoterole(uint32_t(Value));
-			break;
-		}
-		case 5: // field_owner
-		{
-			AActor* Value = *(reinterpret_cast<AActor* const*>(Data));
-
-			if (Value != nullptr)
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
-				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
-				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
-				{
-					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 5);
-				}
-				else
-				{
-					OutUpdate.set_field_owner(ObjectRef);
-				}
-			}
-			else
-			{
-				OutUpdate.set_field_owner(SpatialConstants::NULL_OBJECT_REF);
-			}
 			break;
 		}
 		case 6: // field_replicatedmovement
@@ -469,18 +453,34 @@ void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* 
 			}
 			break;
 		}
-		case 13: // field_role
+		case 13: // field_owner
+		{
+			AActor* Value = *(reinterpret_cast<AActor* const*>(Data));
+
+			if (Value != nullptr)
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
+				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
+				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+				{
+					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 13);
+				}
+				else
+				{
+					OutUpdate.set_field_owner(ObjectRef);
+				}
+			}
+			else
+			{
+				OutUpdate.set_field_owner(SpatialConstants::NULL_OBJECT_REF);
+			}
+			break;
+		}
+		case 14: // field_role
 		{
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(Data));
 
 			OutUpdate.set_field_role(uint32_t(Value));
-			break;
-		}
-		case 14: // field_bcanbedamaged
-		{
-			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
-
-			OutUpdate.set_field_bcanbedamaged(Value);
 			break;
 		}
 		case 15: // field_instigator
@@ -520,63 +520,56 @@ void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* 
 			OutUpdate.set_field_ping(uint32_t(Value));
 			break;
 		}
-		case 18: // field_playername
-		{
-			FString Value = *(reinterpret_cast<FString const*>(Data));
-
-			OutUpdate.set_field_playername(TCHAR_TO_UTF8(*Value));
-			break;
-		}
-		case 19: // field_playerid
+		case 18: // field_playerid
 		{
 			int32 Value = *(reinterpret_cast<int32 const*>(Data));
 
 			OutUpdate.set_field_playerid(Value);
 			break;
 		}
-		case 20: // field_bfrompreviouslevel
+		case 19: // field_bfrompreviouslevel
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bfrompreviouslevel(Value);
 			break;
 		}
-		case 21: // field_bisabot
+		case 20: // field_bisabot
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bisabot(Value);
 			break;
 		}
-		case 22: // field_bisinactive
+		case 21: // field_bisinactive
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bisinactive(Value);
 			break;
 		}
-		case 23: // field_bisspectator
+		case 22: // field_bisspectator
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bisspectator(Value);
 			break;
 		}
-		case 24: // field_bonlyspectator
+		case 23: // field_bonlyspectator
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bonlyspectator(Value);
 			break;
 		}
-		case 25: // field_starttime
+		case 24: // field_starttime
 		{
 			int32 Value = *(reinterpret_cast<int32 const*>(Data));
 
 			OutUpdate.set_field_starttime(Value);
 			break;
 		}
-		case 26: // field_uniqueid
+		case 25: // field_uniqueid
 		{
 			FUniqueNetIdRepl Value = *(reinterpret_cast<FUniqueNetIdRepl const*>(Data));
 
@@ -587,6 +580,13 @@ void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* 
 				Value.NetSerialize(ValueDataWriter, PackageMap, Success);
 				OutUpdate.set_field_uniqueid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
+			break;
+		}
+		case 26: // field_playernameprivate
+		{
+			FString Value = *(reinterpret_cast<FString const*>(Data));
+
+			OutUpdate.set_field_playernameprivate(TCHAR_TO_UTF8(*Value));
 			break;
 		}
 	default:
@@ -683,17 +683,39 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 				Handle);
 		}
 	}
+	if (!Update.field_bcanbedamaged().empty())
+	{
+		// field_bcanbedamaged
+		uint16 Handle = 4;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
+
+			Value = (*Update.field_bcanbedamaged().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
 	if (!Update.field_remoterole().empty())
 	{
 		// field_remoterole
-		uint16 Handle = 4;
+		uint16 Handle = 5;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			// On the client, we need to swap Role/RemoteRole.
 			if (!bIsServer)
 			{
-				Handle = 13;
+				Handle = 14;
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
@@ -717,62 +739,6 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
 				*RepData->Property->GetName(),
 				Handle);
-		}
-	}
-	if (!Update.field_owner().empty())
-	{
-		// field_owner
-		uint16 Handle = 5;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
-			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
-
-			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
-				{
-					Value = nullptr;
-				}
-				else
-				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
-				}
-			}
-
-			if (bWriteObjectProperty)
-			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
-
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-					*Interop->GetSpatialOS()->GetWorkerId(),
-					*ActorChannel->Actor->GetName(),
-					ActorChannel->GetEntityId().ToSpatialEntityId(),
-					*RepData->Property->GetName(),
-					Handle);
-			}
 		}
 	}
 	if (!Update.field_replicatedmovement().empty())
@@ -1019,17 +985,73 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 			}
 		}
 	}
+	if (!Update.field_owner().empty())
+	{
+		// field_owner
+		uint16 Handle = 13;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			bool bWriteObjectProperty = true;
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
+
+			{
+				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner().data());
+				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				{
+					Value = nullptr;
+				}
+				else
+				{
+					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+					if (NetGUID.IsValid())
+					{
+						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						Value = dynamic_cast<AActor*>(Object_Raw);
+						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					}
+					else
+					{
+						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+							*Interop->GetSpatialOS()->GetWorkerId(),
+							*ObjectRefToString(ObjectRef),
+							*ActorChannel->Actor->GetName(),
+							ActorChannel->GetEntityId().ToSpatialEntityId(),
+							*RepData->Property->GetName(),
+							Handle);
+						bWriteObjectProperty = false;
+						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					}
+				}
+			}
+
+			if (bWriteObjectProperty)
+			{
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+					*Interop->GetSpatialOS()->GetWorkerId(),
+					*ActorChannel->Actor->GetName(),
+					ActorChannel->GetEntityId().ToSpatialEntityId(),
+					*RepData->Property->GetName(),
+					Handle);
+			}
+		}
+	}
 	if (!Update.field_role().empty())
 	{
 		// field_role
-		uint16 Handle = 13;
+		uint16 Handle = 14;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			// On the client, we need to swap Role/RemoteRole.
 			if (!bIsServer)
 			{
-				Handle = 4;
+				Handle = 5;
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
@@ -1037,28 +1059,6 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
 			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_role().data())));
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
-	if (!Update.field_bcanbedamaged().empty())
-	{
-		// field_bcanbedamaged
-		uint16 Handle = 14;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
-			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
-
-			Value = (*Update.field_bcanbedamaged().data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -1170,32 +1170,10 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 				Handle);
 		}
 	}
-	if (!Update.field_playername().empty())
-	{
-		// field_playername
-		uint16 Handle = 18;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
-			FString Value = *(reinterpret_cast<FString const*>(PropertyData));
-
-			Value = FString(UTF8_TO_TCHAR((*Update.field_playername().data()).c_str()));
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
 	if (!Update.field_playerid().empty())
 	{
 		// field_playerid
-		uint16 Handle = 19;
+		uint16 Handle = 18;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1217,7 +1195,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_bfrompreviouslevel().empty())
 	{
 		// field_bfrompreviouslevel
-		uint16 Handle = 20;
+		uint16 Handle = 19;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1239,7 +1217,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_bisabot().empty())
 	{
 		// field_bisabot
-		uint16 Handle = 21;
+		uint16 Handle = 20;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1261,7 +1239,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_bisinactive().empty())
 	{
 		// field_bisinactive
-		uint16 Handle = 22;
+		uint16 Handle = 21;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1283,7 +1261,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_bisspectator().empty())
 	{
 		// field_bisspectator
-		uint16 Handle = 23;
+		uint16 Handle = 22;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1305,7 +1283,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_bonlyspectator().empty())
 	{
 		// field_bonlyspectator
-		uint16 Handle = 24;
+		uint16 Handle = 23;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1327,7 +1305,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_starttime().empty())
 	{
 		// field_starttime
-		uint16 Handle = 25;
+		uint16 Handle = 24;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1349,7 +1327,7 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 	if (!Update.field_uniqueid().empty())
 	{
 		// field_uniqueid
-		uint16 Handle = 26;
+		uint16 Handle = 25;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
@@ -1364,6 +1342,28 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 				bool bSuccess;
 				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			}
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
+	if (!Update.field_playernameprivate().empty())
+	{
+		// field_playernameprivate
+		uint16 Handle = 26;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			FString Value = *(reinterpret_cast<FString const*>(PropertyData));
+
+			Value = FString(UTF8_TO_TCHAR((*Update.field_playernameprivate().data()).c_str()));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 

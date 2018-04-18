@@ -15,8 +15,8 @@ component UnrealPlayerControllerMultiClientRepData {
 	bool field_bhidden = 1; // COND_None
 	bool field_breplicatemovement = 2; // COND_None
 	bool field_btearoff = 3; // COND_None
-	uint32 field_remoterole = 4; // COND_None
-	UnrealObjectRef field_owner = 5; // COND_None
+	bool field_bcanbedamaged = 4; // COND_None
+	uint32 field_remoterole = 5; // COND_None
 	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics
 	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom
 	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom
@@ -24,11 +24,11 @@ component UnrealPlayerControllerMultiClientRepData {
 	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom
 	string field_attachmentreplication_attachsocket = 11; // COND_Custom
 	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom
-	uint32 field_role = 13; // COND_None
-	bool field_bcanbedamaged = 14; // COND_None
+	UnrealObjectRef field_owner = 13; // COND_None
+	uint32 field_role = 14; // COND_None
 	UnrealObjectRef field_instigator = 15; // COND_None
-	UnrealObjectRef field_pawn = 16; // COND_None
-	UnrealObjectRef field_playerstate = 17; // COND_None
+	UnrealObjectRef field_playerstate = 16; // COND_None
+	UnrealObjectRef field_pawn = 17; // COND_None
 }
 component UnrealPlayerControllerMigratableData {
 	id = 100012;
@@ -44,6 +44,10 @@ type UnrealClientWasKickedRequest {
 }
 type UnrealClientVoiceHandshakeCompleteRequest {
 	uint32 target_subobject_offset = 1;
+}
+type UnrealClientUpdateMultipleLevelsStreamingStatusRequest {
+	uint32 target_subobject_offset = 1;
+	list<bytes> field_levelstatuses = 2;
 }
 type UnrealClientUpdateLevelStreamingStatusRequest {
 	uint32 target_subobject_offset = 1;
@@ -143,6 +147,10 @@ type UnrealClientSetCameraFadeRequest {
 type UnrealClientSetBlockOnAsyncLoadingRequest {
 	uint32 target_subobject_offset = 1;
 }
+type UnrealClientReturnToMainMenuWithTextReasonRequest {
+	uint32 target_subobject_offset = 1;
+	bytes field_returnreason = 2;
+}
 type UnrealClientReturnToMainMenuRequest {
 	uint32 target_subobject_offset = 1;
 	string field_returnreason = 2;
@@ -166,8 +174,8 @@ type UnrealClientReceiveLocalizedMessageRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_message = 2;
 	int32 field_switch = 3;
-	UnrealObjectRef field_relatedplayerstate_1 = 4;
-	UnrealObjectRef field_relatedplayerstate_2 = 5;
+	UnrealObjectRef field_relatedplayerstate1 = 4;
+	UnrealObjectRef field_relatedplayerstate2 = 5;
 	UnrealObjectRef field_optionalobject = 6;
 }
 type UnrealClientPrestreamTexturesRequest {
@@ -200,7 +208,8 @@ type UnrealClientPlayForceFeedbackRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcefeedbackeffect = 2;
 	bool field_blooping = 3;
-	string field_tag = 4;
+	bool field_bignoretimedilation = 4;
+	string field_tag = 5;
 }
 type UnrealClientPlayCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
@@ -306,6 +315,10 @@ type UnrealServerViewNextPlayerRequest {
 type UnrealServerVerifyViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 }
+type UnrealServerUpdateMultipleLevelsVisibilityRequest {
+	uint32 target_subobject_offset = 1;
+	list<bytes> field_levelvisibilities = 2;
+}
 type UnrealServerUpdateLevelVisibilityRequest {
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
@@ -373,6 +386,7 @@ component UnrealPlayerControllerClientRPCs {
 	command UnrealRPCCommandResponse onserverstartedvisuallogger(UnrealOnServerStartedVisualLoggerRequest);
 	command UnrealRPCCommandResponse clientwaskicked(UnrealClientWasKickedRequest);
 	command UnrealRPCCommandResponse clientvoicehandshakecomplete(UnrealClientVoiceHandshakeCompleteRequest);
+	command UnrealRPCCommandResponse clientupdatemultiplelevelsstreamingstatus(UnrealClientUpdateMultipleLevelsStreamingStatusRequest);
 	command UnrealRPCCommandResponse clientupdatelevelstreamingstatus(UnrealClientUpdateLevelStreamingStatusRequest);
 	command UnrealRPCCommandResponse clientunmuteplayer(UnrealClientUnmutePlayerRequest);
 	command UnrealRPCCommandResponse clienttravelinternal(UnrealClientTravelInternalRequest);
@@ -390,6 +404,7 @@ component UnrealPlayerControllerClientRPCs {
 	command UnrealRPCCommandResponse clientsetcameramode(UnrealClientSetCameraModeRequest);
 	command UnrealRPCCommandResponse clientsetcamerafade(UnrealClientSetCameraFadeRequest);
 	command UnrealRPCCommandResponse clientsetblockonasyncloading(UnrealClientSetBlockOnAsyncLoadingRequest);
+	command UnrealRPCCommandResponse clientreturntomainmenuwithtextreason(UnrealClientReturnToMainMenuWithTextReasonRequest);
 	command UnrealRPCCommandResponse clientreturntomainmenu(UnrealClientReturnToMainMenuRequest);
 	command UnrealRPCCommandResponse clientretryclientrestart(UnrealClientRetryClientRestartRequest);
 	command UnrealRPCCommandResponse clientrestart(UnrealClientRestartRequest);
@@ -427,6 +442,7 @@ component UnrealPlayerControllerServerRPCs {
 	command UnrealRPCCommandResponse serverviewprevplayer(UnrealServerViewPrevPlayerRequest);
 	command UnrealRPCCommandResponse serverviewnextplayer(UnrealServerViewNextPlayerRequest);
 	command UnrealRPCCommandResponse serververifyviewtarget(UnrealServerVerifyViewTargetRequest);
+	command UnrealRPCCommandResponse serverupdatemultiplelevelsvisibility(UnrealServerUpdateMultipleLevelsVisibilityRequest);
 	command UnrealRPCCommandResponse serverupdatelevelvisibility(UnrealServerUpdateLevelVisibilityRequest);
 	command UnrealRPCCommandResponse serverupdatecamera(UnrealServerUpdateCameraRequest);
 	command UnrealRPCCommandResponse serverunmuteplayer(UnrealServerUnmutePlayerRequest);
