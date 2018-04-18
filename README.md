@@ -12,7 +12,7 @@ Use the Unreal SpatialGDK sample game to explore how Unreal projects integrate w
 To use the Unreal SpatialGDK, you need:
 
 ### Software
-* The SpatialOS Unreal engine `UnrealEngine417_NUF` version.
+* The SpatialOS Unreal engine `UnrealEngine419_SpatialGDK` version.
 * The Unreal SpatialGDK module and Unreal Editor plugin.
 See *How to set up and run the project* below for details of these.
 
@@ -26,9 +26,9 @@ See *How to set up and run the project* below for details of these.
 
 ## How to set up and run the project
 Once you have downloaded the sample game in this repository, follow these instructions:
-1. Download and set up the SpatialOS Unreal engine from [https://github.com/improbable/UnrealEngine/tree/UnrealEngine417_NUF](https://github.com/improbable/UnrealEngine/tree/UnrealEngine417_NUF). 
-	* Make sure that you download the `UnrealEngine417_NUF` branch to get the correct version.
-	* Look at the [readme](https://github.com/improbable/UnrealEngine/blob/UnrealEngine417_NUF/README.md) file for guidance on setting up the SpatialOS Unreal engine and follow steps 1 to 4 in the `UnrealEngine417_NUF` readme.
+1. Download and set up the SpatialOS Unreal engine from [https://github.com/improbable/UnrealEngine/tree/UnrealEngine419_SpatialGDK](https://github.com/improbable/UnrealEngine/tree/UnrealEngine419_SpatialGDK). 
+	* Make sure that you download the `UnrealEngine419_SpatialGDK` branch to get the correct version.
+	* Look at the [readme](https://github.com/improbable/UnrealEngine/blob/UnrealEngine419_SpatialGDK/README.md) file for guidance on setting up the SpatialOS Unreal engine and follow steps 1 to 4 in the `UnrealEngine419_SpatialGDK` readme.
 2. Download the Unreal SpatialGDK module and Unreal Editor plugin from [https://github.com/improbable/unreal-gdk](https://github.com/improbable/unreal-gdk).
 3. Create `UNREAL_HOME` environment variable and set to the location of the SpatialOS Unreal engine you have just downloaded.
 4. Initialise the project: from the root directory of your project, run `spatial worker codegen`.
