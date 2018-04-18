@@ -54,6 +54,7 @@ component UnrealPlayerControllerMigratableData {
 	id = 100012;
 	UnrealObjectRef field_acknowledgedpawn = 1;
 }
+import "improbable/unreal/generated/UnrealController.schema";
 type UnrealOnServerStartedVisualLoggerRequest { // PlayerController :: /Script/Engine // PlayerController
 	uint32 target_subobject_offset = 1;
 	bool field_bislogging = 2;
@@ -316,16 +317,6 @@ type UnrealClientAddTextureStreamingLocRequest { // PlayerController :: /Script/
 	improbable.Vector3f field_inloc = 2;
 	float field_duration = 3;
 	bool field_boverridelocation = 4;
-}
-type UnrealClientSetRotationRequest { // PlayerController :: /Script/Engine // Controller
-	uint32 target_subobject_offset = 1;
-	UnrealFRotator field_newrotation = 2;
-	bool field_bresetcamera = 3;
-}
-type UnrealClientSetLocationRequest { // PlayerController :: /Script/Engine // Controller
-	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_newlocation = 2;
-	UnrealFRotator field_newrotation = 3;
 }
 type UnrealServerViewSelfRequest { // PlayerController :: /Script/Engine // PlayerController
 	uint32 target_subobject_offset = 1;

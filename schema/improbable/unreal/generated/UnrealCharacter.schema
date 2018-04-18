@@ -4,8 +4,8 @@ package improbable.unreal;
 
 import "improbable/vector3.schema";
 import "improbable/unreal/core_types.schema";
-import "improbable/unreal/generated/UnrealCharacterMovementComponent.schema";
 
+<<<<<<< HEAD
 component UnrealCharacterSingleClientRepData {
 	id = 100020;
 }
@@ -254,14 +254,22 @@ type UnrealServerMoveRequest {
 }
 =======
 type UnrealClientCheatWalkRequest { // Character :: /Script/Engine // Character
+=======
+type UnrealRootMotionDebugClientPrintOnScreenRequest { // SampleGameCharacter :: /Script/SampleGame // Character
+	uint32 target_subobject_offset = 1;
+	string field_instring = 2;
+}
+type UnrealClientCheatWalkRequest { // SampleGameCharacter :: /Script/SampleGame // Character
+>>>>>>> Working SampleGameChatacter schema and type bindings
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientCheatGhostRequest { // Character :: /Script/Engine // Character
+type UnrealClientCheatGhostRequest { // SampleGameCharacter :: /Script/SampleGame // Character
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientCheatFlyRequest { // Character :: /Script/Engine // Character
+type UnrealClientCheatFlyRequest { // SampleGameCharacter :: /Script/SampleGame // Character
 	uint32 target_subobject_offset = 1;
 }
+<<<<<<< HEAD
 >>>>>>> All steps working!
 
 component UnrealCharacterClientRPCs {
@@ -285,3 +293,5 @@ component UnrealCharacterServerRPCs {
 	command UnrealRPCCommandResponse servermovedual(UnrealServerMoveDualRequest);
 	command UnrealRPCCommandResponse servermove(UnrealServerMoveRequest);
 }
+=======
+>>>>>>> Working SampleGameChatacter schema and type bindings
