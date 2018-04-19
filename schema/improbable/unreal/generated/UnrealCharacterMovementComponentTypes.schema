@@ -5,7 +5,7 @@ package improbable.unreal;
 import "improbable/vector3.schema";
 import "improbable/unreal/core_types.schema";
 
-type UnrealClientVeryShortAdjustPositionRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealClientVeryShortAdjustPositionRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 	improbable.Vector3f field_newloc = 3;
@@ -15,7 +15,7 @@ type UnrealClientVeryShortAdjustPositionRequest { // CharacterMovementComponent 
 	bool field_bbaserelativeposition = 7;
 	uint32 field_servermovementmode = 8;
 }
-type UnrealClientAdjustRootMotionSourcePositionRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealClientAdjustRootMotionSourcePositionRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 	bool field_serverrootmotion_bhasadditivesources = 3;
@@ -34,7 +34,7 @@ type UnrealClientAdjustRootMotionSourcePositionRequest { // CharacterMovementCom
 	bool field_bbaserelativeposition = 16;
 	uint32 field_servermovementmode = 17;
 }
-type UnrealClientAdjustRootMotionPositionRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealClientAdjustRootMotionPositionRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 	float field_servermontagetrackposition = 3;
@@ -47,7 +47,7 @@ type UnrealClientAdjustRootMotionPositionRequest { // CharacterMovementComponent
 	bool field_bbaserelativeposition = 10;
 	uint32 field_servermovementmode = 11;
 }
-type UnrealClientAdjustPositionRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealClientAdjustPositionRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 	improbable.Vector3f field_newloc = 3;
@@ -58,17 +58,17 @@ type UnrealClientAdjustPositionRequest { // CharacterMovementComponent :: /Scrip
 	bool field_bbaserelativeposition = 8;
 	uint32 field_servermovementmode = 9;
 }
-type UnrealClientAckGoodMoveRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealClientAckGoodMoveRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 }
-type UnrealServerMoveOldRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealServerMoveOldRequest {
 	uint32 target_subobject_offset = 1;
 	float field_oldtimestamp = 2;
 	improbable.Vector3f field_oldaccel = 3;
 	uint32 field_oldmoveflags = 4;
 }
-type UnrealServerMoveDualHybridRootMotionRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealServerMoveDualHybridRootMotionRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp0 = 2;
 	improbable.Vector3f field_inaccel0 = 3;
@@ -84,7 +84,7 @@ type UnrealServerMoveDualHybridRootMotionRequest { // CharacterMovementComponent
 	string field_clientbasebonename = 13;
 	uint32 field_clientmovementmode = 14;
 }
-type UnrealServerMoveDualRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealServerMoveDualRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp0 = 2;
 	improbable.Vector3f field_inaccel0 = 3;
@@ -100,7 +100,7 @@ type UnrealServerMoveDualRequest { // CharacterMovementComponent :: /Script/Engi
 	string field_clientbasebonename = 13;
 	uint32 field_clientmovementmode = 14;
 }
-type UnrealServerMoveRequest { // CharacterMovementComponent :: /Script/Engine // CharacterMovementComponent
+type UnrealServerMoveRequest {
 	uint32 target_subobject_offset = 1;
 	float field_timestamp = 2;
 	improbable.Vector3f field_inaccel = 3;

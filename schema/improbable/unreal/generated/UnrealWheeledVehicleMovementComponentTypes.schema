@@ -5,7 +5,7 @@ package improbable.unreal;
 import "improbable/vector3.schema";
 import "improbable/unreal/core_types.schema";
 
-type UnrealServerUpdateStateRequest { // WheeledVehicleMovementComponent :: /Script/PhysXVehicles // WheeledVehicleMovementComponent
+type UnrealServerUpdateStateRequest {
 	uint32 target_subobject_offset = 1;
 	float field_insteeringinput = 2;
 	float field_inthrottleinput = 3;

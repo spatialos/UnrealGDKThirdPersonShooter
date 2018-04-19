@@ -5,12 +5,12 @@ package improbable.unreal;
 import "improbable/vector3.schema";
 import "improbable/unreal/core_types.schema";
 
-type UnrealClientSetRotationRequest { // PlayerController :: /Script/Engine // Controller
+type UnrealClientSetRotationRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealFRotator field_newrotation = 2;
 	bool field_bresetcamera = 3;
 }
-type UnrealClientSetLocationRequest { // PlayerController :: /Script/Engine // Controller
+type UnrealClientSetLocationRequest {
 	uint32 target_subobject_offset = 1;
 	improbable.Vector3f field_newlocation = 2;
 	UnrealFRotator field_newrotation = 3;

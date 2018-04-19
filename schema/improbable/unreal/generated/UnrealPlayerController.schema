@@ -54,18 +54,20 @@ component UnrealPlayerControllerMigratableData {
 	id = 100012;
 	UnrealObjectRef field_acknowledgedpawn = 1;
 }
-import "improbable/unreal/generated/UnrealController.schema";
-type UnrealOnServerStartedVisualLoggerRequest { // PlayerController :: /Script/Engine // PlayerController
+import "improbable/unreal/generated/UnrealPlayerControllerTypes.schema";
+import "improbable/unreal/generated/UnrealControllerTypes.schema";
+type UnrealOnServerStartedVisualLoggerRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bislogging = 2;
 }
-type UnrealClientWasKickedRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientWasKickedRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_kickreason = 2;
 }
-type UnrealClientVoiceHandshakeCompleteRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientVoiceHandshakeCompleteRequest {
 	uint32 target_subobject_offset = 1;
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 type UnrealClientUpdateMultipleLevelsStreamingStatusRequest {
 	uint32 target_subobject_offset = 1;
@@ -75,6 +77,9 @@ type UnrealClientUpdateLevelStreamingStatusRequest {
 =======
 type UnrealClientUpdateLevelStreamingStatusRequest { // PlayerController :: /Script/Engine // PlayerController
 >>>>>>> All steps working!
+=======
+type UnrealClientUpdateLevelStreamingStatusRequest {
+>>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bnewshouldbeloaded = 3;
@@ -82,11 +87,11 @@ type UnrealClientUpdateLevelStreamingStatusRequest { // PlayerController :: /Scr
 	bool field_bnewshouldblockonload = 5;
 	int32 field_lodindex = 6;
 }
-type UnrealClientUnmutePlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientUnmutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealClientTravelInternalRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientTravelInternalRequest {
 	uint32 target_subobject_offset = 1;
 	string field_url = 2;
 	uint32 field_traveltype = 3;
@@ -96,35 +101,35 @@ type UnrealClientTravelInternalRequest { // PlayerController :: /Script/Engine /
 	int32 field_mappackageguid_c = 7;
 	int32 field_mappackageguid_d = 8;
 }
-type UnrealClientTeamMessageRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientTeamMessageRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_senderplayerstate = 2;
 	string field_s = 3;
 	string field_type = 4;
 	float field_msglifetime = 5;
 }
-type UnrealClientStopForceFeedbackRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientStopForceFeedbackRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcefeedbackeffect = 2;
 	string field_tag = 3;
 }
-type UnrealClientStopCameraShakeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientStopCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_shake = 2;
 	bool field_bimmediately = 3;
 }
-type UnrealClientStopCameraAnimRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientStopCameraAnimRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_animtostop = 2;
 }
-type UnrealClientStartOnlineSessionRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientStartOnlineSessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientSpawnCameraLensEffectRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSpawnCameraLensEffectRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_lenseffectemitterclass = 2;
 }
-type UnrealClientSetViewTargetRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_a = 2;
 	float field_transitionparams_blendtime = 3;
@@ -132,32 +137,32 @@ type UnrealClientSetViewTargetRequest { // PlayerController :: /Script/Engine //
 	float field_transitionparams_blendexp = 5;
 	bool field_transitionparams_blockoutgoing = 6;
 }
-type UnrealClientSetSpectatorWaitingRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetSpectatorWaitingRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bwaiting = 2;
 }
-type UnrealClientSetHUDRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetHUDRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_newhudclass = 2;
 }
-type UnrealClientSetForceMipLevelsToBeResidentRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetForceMipLevelsToBeResidentRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_material = 2;
 	float field_forceduration = 3;
 	int32 field_cinematictexturegroups = 4;
 }
-type UnrealClientSetCinematicModeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetCinematicModeRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bincinematicmode = 2;
 	bool field_baffectsmovement = 3;
 	bool field_baffectsturning = 4;
 	bool field_baffectshud = 5;
 }
-type UnrealClientSetCameraModeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetCameraModeRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newcammode = 2;
 }
-type UnrealClientSetCameraFadeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetCameraFadeRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_benablefading = 2;
 	uint32 field_fadecolor_b = 3;
@@ -169,9 +174,10 @@ type UnrealClientSetCameraFadeRequest { // PlayerController :: /Script/Engine //
 	float field_fadetime = 9;
 	bool field_bfadeaudio = 10;
 }
-type UnrealClientSetBlockOnAsyncLoadingRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientSetBlockOnAsyncLoadingRequest {
 	uint32 target_subobject_offset = 1;
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 type UnrealClientReturnToMainMenuWithTextReasonRequest {
 	uint32 target_subobject_offset = 1;
@@ -181,25 +187,28 @@ type UnrealClientReturnToMainMenuRequest {
 =======
 type UnrealClientReturnToMainMenuRequest { // PlayerController :: /Script/Engine // PlayerController
 >>>>>>> All steps working!
+=======
+type UnrealClientReturnToMainMenuRequest {
+>>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_returnreason = 2;
 }
-type UnrealClientRetryClientRestartRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientRetryClientRestartRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_newpawn = 2;
 }
-type UnrealClientRestartRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientRestartRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_newpawn = 2;
 }
-type UnrealClientResetRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientResetRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientRepObjRefRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientRepObjRefRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_object = 2;
 }
-type UnrealClientReceiveLocalizedMessageRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientReceiveLocalizedMessageRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_message = 2;
 	int32 field_switch = 3;
@@ -207,47 +216,47 @@ type UnrealClientReceiveLocalizedMessageRequest { // PlayerController :: /Script
 	UnrealObjectRef field_relatedplayerstate2 = 5;
 	UnrealObjectRef field_optionalobject = 6;
 }
-type UnrealClientPrestreamTexturesRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPrestreamTexturesRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcedactor = 2;
 	float field_forceduration = 3;
 	bool field_benablestreaming = 4;
 	int32 field_cinematictexturegroups = 5;
 }
-type UnrealClientPrepareMapChangeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPrepareMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 	string field_levelname = 2;
 	bool field_bfirst = 3;
 	bool field_blast = 4;
 }
-type UnrealClientPlaySoundAtLocationRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPlaySoundAtLocationRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_sound = 2;
 	improbable.Vector3f field_location = 3;
 	float field_volumemultiplier = 4;
 	float field_pitchmultiplier = 5;
 }
-type UnrealClientPlaySoundRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPlaySoundRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_sound = 2;
 	float field_volumemultiplier = 3;
 	float field_pitchmultiplier = 4;
 }
-type UnrealClientPlayForceFeedbackRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPlayForceFeedbackRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcefeedbackeffect = 2;
 	bool field_blooping = 3;
 	bool field_bignoretimedilation = 4;
 	string field_tag = 5;
 }
-type UnrealClientPlayCameraShakeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPlayCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_shake = 2;
 	float field_scale = 3;
 	uint32 field_playspace = 4;
 	UnrealFRotator field_userplayspacerot = 5;
 }
-type UnrealClientPlayCameraAnimRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientPlayCameraAnimRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_animtoplay = 2;
 	float field_scale = 3;
@@ -259,81 +268,82 @@ type UnrealClientPlayCameraAnimRequest { // PlayerController :: /Script/Engine /
 	uint32 field_space = 9;
 	UnrealFRotator field_customplayspace = 10;
 }
-type UnrealClientMutePlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientMutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealClientMessageRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientMessageRequest {
 	uint32 target_subobject_offset = 1;
 	string field_s = 2;
 	string field_type = 3;
 	float field_msglifetime = 4;
 }
-type UnrealClientIgnoreMoveInputRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientIgnoreMoveInputRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bignore = 2;
 }
-type UnrealClientIgnoreLookInputRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientIgnoreLookInputRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bignore = 2;
 }
-type UnrealClientGotoStateRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientGotoStateRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newstate = 2;
 }
-type UnrealClientGameEndedRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientGameEndedRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_endgamefocus = 2;
 	bool field_biswinner = 3;
 }
-type UnrealClientForceGarbageCollectionRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientForceGarbageCollectionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientFlushLevelStreamingRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientFlushLevelStreamingRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientEndOnlineSessionRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientEndOnlineSessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientEnableNetworkVoiceRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientEnableNetworkVoiceRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_benable = 2;
 }
-type UnrealClientCommitMapChangeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientCommitMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientClearCameraLensEffectsRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientClearCameraLensEffectsRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientCapBandwidthRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientCapBandwidthRequest {
 	uint32 target_subobject_offset = 1;
 	int32 field_cap = 2;
 }
-type UnrealClientCancelPendingMapChangeRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientCancelPendingMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientAddTextureStreamingLocRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealClientAddTextureStreamingLocRequest {
 	uint32 target_subobject_offset = 1;
 	improbable.Vector3f field_inloc = 2;
 	float field_duration = 3;
 	bool field_boverridelocation = 4;
 }
-type UnrealServerViewSelfRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerViewSelfRequest {
 	uint32 target_subobject_offset = 1;
 	float field_transitionparams_blendtime = 2;
 	uint32 field_transitionparams_blendfunction = 3;
 	float field_transitionparams_blendexp = 4;
 	bool field_transitionparams_blockoutgoing = 5;
 }
-type UnrealServerViewPrevPlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerViewPrevPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerViewNextPlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerViewNextPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerVerifyViewTargetRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerVerifyViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 }
+<<<<<<< HEAD
 <<<<<<< HEAD
 type UnrealServerUpdateMultipleLevelsVisibilityRequest {
 	uint32 target_subobject_offset = 1;
@@ -343,63 +353,66 @@ type UnrealServerUpdateLevelVisibilityRequest {
 =======
 type UnrealServerUpdateLevelVisibilityRequest { // PlayerController :: /Script/Engine // PlayerController
 >>>>>>> All steps working!
+=======
+type UnrealServerUpdateLevelVisibilityRequest {
+>>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bisvisible = 3;
 }
-type UnrealServerUpdateCameraRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerUpdateCameraRequest {
 	uint32 target_subobject_offset = 1;
 	improbable.Vector3f field_camloc = 2;
 	int32 field_campitchandyaw = 3;
 }
-type UnrealServerUnmutePlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerUnmutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealServerToggleAILoggingRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerToggleAILoggingRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerShortTimeoutRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerShortTimeoutRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerSetSpectatorWaitingRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerSetSpectatorWaitingRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bwaiting = 2;
 }
-type UnrealServerSetSpectatorLocationRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerSetSpectatorLocationRequest {
 	uint32 target_subobject_offset = 1;
 	improbable.Vector3f field_newloc = 2;
 	UnrealFRotator field_newrot = 3;
 }
-type UnrealServerRestartPlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerRestartPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerPauseRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerPauseRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerNotifyLoadedWorldRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerNotifyLoadedWorldRequest {
 	uint32 target_subobject_offset = 1;
 	string field_worldpackagename = 2;
 }
-type UnrealServerMutePlayerRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerMutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealServerCheckClientPossessionReliableRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerCheckClientPossessionReliableRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerCheckClientPossessionRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerCheckClientPossessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerChangeNameRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerChangeNameRequest {
 	uint32 target_subobject_offset = 1;
 	string field_s = 2;
 }
-type UnrealServerCameraRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerCameraRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newmode = 2;
 }
-type UnrealServerAcknowledgePossessionRequest { // PlayerController :: /Script/Engine // PlayerController
+type UnrealServerAcknowledgePossessionRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_p = 2;
 }
