@@ -9,11 +9,12 @@ component UnrealWheeledVehicleSingleClientRepData {
 	id = 100025;
 }
 component UnrealWheeledVehicleMultiClientRepData {
+	id = 100026;
 	bool field_bhidden = 1; // COND_None //  Actor
 	bool field_breplicatemovement = 2; // COND_None //  Actor
 	bool field_btearoff = 3; // COND_None //  Actor
-	uint32 field_remoterole = 4; // COND_None //  Actor
-	UnrealObjectRef field_owner = 5; // COND_None //  Actor
+	bool field_bcanbedamaged = 4; // COND_None //  Actor
+	uint32 field_remoterole = 5; // COND_None //  Actor
 	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics //  RepMovement :: Actor
 	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
 	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom //  Vector_NetQuantize100 :: RepAttachment :: Actor
@@ -21,8 +22,8 @@ component UnrealWheeledVehicleMultiClientRepData {
 	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom //  Rotator :: RepAttachment :: Actor
 	string field_attachmentreplication_attachsocket = 11; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
 	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
-	uint32 field_role = 13; // COND_None //  Actor
-	bool field_bcanbedamaged = 14; // COND_None //  Actor
+	UnrealObjectRef field_owner = 13; // COND_None //  Actor
+	uint32 field_role = 14; // COND_None //  Actor
 	UnrealObjectRef field_instigator = 15; // COND_None //  Actor
 	UnrealObjectRef field_playerstate = 16; // COND_None //  Pawn
 	uint32 field_remoteviewpitch = 17; // COND_SkipOwner //  Pawn

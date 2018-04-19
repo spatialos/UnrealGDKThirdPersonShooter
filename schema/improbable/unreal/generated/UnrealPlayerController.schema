@@ -12,30 +12,11 @@ component UnrealPlayerControllerSingleClientRepData {
 }
 component UnrealPlayerControllerMultiClientRepData {
 	id = 100011;
-<<<<<<< HEAD
-	bool field_bhidden = 1; // COND_None
-	bool field_breplicatemovement = 2; // COND_None
-	bool field_btearoff = 3; // COND_None
-	bool field_bcanbedamaged = 4; // COND_None
-	uint32 field_remoterole = 5; // COND_None
-	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics
-	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom
-	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom
-	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom
-	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom
-	string field_attachmentreplication_attachsocket = 11; // COND_Custom
-	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom
-	UnrealObjectRef field_owner = 13; // COND_None
-	uint32 field_role = 14; // COND_None
-	UnrealObjectRef field_instigator = 15; // COND_None
-	UnrealObjectRef field_playerstate = 16; // COND_None
-	UnrealObjectRef field_pawn = 17; // COND_None
-=======
 	bool field_bhidden = 1; // COND_None //  Actor
 	bool field_breplicatemovement = 2; // COND_None //  Actor
 	bool field_btearoff = 3; // COND_None //  Actor
-	uint32 field_remoterole = 4; // COND_None //  Actor
-	UnrealObjectRef field_owner = 5; // COND_None //  Actor
+	bool field_bcanbedamaged = 4; // COND_None //  Actor
+	uint32 field_remoterole = 5; // COND_None //  Actor
 	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics //  RepMovement :: Actor
 	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
 	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom //  Vector_NetQuantize100 :: RepAttachment :: Actor
@@ -43,12 +24,11 @@ component UnrealPlayerControllerMultiClientRepData {
 	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom //  Rotator :: RepAttachment :: Actor
 	string field_attachmentreplication_attachsocket = 11; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
 	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
-	uint32 field_role = 13; // COND_None //  Actor
-	bool field_bcanbedamaged = 14; // COND_None //  Actor
+	UnrealObjectRef field_owner = 13; // COND_None //  Actor
+	uint32 field_role = 14; // COND_None //  Actor
 	UnrealObjectRef field_instigator = 15; // COND_None //  Actor
-	UnrealObjectRef field_pawn = 16; // COND_None //  Controller
-	UnrealObjectRef field_playerstate = 17; // COND_None //  Controller
->>>>>>> All steps working!
+	UnrealObjectRef field_playerstate = 16; // COND_None //  Controller
+	UnrealObjectRef field_pawn = 17; // COND_None //  Controller
 }
 component UnrealPlayerControllerMigratableData {
 	id = 100012;
@@ -67,19 +47,11 @@ type UnrealClientWasKickedRequest {
 type UnrealClientVoiceHandshakeCompleteRequest {
 	uint32 target_subobject_offset = 1;
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 type UnrealClientUpdateMultipleLevelsStreamingStatusRequest {
 	uint32 target_subobject_offset = 1;
 	list<bytes> field_levelstatuses = 2;
 }
 type UnrealClientUpdateLevelStreamingStatusRequest {
-=======
-type UnrealClientUpdateLevelStreamingStatusRequest { // PlayerController :: /Script/Engine // PlayerController
->>>>>>> All steps working!
-=======
-type UnrealClientUpdateLevelStreamingStatusRequest {
->>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bnewshouldbeloaded = 3;
@@ -177,19 +149,11 @@ type UnrealClientSetCameraFadeRequest {
 type UnrealClientSetBlockOnAsyncLoadingRequest {
 	uint32 target_subobject_offset = 1;
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 type UnrealClientReturnToMainMenuWithTextReasonRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_returnreason = 2;
 }
 type UnrealClientReturnToMainMenuRequest {
-=======
-type UnrealClientReturnToMainMenuRequest { // PlayerController :: /Script/Engine // PlayerController
->>>>>>> All steps working!
-=======
-type UnrealClientReturnToMainMenuRequest {
->>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_returnreason = 2;
 }
@@ -343,19 +307,11 @@ type UnrealServerViewNextPlayerRequest {
 type UnrealServerVerifyViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 }
-<<<<<<< HEAD
-<<<<<<< HEAD
 type UnrealServerUpdateMultipleLevelsVisibilityRequest {
 	uint32 target_subobject_offset = 1;
 	list<bytes> field_levelvisibilities = 2;
 }
 type UnrealServerUpdateLevelVisibilityRequest {
-=======
-type UnrealServerUpdateLevelVisibilityRequest { // PlayerController :: /Script/Engine // PlayerController
->>>>>>> All steps working!
-=======
-type UnrealServerUpdateLevelVisibilityRequest {
->>>>>>> New schema and type bindings generated with the SchemaType file system.
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bisvisible = 3;
