@@ -85,7 +85,7 @@ type UnrealClientStopForceFeedbackRequest {
 }
 type UnrealClientStopCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
-	UnrealObjectRef field_shake = 2;
+	uint32 field_shake = 2;
 	bool field_bimmediately = 3;
 }
 type UnrealClientStopCameraAnimRequest {
@@ -97,7 +97,7 @@ type UnrealClientStartOnlineSessionRequest {
 }
 type UnrealClientSpawnCameraLensEffectRequest {
 	uint32 target_subobject_offset = 1;
-	UnrealObjectRef field_lenseffectemitterclass = 2;
+	uint32 field_lenseffectemitterclass = 2;
 }
 type UnrealClientSetViewTargetRequest {
 	uint32 target_subobject_offset = 1;
@@ -113,7 +113,7 @@ type UnrealClientSetSpectatorWaitingRequest {
 }
 type UnrealClientSetHUDRequest {
 	uint32 target_subobject_offset = 1;
-	UnrealObjectRef field_newhudclass = 2;
+	uint32 field_newhudclass = 2;
 }
 type UnrealClientSetForceMipLevelsToBeResidentRequest {
 	uint32 target_subobject_offset = 1;
@@ -172,7 +172,7 @@ type UnrealClientRepObjRefRequest {
 }
 type UnrealClientReceiveLocalizedMessageRequest {
 	uint32 target_subobject_offset = 1;
-	UnrealObjectRef field_message = 2;
+	uint32 field_message = 2;
 	int32 field_switch = 3;
 	UnrealObjectRef field_relatedplayerstate1 = 4;
 	UnrealObjectRef field_relatedplayerstate2 = 5;
@@ -213,7 +213,7 @@ type UnrealClientPlayForceFeedbackRequest {
 }
 type UnrealClientPlayCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
-	UnrealObjectRef field_shake = 2;
+	uint32 field_shake = 2;
 	float field_scale = 3;
 	uint32 field_playspace = 4;
 	UnrealFRotator field_userplayspacerot = 5;

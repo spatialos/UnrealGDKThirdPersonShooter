@@ -1950,7 +1950,7 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientStopCameraShakeRequest Request;
-		// UNSUPPORTED UClassProperty Request.set_field_shake(Shake);
+		Request.set_field_shake(PackageMap->GetHashFromStaticClass(Shake));
 		Request.set_field_bimmediately(bImmediately);
 
 		// Send command request.
@@ -2057,7 +2057,7 @@ void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealClientSpawnCameraLensEffectRequest Request;
-		// UNSUPPORTED UClassProperty Request.set_field_lenseffectemitterclass(LensEffectEmitterClass);
+		Request.set_field_lenseffectemitterclass(PackageMap->GetHashFromStaticClass(LensEffectEmitterClass));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2172,7 +2172,7 @@ void USpatialTypeBinding_PlayerController::ClientSetHUD_SendCommand(worker::Conn
 
 		// Build request.
 		improbable::unreal::UnrealClientSetHUDRequest Request;
-		// UNSUPPORTED UClassProperty Request.set_field_newhudclass(NewHUDClass);
+		Request.set_field_newhudclass(PackageMap->GetHashFromStaticClass(NewHUDClass));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2630,7 +2630,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 
 		// Build request.
 		improbable::unreal::UnrealClientReceiveLocalizedMessageRequest Request;
-		// UNSUPPORTED UClassProperty Request.set_field_message(Message);
+		Request.set_field_message(PackageMap->GetHashFromStaticClass(Message));
 		Request.set_field_switch(Switch);
 		if (RelatedPlayerState_1 != nullptr)
 		{
@@ -2968,7 +2968,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientPlayCameraShakeRequest Request;
-		// UNSUPPORTED UClassProperty Request.set_field_shake(Shake);
+		Request.set_field_shake(PackageMap->GetHashFromStaticClass(Shake));
 		Request.set_field_scale(Scale);
 		Request.set_field_playspace(uint32_t(PlaySpace));
 		Request.set_field_userplayspacerot(improbable::unreal::UnrealFRotator(UserPlaySpaceRot.Yaw, UserPlaySpaceRot.Pitch, UserPlaySpaceRot.Roll));
@@ -4762,7 +4762,7 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraShake_OnCommandReques
 		bool bImmediately;
 
 		// Extract from request data.
-		// UNSUPPORTED UClassProperty Shake Op.Request.field_shake()
+		Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
 		bImmediately = Op.Request.field_bimmediately();
 
 		// Call implementation.
@@ -4920,7 +4920,7 @@ void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_OnCommand
 		TSubclassOf<AEmitterCameraLensEffectBase>  LensEffectEmitterClass;
 
 		// Extract from request data.
-		// UNSUPPORTED UClassProperty LensEffectEmitterClass Op.Request.field_lenseffectemitterclass()
+		LensEffectEmitterClass = PackageMap->GetStaticClassFromHash(Op.Request.field_lenseffectemitterclass());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSpawnCameraLensEffect, target: %s %s"),
@@ -5088,7 +5088,7 @@ void USpatialTypeBinding_PlayerController::ClientSetHUD_OnCommandRequest(const w
 		TSubclassOf<AHUD>  NewHUDClass;
 
 		// Extract from request data.
-		// UNSUPPORTED UClassProperty NewHUDClass Op.Request.field_newhudclass()
+		NewHUDClass = PackageMap->GetStaticClassFromHash(Op.Request.field_newhudclass());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetHUD, target: %s %s"),
@@ -5754,7 +5754,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 		UObject* OptionalObject;
 
 		// Extract from request data.
-		// UNSUPPORTED UClassProperty Message Op.Request.field_message()
+		Message = PackageMap->GetStaticClassFromHash(Op.Request.field_message());
 		Switch = Op.Request.field_switch();
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_relatedplayerstate1();
@@ -6243,7 +6243,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnCommandReques
 		FRotator UserPlaySpaceRot;
 
 		// Extract from request data.
-		// UNSUPPORTED UClassProperty Shake Op.Request.field_shake()
+		Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
 		Scale = Op.Request.field_scale();
 		PlaySpace = TEnumAsByte<ECameraAnimPlaySpace::Type>(uint8(Op.Request.field_playspace()));
 		{
