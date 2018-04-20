@@ -7,28 +7,28 @@ import "improbable/unreal/core_types.schema";
 
 component UnrealPlayerControllerSingleClientRepData {
 	id = 100010;
-	UnrealFRotator field_targetviewrotation = 1; // COND_OwnerOnly //  Rotator :: PlayerController
-	improbable.Vector3f field_spawnlocation = 2; // COND_OwnerOnly //  Vector :: PlayerController
+	UnrealFRotator field_targetviewrotation = 1; // COND_OwnerOnly // ::PlayerController
+	improbable.Vector3f field_spawnlocation = 2; // COND_OwnerOnly // ::PlayerController
 }
 component UnrealPlayerControllerMultiClientRepData {
 	id = 100011;
-	bool field_bhidden = 1; // COND_None //  Actor
-	bool field_breplicatemovement = 2; // COND_None //  Actor
-	bool field_btearoff = 3; // COND_None //  Actor
-	bool field_bcanbedamaged = 4; // COND_None //  Actor
-	uint32 field_remoterole = 5; // COND_None //  Actor
-	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics //  RepMovement :: Actor
-	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
-	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom //  Vector_NetQuantize100 :: RepAttachment :: Actor
-	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom //  Vector_NetQuantize100 :: RepAttachment :: Actor
-	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom //  Rotator :: RepAttachment :: Actor
-	string field_attachmentreplication_attachsocket = 11; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
-	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom //  RepAttachment :: RepAttachment :: Actor
-	UnrealObjectRef field_owner = 13; // COND_None //  Actor
-	uint32 field_role = 14; // COND_None //  Actor
-	UnrealObjectRef field_instigator = 15; // COND_None //  Actor
-	UnrealObjectRef field_playerstate = 16; // COND_None //  Controller
-	UnrealObjectRef field_pawn = 17; // COND_None //  Controller
+	bool field_bhidden = 1; // COND_None // ::Actor
+	bool field_breplicatemovement = 2; // COND_None // ::Actor
+	bool field_btearoff = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged = 4; // COND_None // ::Actor
+	uint32 field_remoterole = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics // ::Actor
+	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication_attachsocket = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner = 13; // COND_None // ::Actor
+	uint32 field_role = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator = 15; // COND_None // ::Actor
+	UnrealObjectRef field_playerstate = 16; // COND_None // ::Controller
+	UnrealObjectRef field_pawn = 17; // COND_None // ::Controller
 }
 component UnrealPlayerControllerMigratableData {
 	id = 100012;
