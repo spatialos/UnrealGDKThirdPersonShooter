@@ -550,14 +550,14 @@ void USpatialTypeBinding_PlayerController::ServerSendUpdate_SingleClient(const u
 	{
 		case 18: // field_targetviewrotation
 		{
-			FRotator Value = *(reinterpret_cast<FRotator const*>(Data));
+			const FRotator& Value = *(reinterpret_cast<FRotator const*>(Data));
 
 			OutUpdate.set_field_targetviewrotation(improbable::unreal::UnrealFRotator(Value.Yaw, Value.Pitch, Value.Roll));
 			break;
 		}
 		case 19: // field_spawnlocation
 		{
-			FVector Value = *(reinterpret_cast<FVector const*>(Data));
+			const FVector& Value = *(reinterpret_cast<FVector const*>(Data));
 
 			OutUpdate.set_field_spawnlocation(improbable::Vector3f(Value.X, Value.Y, Value.Z));
 			break;
@@ -609,13 +609,13 @@ void USpatialTypeBinding_PlayerController::ServerSendUpdate_MultiClient(const ui
 		}
 		case 6: // field_replicatedmovement
 		{
-			FRepMovement Value = *(reinterpret_cast<FRepMovement const*>(Data));
+			const FRepMovement& Value = *(reinterpret_cast<FRepMovement const*>(Data));
 
 			{
 				TArray<uint8> ValueData;
 				FMemoryWriter ValueDataWriter(ValueData);
 				bool Success;
-				Value.NetSerialize(ValueDataWriter, PackageMap, Success);
+				(const_cast<FRepMovement&>(Value)).NetSerialize(ValueDataWriter, PackageMap, Success);
 				OutUpdate.set_field_replicatedmovement(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
 			break;
@@ -645,21 +645,21 @@ void USpatialTypeBinding_PlayerController::ServerSendUpdate_MultiClient(const ui
 		}
 		case 8: // field_attachmentreplication_locationoffset
 		{
-			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
+			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
 			OutUpdate.set_field_attachmentreplication_locationoffset(improbable::Vector3f(Value.X, Value.Y, Value.Z));
 			break;
 		}
 		case 9: // field_attachmentreplication_relativescale3d
 		{
-			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
+			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
 			OutUpdate.set_field_attachmentreplication_relativescale3d(improbable::Vector3f(Value.X, Value.Y, Value.Z));
 			break;
 		}
 		case 10: // field_attachmentreplication_rotationoffset
 		{
-			FRotator Value = *(reinterpret_cast<FRotator const*>(Data));
+			const FRotator& Value = *(reinterpret_cast<FRotator const*>(Data));
 
 			OutUpdate.set_field_attachmentreplication_rotationoffset(improbable::unreal::UnrealFRotator(Value.Yaw, Value.Pitch, Value.Roll));
 			break;
@@ -1772,7 +1772,7 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendCommand(worker
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			PlayerId.NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -3070,7 +3070,7 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendCommand(worker::
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			PlayerId.NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -3822,7 +3822,7 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendCommand(worker
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			PlayerId.NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -4062,7 +4062,7 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendCommand(worker::
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			PlayerId.NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
