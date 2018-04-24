@@ -125,7 +125,13 @@ void USpatialTypeBinding_PlayerState::UnbindFromView()
 
 worker::Entity USpatialTypeBinding_PlayerState::CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const
 {
-	checkf(GetRepHandlePropertyMap().Num() >= InitialChanges.RepChanged.Num() - 1, TEXT("Attempting to replicate more properties than typebinding is aware of. Have additional replicated properties been added in a subobject?"))
+	// Validate replication list.
+	const uint16 RepHandlePropertyMapCount = GetRepHandlePropertyMap().Num();
+	for (auto& Rep : InitialChanges.RepChanged)
+	{
+		checkf(Rep <= RepHandlePropertyMapCount, TEXT("Attempting to replicate a property with a handle that the type binding is not aware of. Have additional replicated properties been added in a non generated child object?"))
+	}
+
 	// Setup initial data.
 	improbable::unreal::UnrealPlayerStateSingleClientRepData::Data SingleClientData;
 	improbable::unreal::UnrealPlayerStateSingleClientRepData::Update SingleClientUpdate;
@@ -303,6 +309,13 @@ void USpatialTypeBinding_PlayerState::BuildSpatialComponentUpdate(
 				ServerSendUpdate_MultiClient(Data, HandleIterator.Handle, Cmd.Property, Channel, MultiClientUpdate);
 				bMultiClientUpdateChanged = true;
 				break;
+			}
+			if (Cmd.Type == REPCMD_DynamicArray)
+			{
+				if (!HandleIterator.JumpOverArray())
+				{
+					break;
+				}
 			}
 		}
 	}
