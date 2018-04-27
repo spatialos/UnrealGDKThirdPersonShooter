@@ -2,7 +2,9 @@
 // Note that this file has been generated automatically
 
 #include "SpatialTypeBinding_PlayerController.h"
-#include "Engine.h"
+
+#include "GameFramework/PlayerState.h"
+#include "NetworkGuid.h"
 
 #include "SpatialOS.h"
 #include "EntityBuilder.h"
@@ -14,6 +16,7 @@
 #include "SpatialPackageMapClient.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
+#include "Camera/CameraAnim.h"
 
 #include "UnrealPlayerControllerSingleClientRepDataAddComponentOp.h"
 #include "UnrealPlayerControllerMultiClientRepDataAddComponentOp.h"

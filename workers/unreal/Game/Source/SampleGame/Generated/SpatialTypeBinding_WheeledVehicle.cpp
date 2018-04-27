@@ -2,7 +2,9 @@
 // Note that this file has been generated automatically
 
 #include "SpatialTypeBinding_WheeledVehicle.h"
-#include "Engine.h"
+
+#include "GameFramework/PlayerState.h"
+#include "NetworkGuid.h"
 
 #include "SpatialOS.h"
 #include "EntityBuilder.h"

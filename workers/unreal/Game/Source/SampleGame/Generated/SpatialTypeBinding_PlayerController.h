@@ -2,6 +2,7 @@
 // Note that this file has been generated automatically
 #pragma once
 
+#include "CoreMinimal.h"
 #include <improbable/worker.h>
 #include <improbable/view.h>
 #include <improbable/unreal/core_types.h>
