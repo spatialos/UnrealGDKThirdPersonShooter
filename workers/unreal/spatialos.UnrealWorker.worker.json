@@ -1,7 +1,6 @@
 {
   "build": {
-    "tasks_filename": "Game/Intermediate/Improbable/spatialos.unreal.worker.build.json",
-    "generated_build_scripts_type": "unreal"
+    "tasks_filename": "Game/Scripts/spatialos.unreal.worker.build.json"
   },
   "bridge": {
     "worker_attribute_set": {
@@ -91,7 +90,7 @@
           "${IMPROBABLE_WORKER_DIR}/Game/SampleGame.uproject",
           "-server",
           "+workerType",
-          "UnrealWorker",         
+          "UnrealWorker",
           "-stdout",
           "-nowrite",
           "-unattended",
@@ -104,7 +103,7 @@
           "-NoVerifyGC",
           "-windowed",
           "-ResX=400",
-          "-ResY=300"   
+          "-ResY=300"
         ]
       }
     }

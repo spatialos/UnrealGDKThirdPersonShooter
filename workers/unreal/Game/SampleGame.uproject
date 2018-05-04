@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{594FE353-43A3-F1B1-D054-41BA6971F9AF}",
+	"EngineAssociation": "{D2ACD56A-4CD6-4F23-BD0E-B59A373728D7}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -20,9 +20,14 @@
 	],
 	"PostBuildSteps":
 	{
-		"Win64": [
+        "Win64": [
 			"cd /D \"$(ProjectDir)\"",
-			"spatial invoke unreal package --engineDir=\"$(EngineDir)\" --project=\"$(ProjectFile)\" --platform=\"$(TargetPlatform)\" --target=\"$(TargetType)\" --configuration=\"$(TargetConfiguration)\" -- -allmaps",
+			"Binaries\\ThirdParty\\Improbable\\Programs\\unreal_packager package --engineDir=\"$(EngineDir)\" --project=\"$(ProjectFile)\" --platform=\"$(TargetPlatform)\" --target=\"$(TargetType)\" --configuration=\"$(TargetConfiguration)\" -- -allmaps",
+			"exit /B %ERRORLEVEL%"
+		],
+		"Linux": [
+			"cd /D \"$(ProjectDir)\"",
+			"Binaries\\ThirdParty\\Improbable\\Programs\\unreal_packager package --engineDir=\"$(EngineDir)\" --project=\"$(ProjectFile)\" --platform=\"$(TargetPlatform)\" --target=\"$(TargetType)\" --configuration=\"$(TargetConfiguration)\" -- -allmaps",
 			"exit /B %ERRORLEVEL%"
 		]
 	}

@@ -18,7 +18,6 @@ public class SampleGame : ModuleRules
 				"Sockets",
 				"OnlineSubsystemUtils",
 				"PhysXVehicles",
-				"SpatialOS",
 				"SpatialGDK"
 			});
 	}

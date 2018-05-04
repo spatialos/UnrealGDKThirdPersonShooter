@@ -1,7 +1,6 @@
 {
   "build": {
-    "tasks_filename": "Game/Intermediate/Improbable/spatialos.unreal.client.build.json",
-    "generated_build_scripts_type": "unreal"
+    "tasks_filename": "Game/Scripts/spatialos.unreal.client.build.json"
   },
   "bridge": {
     "worker_attribute_set": {
@@ -32,22 +31,22 @@
       "windows": {
         "command": "${UNREAL_HOME}\\Engine\\Binaries\\Win64\\UE4Editor.exe",
         "arguments": [
-            "${IMPROBABLE_WORKER_DIR}/Game/SampleGame.uproject",
-            "-game",
-            "+workerType",
-            "UnrealClient",
-            "-stdout",
-            "-nowrite",
-            "-unattended",
-            "-nologtimes",
-            "-nopause",
-            "-noin",
-            "-messaging",
-            "-abslog=${IMPROBABLE_LOG_FILE}",
-            "-NoVerifyGC",
-            "-windowed",
-            "-ResX=800",
-            "-ResY=600"
+          "${IMPROBABLE_WORKER_DIR}/Game/SampleGame.uproject",
+          "-game",
+          "+workerType",
+          "UnrealClient",
+          "-stdout",
+          "-nowrite",
+          "-unattended",
+          "-nologtimes",
+          "-nopause",
+          "-noin",
+          "-messaging",
+          "-abslog=${IMPROBABLE_LOG_FILE}",
+          "-NoVerifyGC",
+          "-windowed",
+          "-ResX=800",
+          "-ResY=600"
         ]
       }
     }
