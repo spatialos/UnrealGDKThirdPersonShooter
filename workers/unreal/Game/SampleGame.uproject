@@ -20,7 +20,7 @@
 	],
 	"PostBuildSteps":
 	{
-        "Win64": [
+		"Win64": [
 			"cd /D \"$(ProjectDir)\"",
 			"Binaries\\ThirdParty\\Improbable\\Programs\\unreal_packager package --engineDir=\"$(EngineDir)\" --project=\"$(ProjectFile)\" --platform=\"$(TargetPlatform)\" --target=\"$(TargetType)\" --configuration=\"$(TargetConfiguration)\" -- -allmaps",
 			"exit /B %ERRORLEVEL%"

@@ -586,7 +586,6 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_Migratable(const uint8
 void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealWheeledVehicleSingleClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
-
 	TArray<UProperty*> RepNotifies;
 	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies);
 }
@@ -594,8 +593,8 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_SingleClient(USpatialActo
 void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealWheeledVehicleMultiClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
+	TSet<UProperty*> RepNotifies;
 
-	TArray<UProperty*> RepNotifies;
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
 	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::UnrealWheeledVehicleClientRPCs::ComponentId);
 	const FRepHandlePropertyMap& HandleToPropertyMap = GetRepHandlePropertyMap();
@@ -1244,7 +1243,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies);
+	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
 }
 
 void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealWheeledVehicleMigratableData::Update& Update) const
