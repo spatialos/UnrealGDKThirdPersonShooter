@@ -20,11 +20,18 @@ if not exist %SPATIALGDK_PATH%\ (
 set PATH_VALID=true
 if not exist %SPATIALGDK_PLUGINSPATH% set PATH_VALID=false
 if not exist %SPATIALGDK_MODULEPATH% set PATH_VALID=false
-if not exist %SPATIALGDK_SCRIPTSPATH% set PATH_VALID=false
-if not exist %SPATIALGDK_BINARIESPATH% set PATH_VALID=false
 
 if %PATH_VALID%==false (
- 	echo Error: SpatialGDK path %SPATIALGDK_PATH% is invalid. Provide path to cloned SpatialGDK git repository.
+	echo Error: SpatialGDK path %SPATIALGDK_PATH% is invalid. Provide path to cloned SpatialGDK git repository.
+	exit 1
+)
+
+set REPO_PREPARED=true
+if not exist %SPATIALGDK_SCRIPTSPATH% set REPO_PREPARED=false
+if not exist %SPATIALGDK_BINARIESPATH% set REPO_PREPARED=false
+
+if %REPO_PREPARED%==false (
+	echo Error: The specified SpatialGDK directory has not been prepared. Please run ci/build.sh in that directory.
 	exit 1
 )
 
