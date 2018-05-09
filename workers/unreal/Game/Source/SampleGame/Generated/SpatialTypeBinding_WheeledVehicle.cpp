@@ -228,12 +228,12 @@ void USpatialTypeBinding_WheeledVehicle::SendComponentUpdates(const FPropertyCha
 	}
 }
 
-void USpatialTypeBinding_WheeledVehicle::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, FFrame* const Frame)
+void USpatialTypeBinding_WheeledVehicle::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
-	(this->*(*SenderFuncIterator))(Connection.Get(), Frame, TargetObject);
+	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
 void USpatialTypeBinding_WheeledVehicle::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
@@ -1250,16 +1250,12 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_Migratable(USpatialActorC
 {
 }
 
-void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, InSteeringInput);
-	P_GET_PROPERTY(UFloatProperty, InThrottleInput);
-	P_GET_PROPERTY(UFloatProperty, InBrakeInput);
-	P_GET_PROPERTY(UFloatProperty, InHandbrakeInput);
-	P_GET_PROPERTY(UIntProperty, CurrentGear);
+	// This struct is declared in WheeledVehicleMovementComponent.generated.h (in a macro that is then put in WheeledVehicleMovementComponent.h UCLASS macro)
+	WheeledVehicleMovementComponent_eventServerUpdateState_Parms StructuredParams = *static_cast<WheeledVehicleMovementComponent_eventServerUpdateState_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, InSteeringInput, InThrottleInput, InBrakeInput, InHandbrakeInput, CurrentGear]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1271,11 +1267,11 @@ void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealServerUpdateStateRequest Request;
-		Request.set_field_insteeringinput(InSteeringInput);
-		Request.set_field_inthrottleinput(InThrottleInput);
-		Request.set_field_inbrakeinput(InBrakeInput);
-		Request.set_field_inhandbrakeinput(InHandbrakeInput);
-		Request.set_field_currentgear(CurrentGear);
+		Request.set_field_insteeringinput(StructuredParams.InSteeringInput);
+		Request.set_field_inthrottleinput(StructuredParams.InThrottleInput);
+		Request.set_field_inbrakeinput(StructuredParams.InBrakeInput);
+		Request.set_field_inhandbrakeinput(StructuredParams.InHandbrakeInput);
+		Request.set_field_currentgear(StructuredParams.CurrentGear);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1302,38 +1298,39 @@ void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		UWheeledVehicleMovementComponent* TargetObject = Cast<UWheeledVehicleMovementComponent>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerUpdateState_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerUpdateState_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerUpdateState_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float InSteeringInput;
-		float InThrottleInput;
-		float InBrakeInput;
-		float InHandbrakeInput;
-		int32 CurrentGear;
+		// This struct is declared in WheeledVehicleMovementComponent.generated.h (in a macro that is then put in WheeledVehicleMovementComponent.h UCLASS macro)
+		WheeledVehicleMovementComponent_eventServerUpdateState_Parms Parameters;
 
 		// Extract from request data.
-		InSteeringInput = Op.Request.field_insteeringinput();
-		InThrottleInput = Op.Request.field_inthrottleinput();
-		InBrakeInput = Op.Request.field_inbrakeinput();
-		InHandbrakeInput = Op.Request.field_inhandbrakeinput();
-		CurrentGear = Op.Request.field_currentgear();
+		Parameters.InSteeringInput = Op.Request.field_insteeringinput();
+		Parameters.InThrottleInput = Op.Request.field_inthrottleinput();
+		Parameters.InBrakeInput = Op.Request.field_inbrakeinput();
+		Parameters.InHandbrakeInput = Op.Request.field_inhandbrakeinput();
+		Parameters.CurrentGear = Op.Request.field_currentgear();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateState, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerUpdateState_Implementation(InSteeringInput, InThrottleInput, InBrakeInput, InHandbrakeInput, CurrentGear);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerUpdateState"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateState_OnCommandRequest: Function not found. Object: %s, Function: ServerUpdateState."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();

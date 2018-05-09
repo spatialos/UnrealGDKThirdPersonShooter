@@ -229,12 +229,12 @@ void USpatialTypeBinding_PlayerState::SendComponentUpdates(const FPropertyChange
 	}
 }
 
-void USpatialTypeBinding_PlayerState::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, FFrame* const Frame)
+void USpatialTypeBinding_PlayerState::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
-	(this->*(*SenderFuncIterator))(Connection.Get(), Frame, TargetObject);
+	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
 void USpatialTypeBinding_PlayerState::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const

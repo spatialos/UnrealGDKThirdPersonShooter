@@ -29,7 +29,7 @@ public:
 
 	worker::Entity CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const override;
 	void SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const override;
-	void SendRPCCommand(UObject* TargetObject, const UFunction* const Function, FFrame* const Frame) override;
+	void SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters) override;
 
 	void ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const override;
 	worker::Map<worker::ComponentId, worker::InterestOverride> GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const override;
@@ -38,7 +38,7 @@ private:
 	improbable::unreal::callbacks::FScopedViewCallbacks ViewCallbacks;
 
 	// RPC to sender map.
-	using FRPCSender = void (USpatialTypeBinding_WheeledVehicle::*)(worker::Connection* const, struct FFrame* const, UObject*);
+	using FRPCSender = void (USpatialTypeBinding_WheeledVehicle::*)(worker::Connection* const, void*, UObject*);
 	TMap<FName, FRPCSender> RPCToSenderMap;
 
 	// Component update helper functions.
@@ -59,7 +59,7 @@ private:
 	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealWheeledVehicleMigratableData::Update& Update) const;
 
 	// RPC command sender functions.
-	void ServerUpdateState_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject);
+	void ServerUpdateState_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 
 	// RPC command request handler functions.
 	void ServerUpdateState_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::UnrealWheeledVehicleServerRPCs::Commands::Serverupdatestate>& Op);

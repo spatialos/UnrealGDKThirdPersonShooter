@@ -302,12 +302,12 @@ void USpatialTypeBinding_Character::SendComponentUpdates(const FPropertyChangeSt
 	}
 }
 
-void USpatialTypeBinding_Character::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, FFrame* const Frame)
+void USpatialTypeBinding_Character::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
-	(this->*(*SenderFuncIterator))(Connection.Get(), Frame, TargetObject);
+	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
 void USpatialTypeBinding_Character::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
@@ -2328,12 +2328,12 @@ void USpatialTypeBinding_Character::ReceiveUpdate_Migratable(USpatialActorChanne
 	}
 }
 
-void USpatialTypeBinding_Character::RootMotionDebugClientPrintOnScreen_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::RootMotionDebugClientPrintOnScreen_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UStrProperty, InString);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventRootMotionDebugClientPrintOnScreen_Parms StructuredParams = *static_cast<Character_eventRootMotionDebugClientPrintOnScreen_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, InString]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2345,7 +2345,7 @@ void USpatialTypeBinding_Character::RootMotionDebugClientPrintOnScreen_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealRootMotionDebugClientPrintOnScreenRequest Request;
-		Request.set_field_instring(TCHAR_TO_UTF8(*InString));
+		Request.set_field_instring(TCHAR_TO_UTF8(*StructuredParams.InString));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2359,18 +2359,12 @@ void USpatialTypeBinding_Character::RootMotionDebugClientPrintOnScreen_SendComma
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector, NewLoc)
-	P_GET_OBJECT(UPrimitiveComponent, NewBase);
-	P_GET_PROPERTY(UNameProperty, NewBaseBoneName);
-	P_GET_UBOOL(bHasBase);
-	P_GET_UBOOL(bBaseRelativePosition);
-	P_GET_PROPERTY(UByteProperty, ServerMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventClientVeryShortAdjustPosition_Parms StructuredParams = *static_cast<Character_eventClientVeryShortAdjustPosition_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, NewLoc, NewBase, NewBaseBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2382,16 +2376,16 @@ void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_SendCommand(wo
 
 		// Build request.
 		improbable::unreal::UnrealClientVeryShortAdjustPositionRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_newloc(improbable::Vector3f(NewLoc.X, NewLoc.Y, NewLoc.Z));
-		if (NewBase != nullptr)
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_newloc(improbable::Vector3f(StructuredParams.NewLoc.X, StructuredParams.NewLoc.Y, StructuredParams.NewLoc.Z));
+		if (StructuredParams.NewBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(NewBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientVeryShortAdjustPosition queued. NewBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {NewBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientVeryShortAdjustPosition queued. StructuredParams.NewBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.NewBase};
 			}
 			else
 			{
@@ -2402,10 +2396,10 @@ void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_SendCommand(wo
 		{
 			Request.set_field_newbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_newbasebonename(TCHAR_TO_UTF8(*NewBaseBoneName.ToString()));
-		Request.set_field_bhasbase(bHasBase);
-		Request.set_field_bbaserelativeposition(bBaseRelativePosition);
-		Request.set_field_servermovementmode(uint32_t(ServerMovementMode));
+		Request.set_field_newbasebonename(TCHAR_TO_UTF8(*StructuredParams.NewBaseBoneName.ToString()));
+		Request.set_field_bhasbase(StructuredParams.bHasBase);
+		Request.set_field_bbaserelativeposition(StructuredParams.bBaseRelativePosition);
+		Request.set_field_servermovementmode(uint32_t(StructuredParams.ServerMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2419,7 +2413,7 @@ void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ClientCheatWalk_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientCheatWalk_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2446,7 +2440,7 @@ void USpatialTypeBinding_Character::ClientCheatWalk_SendCommand(worker::Connecti
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_Character::ClientCheatGhost_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientCheatGhost_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2473,7 +2467,7 @@ void USpatialTypeBinding_Character::ClientCheatGhost_SendCommand(worker::Connect
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_Character::ClientCheatFly_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientCheatFly_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2500,23 +2494,12 @@ void USpatialTypeBinding_Character::ClientCheatFly_SendCommand(worker::Connectio
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FRootMotionSourceGroup, ServerRootMotion)
-	P_GET_UBOOL(bHasAnimRootMotion);
-	P_GET_PROPERTY(UFloatProperty, ServerMontageTrackPosition);
-	P_GET_STRUCT(FVector, ServerLoc)
-	P_GET_STRUCT(FVector_NetQuantizeNormal, ServerRotation)
-	P_GET_PROPERTY(UFloatProperty, ServerVelZ);
-	P_GET_OBJECT(UPrimitiveComponent, ServerBase);
-	P_GET_PROPERTY(UNameProperty, ServerBoneName);
-	P_GET_UBOOL(bHasBase);
-	P_GET_UBOOL(bBaseRelativePosition);
-	P_GET_PROPERTY(UByteProperty, ServerMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventClientAdjustRootMotionSourcePosition_Parms StructuredParams = *static_cast<Character_eventClientAdjustRootMotionSourcePosition_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, ServerRootMotion, bHasAnimRootMotion, ServerMontageTrackPosition, ServerLoc, ServerRotation, ServerVelZ, ServerBase, ServerBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2528,25 +2511,25 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_SendCom
 
 		// Build request.
 		improbable::unreal::UnrealClientAdjustRootMotionSourcePositionRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_serverrootmotion_bhasadditivesources(ServerRootMotion.bHasAdditiveSources);
-		Request.set_field_serverrootmotion_bhasoverridesources(ServerRootMotion.bHasOverrideSources);
-		Request.set_field_serverrootmotion_lastpreadditivevelocity(improbable::Vector3f(ServerRootMotion.LastPreAdditiveVelocity.X, ServerRootMotion.LastPreAdditiveVelocity.Y, ServerRootMotion.LastPreAdditiveVelocity.Z));
-		Request.set_field_serverrootmotion_bisadditivevelocityapplied(ServerRootMotion.bIsAdditiveVelocityApplied);
-		Request.set_field_serverrootmotion_lastaccumulatedsettings_flags(uint32_t(ServerRootMotion.LastAccumulatedSettings.Flags));
-		Request.set_field_bhasanimrootmotion(bHasAnimRootMotion);
-		Request.set_field_servermontagetrackposition(ServerMontageTrackPosition);
-		Request.set_field_serverloc(improbable::Vector3f(ServerLoc.X, ServerLoc.Y, ServerLoc.Z));
-		Request.set_field_serverrotation(improbable::Vector3f(ServerRotation.X, ServerRotation.Y, ServerRotation.Z));
-		Request.set_field_servervelz(ServerVelZ);
-		if (ServerBase != nullptr)
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_serverrootmotion_bhasadditivesources(StructuredParams.ServerRootMotion.bHasAdditiveSources);
+		Request.set_field_serverrootmotion_bhasoverridesources(StructuredParams.ServerRootMotion.bHasOverrideSources);
+		Request.set_field_serverrootmotion_lastpreadditivevelocity(improbable::Vector3f(StructuredParams.ServerRootMotion.LastPreAdditiveVelocity.X, StructuredParams.ServerRootMotion.LastPreAdditiveVelocity.Y, StructuredParams.ServerRootMotion.LastPreAdditiveVelocity.Z));
+		Request.set_field_serverrootmotion_bisadditivevelocityapplied(StructuredParams.ServerRootMotion.bIsAdditiveVelocityApplied);
+		Request.set_field_serverrootmotion_lastaccumulatedsettings_flags(uint32_t(StructuredParams.ServerRootMotion.LastAccumulatedSettings.Flags));
+		Request.set_field_bhasanimrootmotion(StructuredParams.bHasAnimRootMotion);
+		Request.set_field_servermontagetrackposition(StructuredParams.ServerMontageTrackPosition);
+		Request.set_field_serverloc(improbable::Vector3f(StructuredParams.ServerLoc.X, StructuredParams.ServerLoc.Y, StructuredParams.ServerLoc.Z));
+		Request.set_field_serverrotation(improbable::Vector3f(StructuredParams.ServerRotation.X, StructuredParams.ServerRotation.Y, StructuredParams.ServerRotation.Z));
+		Request.set_field_servervelz(StructuredParams.ServerVelZ);
+		if (StructuredParams.ServerBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ServerBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ServerBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustRootMotionSourcePosition queued. ServerBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ServerBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustRootMotionSourcePosition queued. StructuredParams.ServerBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ServerBase};
 			}
 			else
 			{
@@ -2557,10 +2540,10 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_SendCom
 		{
 			Request.set_field_serverbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_serverbonename(TCHAR_TO_UTF8(*ServerBoneName.ToString()));
-		Request.set_field_bhasbase(bHasBase);
-		Request.set_field_bbaserelativeposition(bBaseRelativePosition);
-		Request.set_field_servermovementmode(uint32_t(ServerMovementMode));
+		Request.set_field_serverbonename(TCHAR_TO_UTF8(*StructuredParams.ServerBoneName.ToString()));
+		Request.set_field_bhasbase(StructuredParams.bHasBase);
+		Request.set_field_bbaserelativeposition(StructuredParams.bBaseRelativePosition);
+		Request.set_field_servermovementmode(uint32_t(StructuredParams.ServerMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2574,21 +2557,12 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_SendCom
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_PROPERTY(UFloatProperty, ServerMontageTrackPosition);
-	P_GET_STRUCT(FVector, ServerLoc)
-	P_GET_STRUCT(FVector_NetQuantizeNormal, ServerRotation)
-	P_GET_PROPERTY(UFloatProperty, ServerVelZ);
-	P_GET_OBJECT(UPrimitiveComponent, ServerBase);
-	P_GET_PROPERTY(UNameProperty, ServerBoneName);
-	P_GET_UBOOL(bHasBase);
-	P_GET_UBOOL(bBaseRelativePosition);
-	P_GET_PROPERTY(UByteProperty, ServerMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventClientAdjustRootMotionPosition_Parms StructuredParams = *static_cast<Character_eventClientAdjustRootMotionPosition_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, ServerMontageTrackPosition, ServerLoc, ServerRotation, ServerVelZ, ServerBase, ServerBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2600,19 +2574,19 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealClientAdjustRootMotionPositionRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_servermontagetrackposition(ServerMontageTrackPosition);
-		Request.set_field_serverloc(improbable::Vector3f(ServerLoc.X, ServerLoc.Y, ServerLoc.Z));
-		Request.set_field_serverrotation(improbable::Vector3f(ServerRotation.X, ServerRotation.Y, ServerRotation.Z));
-		Request.set_field_servervelz(ServerVelZ);
-		if (ServerBase != nullptr)
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_servermontagetrackposition(StructuredParams.ServerMontageTrackPosition);
+		Request.set_field_serverloc(improbable::Vector3f(StructuredParams.ServerLoc.X, StructuredParams.ServerLoc.Y, StructuredParams.ServerLoc.Z));
+		Request.set_field_serverrotation(improbable::Vector3f(StructuredParams.ServerRotation.X, StructuredParams.ServerRotation.Y, StructuredParams.ServerRotation.Z));
+		Request.set_field_servervelz(StructuredParams.ServerVelZ);
+		if (StructuredParams.ServerBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ServerBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ServerBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustRootMotionPosition queued. ServerBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ServerBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustRootMotionPosition queued. StructuredParams.ServerBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ServerBase};
 			}
 			else
 			{
@@ -2623,10 +2597,10 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_SendCommand(w
 		{
 			Request.set_field_serverbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_serverbonename(TCHAR_TO_UTF8(*ServerBoneName.ToString()));
-		Request.set_field_bhasbase(bHasBase);
-		Request.set_field_bbaserelativeposition(bBaseRelativePosition);
-		Request.set_field_servermovementmode(uint32_t(ServerMovementMode));
+		Request.set_field_serverbonename(TCHAR_TO_UTF8(*StructuredParams.ServerBoneName.ToString()));
+		Request.set_field_bhasbase(StructuredParams.bHasBase);
+		Request.set_field_bbaserelativeposition(StructuredParams.bBaseRelativePosition);
+		Request.set_field_servermovementmode(uint32_t(StructuredParams.ServerMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2640,19 +2614,12 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ClientAdjustPosition_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientAdjustPosition_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector, NewLoc)
-	P_GET_STRUCT(FVector, NewVel)
-	P_GET_OBJECT(UPrimitiveComponent, NewBase);
-	P_GET_PROPERTY(UNameProperty, NewBaseBoneName);
-	P_GET_UBOOL(bHasBase);
-	P_GET_UBOOL(bBaseRelativePosition);
-	P_GET_PROPERTY(UByteProperty, ServerMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventClientAdjustPosition_Parms StructuredParams = *static_cast<Character_eventClientAdjustPosition_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, NewLoc, NewVel, NewBase, NewBaseBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2664,17 +2631,17 @@ void USpatialTypeBinding_Character::ClientAdjustPosition_SendCommand(worker::Con
 
 		// Build request.
 		improbable::unreal::UnrealClientAdjustPositionRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_newloc(improbable::Vector3f(NewLoc.X, NewLoc.Y, NewLoc.Z));
-		Request.set_field_newvel(improbable::Vector3f(NewVel.X, NewVel.Y, NewVel.Z));
-		if (NewBase != nullptr)
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_newloc(improbable::Vector3f(StructuredParams.NewLoc.X, StructuredParams.NewLoc.Y, StructuredParams.NewLoc.Z));
+		Request.set_field_newvel(improbable::Vector3f(StructuredParams.NewVel.X, StructuredParams.NewVel.Y, StructuredParams.NewVel.Z));
+		if (StructuredParams.NewBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(NewBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustPosition queued. NewBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {NewBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAdjustPosition queued. StructuredParams.NewBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.NewBase};
 			}
 			else
 			{
@@ -2685,10 +2652,10 @@ void USpatialTypeBinding_Character::ClientAdjustPosition_SendCommand(worker::Con
 		{
 			Request.set_field_newbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_newbasebonename(TCHAR_TO_UTF8(*NewBaseBoneName.ToString()));
-		Request.set_field_bhasbase(bHasBase);
-		Request.set_field_bbaserelativeposition(bBaseRelativePosition);
-		Request.set_field_servermovementmode(uint32_t(ServerMovementMode));
+		Request.set_field_newbasebonename(TCHAR_TO_UTF8(*StructuredParams.NewBaseBoneName.ToString()));
+		Request.set_field_bhasbase(StructuredParams.bHasBase);
+		Request.set_field_bbaserelativeposition(StructuredParams.bBaseRelativePosition);
+		Request.set_field_servermovementmode(uint32_t(StructuredParams.ServerMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2702,12 +2669,12 @@ void USpatialTypeBinding_Character::ClientAdjustPosition_SendCommand(worker::Con
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ClientAckGoodMove_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ClientAckGoodMove_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventClientAckGoodMove_Parms StructuredParams = *static_cast<Character_eventClientAckGoodMove_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2719,7 +2686,7 @@ void USpatialTypeBinding_Character::ClientAckGoodMove_SendCommand(worker::Connec
 
 		// Build request.
 		improbable::unreal::UnrealClientAckGoodMoveRequest Request;
-		Request.set_field_timestamp(TimeStamp);
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2733,14 +2700,12 @@ void USpatialTypeBinding_Character::ClientAckGoodMove_SendCommand(worker::Connec
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMoveOld_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMoveOld_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, OldTimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, OldAccel)
-	P_GET_PROPERTY(UByteProperty, OldMoveFlags);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMoveOld_Parms StructuredParams = *static_cast<Character_eventServerMoveOld_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, OldTimeStamp, OldAccel, OldMoveFlags]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2752,9 +2717,9 @@ void USpatialTypeBinding_Character::ServerMoveOld_SendCommand(worker::Connection
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveOldRequest Request;
-		Request.set_field_oldtimestamp(OldTimeStamp);
-		Request.set_field_oldaccel(improbable::Vector3f(OldAccel.X, OldAccel.Y, OldAccel.Z));
-		Request.set_field_oldmoveflags(uint32_t(OldMoveFlags));
+		Request.set_field_oldtimestamp(StructuredParams.OldTimeStamp);
+		Request.set_field_oldaccel(improbable::Vector3f(StructuredParams.OldAccel.X, StructuredParams.OldAccel.Y, StructuredParams.OldAccel.Z));
+		Request.set_field_oldmoveflags(uint32_t(StructuredParams.OldMoveFlags));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2768,18 +2733,12 @@ void USpatialTypeBinding_Character::ServerMoveOld_SendCommand(worker::Connection
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMoveNoBase_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMoveNoBase_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel)
-	P_GET_STRUCT(FVector_NetQuantize100, ClientLoc)
-	P_GET_PROPERTY(UByteProperty, CompressedMoveFlags);
-	P_GET_PROPERTY(UByteProperty, ClientRoll);
-	P_GET_PROPERTY(UUInt32Property, View);
-	P_GET_PROPERTY(UByteProperty, ClientMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMoveNoBase_Parms StructuredParams = *static_cast<Character_eventServerMoveNoBase_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, InAccel, ClientLoc, CompressedMoveFlags, ClientRoll, View, ClientMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2791,13 +2750,13 @@ void USpatialTypeBinding_Character::ServerMoveNoBase_SendCommand(worker::Connect
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveNoBaseRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_inaccel(improbable::Vector3f(InAccel.X, InAccel.Y, InAccel.Z));
-		Request.set_field_clientloc(improbable::Vector3f(ClientLoc.X, ClientLoc.Y, ClientLoc.Z));
-		Request.set_field_compressedmoveflags(uint32_t(CompressedMoveFlags));
-		Request.set_field_clientroll(uint32_t(ClientRoll));
-		Request.set_field_view(uint32_t(View));
-		Request.set_field_clientmovementmode(uint32_t(ClientMovementMode));
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_inaccel(improbable::Vector3f(StructuredParams.InAccel.X, StructuredParams.InAccel.Y, StructuredParams.InAccel.Z));
+		Request.set_field_clientloc(improbable::Vector3f(StructuredParams.ClientLoc.X, StructuredParams.ClientLoc.Y, StructuredParams.ClientLoc.Z));
+		Request.set_field_compressedmoveflags(uint32_t(StructuredParams.CompressedMoveFlags));
+		Request.set_field_clientroll(uint32_t(StructuredParams.ClientRoll));
+		Request.set_field_view(uint32_t(StructuredParams.View));
+		Request.set_field_clientmovementmode(uint32_t(StructuredParams.ClientMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2811,22 +2770,12 @@ void USpatialTypeBinding_Character::ServerMoveNoBase_SendCommand(worker::Connect
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMoveDualNoBase_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMoveDualNoBase_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp0);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel0)
-	P_GET_PROPERTY(UByteProperty, PendingFlags);
-	P_GET_PROPERTY(UUInt32Property, View0);
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel)
-	P_GET_STRUCT(FVector_NetQuantize100, ClientLoc)
-	P_GET_PROPERTY(UByteProperty, NewFlags);
-	P_GET_PROPERTY(UByteProperty, ClientRoll);
-	P_GET_PROPERTY(UUInt32Property, View);
-	P_GET_PROPERTY(UByteProperty, ClientMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMoveDualNoBase_Parms StructuredParams = *static_cast<Character_eventServerMoveDualNoBase_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2838,17 +2787,17 @@ void USpatialTypeBinding_Character::ServerMoveDualNoBase_SendCommand(worker::Con
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveDualNoBaseRequest Request;
-		Request.set_field_timestamp0(TimeStamp0);
-		Request.set_field_inaccel0(improbable::Vector3f(InAccel0.X, InAccel0.Y, InAccel0.Z));
-		Request.set_field_pendingflags(uint32_t(PendingFlags));
-		Request.set_field_view0(uint32_t(View0));
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_inaccel(improbable::Vector3f(InAccel.X, InAccel.Y, InAccel.Z));
-		Request.set_field_clientloc(improbable::Vector3f(ClientLoc.X, ClientLoc.Y, ClientLoc.Z));
-		Request.set_field_newflags(uint32_t(NewFlags));
-		Request.set_field_clientroll(uint32_t(ClientRoll));
-		Request.set_field_view(uint32_t(View));
-		Request.set_field_clientmovementmode(uint32_t(ClientMovementMode));
+		Request.set_field_timestamp0(StructuredParams.TimeStamp0);
+		Request.set_field_inaccel0(improbable::Vector3f(StructuredParams.InAccel0.X, StructuredParams.InAccel0.Y, StructuredParams.InAccel0.Z));
+		Request.set_field_pendingflags(uint32_t(StructuredParams.PendingFlags));
+		Request.set_field_view0(uint32_t(StructuredParams.View0));
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_inaccel(improbable::Vector3f(StructuredParams.InAccel.X, StructuredParams.InAccel.Y, StructuredParams.InAccel.Z));
+		Request.set_field_clientloc(improbable::Vector3f(StructuredParams.ClientLoc.X, StructuredParams.ClientLoc.Y, StructuredParams.ClientLoc.Z));
+		Request.set_field_newflags(uint32_t(StructuredParams.NewFlags));
+		Request.set_field_clientroll(uint32_t(StructuredParams.ClientRoll));
+		Request.set_field_view(uint32_t(StructuredParams.View));
+		Request.set_field_clientmovementmode(uint32_t(StructuredParams.ClientMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2862,24 +2811,12 @@ void USpatialTypeBinding_Character::ServerMoveDualNoBase_SendCommand(worker::Con
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp0);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel0)
-	P_GET_PROPERTY(UByteProperty, PendingFlags);
-	P_GET_PROPERTY(UUInt32Property, View0);
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel)
-	P_GET_STRUCT(FVector_NetQuantize100, ClientLoc)
-	P_GET_PROPERTY(UByteProperty, NewFlags);
-	P_GET_PROPERTY(UByteProperty, ClientRoll);
-	P_GET_PROPERTY(UUInt32Property, View);
-	P_GET_OBJECT(UPrimitiveComponent, ClientMovementBase);
-	P_GET_PROPERTY(UNameProperty, ClientBaseBoneName);
-	P_GET_PROPERTY(UByteProperty, ClientMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMoveDualHybridRootMotion_Parms StructuredParams = *static_cast<Character_eventServerMoveDualHybridRootMotion_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2891,24 +2828,24 @@ void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveDualHybridRootMotionRequest Request;
-		Request.set_field_timestamp0(TimeStamp0);
-		Request.set_field_inaccel0(improbable::Vector3f(InAccel0.X, InAccel0.Y, InAccel0.Z));
-		Request.set_field_pendingflags(uint32_t(PendingFlags));
-		Request.set_field_view0(uint32_t(View0));
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_inaccel(improbable::Vector3f(InAccel.X, InAccel.Y, InAccel.Z));
-		Request.set_field_clientloc(improbable::Vector3f(ClientLoc.X, ClientLoc.Y, ClientLoc.Z));
-		Request.set_field_newflags(uint32_t(NewFlags));
-		Request.set_field_clientroll(uint32_t(ClientRoll));
-		Request.set_field_view(uint32_t(View));
-		if (ClientMovementBase != nullptr)
+		Request.set_field_timestamp0(StructuredParams.TimeStamp0);
+		Request.set_field_inaccel0(improbable::Vector3f(StructuredParams.InAccel0.X, StructuredParams.InAccel0.Y, StructuredParams.InAccel0.Z));
+		Request.set_field_pendingflags(uint32_t(StructuredParams.PendingFlags));
+		Request.set_field_view0(uint32_t(StructuredParams.View0));
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_inaccel(improbable::Vector3f(StructuredParams.InAccel.X, StructuredParams.InAccel.Y, StructuredParams.InAccel.Z));
+		Request.set_field_clientloc(improbable::Vector3f(StructuredParams.ClientLoc.X, StructuredParams.ClientLoc.Y, StructuredParams.ClientLoc.Z));
+		Request.set_field_newflags(uint32_t(StructuredParams.NewFlags));
+		Request.set_field_clientroll(uint32_t(StructuredParams.ClientRoll));
+		Request.set_field_view(uint32_t(StructuredParams.View));
+		if (StructuredParams.ClientMovementBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ClientMovementBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ClientMovementBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMoveDualHybridRootMotion queued. ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ClientMovementBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMoveDualHybridRootMotion queued. StructuredParams.ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ClientMovementBase};
 			}
 			else
 			{
@@ -2919,8 +2856,8 @@ void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_SendCommand(w
 		{
 			Request.set_field_clientmovementbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*ClientBaseBoneName.ToString()));
-		Request.set_field_clientmovementmode(uint32_t(ClientMovementMode));
+		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*StructuredParams.ClientBaseBoneName.ToString()));
+		Request.set_field_clientmovementmode(uint32_t(StructuredParams.ClientMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2934,24 +2871,12 @@ void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMoveDual_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMoveDual_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp0);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel0)
-	P_GET_PROPERTY(UByteProperty, PendingFlags);
-	P_GET_PROPERTY(UUInt32Property, View0);
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel)
-	P_GET_STRUCT(FVector_NetQuantize100, ClientLoc)
-	P_GET_PROPERTY(UByteProperty, NewFlags);
-	P_GET_PROPERTY(UByteProperty, ClientRoll);
-	P_GET_PROPERTY(UUInt32Property, View);
-	P_GET_OBJECT(UPrimitiveComponent, ClientMovementBase);
-	P_GET_PROPERTY(UNameProperty, ClientBaseBoneName);
-	P_GET_PROPERTY(UByteProperty, ClientMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMoveDual_Parms StructuredParams = *static_cast<Character_eventServerMoveDual_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2963,24 +2888,24 @@ void USpatialTypeBinding_Character::ServerMoveDual_SendCommand(worker::Connectio
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveDualRequest Request;
-		Request.set_field_timestamp0(TimeStamp0);
-		Request.set_field_inaccel0(improbable::Vector3f(InAccel0.X, InAccel0.Y, InAccel0.Z));
-		Request.set_field_pendingflags(uint32_t(PendingFlags));
-		Request.set_field_view0(uint32_t(View0));
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_inaccel(improbable::Vector3f(InAccel.X, InAccel.Y, InAccel.Z));
-		Request.set_field_clientloc(improbable::Vector3f(ClientLoc.X, ClientLoc.Y, ClientLoc.Z));
-		Request.set_field_newflags(uint32_t(NewFlags));
-		Request.set_field_clientroll(uint32_t(ClientRoll));
-		Request.set_field_view(uint32_t(View));
-		if (ClientMovementBase != nullptr)
+		Request.set_field_timestamp0(StructuredParams.TimeStamp0);
+		Request.set_field_inaccel0(improbable::Vector3f(StructuredParams.InAccel0.X, StructuredParams.InAccel0.Y, StructuredParams.InAccel0.Z));
+		Request.set_field_pendingflags(uint32_t(StructuredParams.PendingFlags));
+		Request.set_field_view0(uint32_t(StructuredParams.View0));
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_inaccel(improbable::Vector3f(StructuredParams.InAccel.X, StructuredParams.InAccel.Y, StructuredParams.InAccel.Z));
+		Request.set_field_clientloc(improbable::Vector3f(StructuredParams.ClientLoc.X, StructuredParams.ClientLoc.Y, StructuredParams.ClientLoc.Z));
+		Request.set_field_newflags(uint32_t(StructuredParams.NewFlags));
+		Request.set_field_clientroll(uint32_t(StructuredParams.ClientRoll));
+		Request.set_field_view(uint32_t(StructuredParams.View));
+		if (StructuredParams.ClientMovementBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ClientMovementBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ClientMovementBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMoveDual queued. ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ClientMovementBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMoveDual queued. StructuredParams.ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ClientMovementBase};
 			}
 			else
 			{
@@ -2991,8 +2916,8 @@ void USpatialTypeBinding_Character::ServerMoveDual_SendCommand(worker::Connectio
 		{
 			Request.set_field_clientmovementbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*ClientBaseBoneName.ToString()));
-		Request.set_field_clientmovementmode(uint32_t(ClientMovementMode));
+		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*StructuredParams.ClientBaseBoneName.ToString()));
+		Request.set_field_clientmovementmode(uint32_t(StructuredParams.ClientMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3006,20 +2931,12 @@ void USpatialTypeBinding_Character::ServerMoveDual_SendCommand(worker::Connectio
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_Character::ServerMove_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_Character::ServerMove_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UFloatProperty, TimeStamp);
-	P_GET_STRUCT(FVector_NetQuantize10, InAccel)
-	P_GET_STRUCT(FVector_NetQuantize100, ClientLoc)
-	P_GET_PROPERTY(UByteProperty, CompressedMoveFlags);
-	P_GET_PROPERTY(UByteProperty, ClientRoll);
-	P_GET_PROPERTY(UUInt32Property, View);
-	P_GET_OBJECT(UPrimitiveComponent, ClientMovementBase);
-	P_GET_PROPERTY(UNameProperty, ClientBaseBoneName);
-	P_GET_PROPERTY(UByteProperty, ClientMovementMode);
+	// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+	Character_eventServerMove_Parms StructuredParams = *static_cast<Character_eventServerMove_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TimeStamp, InAccel, ClientLoc, CompressedMoveFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3031,20 +2948,20 @@ void USpatialTypeBinding_Character::ServerMove_SendCommand(worker::Connection* c
 
 		// Build request.
 		improbable::unreal::UnrealServerMoveRequest Request;
-		Request.set_field_timestamp(TimeStamp);
-		Request.set_field_inaccel(improbable::Vector3f(InAccel.X, InAccel.Y, InAccel.Z));
-		Request.set_field_clientloc(improbable::Vector3f(ClientLoc.X, ClientLoc.Y, ClientLoc.Z));
-		Request.set_field_compressedmoveflags(uint32_t(CompressedMoveFlags));
-		Request.set_field_clientroll(uint32_t(ClientRoll));
-		Request.set_field_view(uint32_t(View));
-		if (ClientMovementBase != nullptr)
+		Request.set_field_timestamp(StructuredParams.TimeStamp);
+		Request.set_field_inaccel(improbable::Vector3f(StructuredParams.InAccel.X, StructuredParams.InAccel.Y, StructuredParams.InAccel.Z));
+		Request.set_field_clientloc(improbable::Vector3f(StructuredParams.ClientLoc.X, StructuredParams.ClientLoc.Y, StructuredParams.ClientLoc.Z));
+		Request.set_field_compressedmoveflags(uint32_t(StructuredParams.CompressedMoveFlags));
+		Request.set_field_clientroll(uint32_t(StructuredParams.ClientRoll));
+		Request.set_field_view(uint32_t(StructuredParams.View));
+		if (StructuredParams.ClientMovementBase != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ClientMovementBase);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ClientMovementBase);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMove queued. ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ClientMovementBase};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMove queued. StructuredParams.ClientMovementBase is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ClientMovementBase};
 			}
 			else
 			{
@@ -3055,8 +2972,8 @@ void USpatialTypeBinding_Character::ServerMove_SendCommand(worker::Connection* c
 		{
 			Request.set_field_clientmovementbase(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*ClientBaseBoneName.ToString()));
-		Request.set_field_clientmovementmode(uint32_t(ClientMovementMode));
+		Request.set_field_clientbasebonename(TCHAR_TO_UTF8(*StructuredParams.ClientBaseBoneName.ToString()));
+		Request.set_field_clientmovementmode(uint32_t(StructuredParams.ClientMovementMode));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3083,30 +3000,35 @@ void USpatialTypeBinding_Character::RootMotionDebugClientPrintOnScreen_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: RootMotionDebugClientPrintOnScreen_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: RootMotionDebugClientPrintOnScreen_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: RootMotionDebugClientPrintOnScreen_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FString InString;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventRootMotionDebugClientPrintOnScreen_Parms Parameters;
 
 		// Extract from request data.
-		InString = FString(UTF8_TO_TCHAR(Op.Request.field_instring().c_str()));
+		Parameters.InString = FString(UTF8_TO_TCHAR(Op.Request.field_instring().c_str()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: RootMotionDebugClientPrintOnScreen, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->RootMotionDebugClientPrintOnScreen_Implementation(InString);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("RootMotionDebugClientPrintOnScreen"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: RootMotionDebugClientPrintOnScreen_OnCommandRequest: Function not found. Object: %s, Function: RootMotionDebugClientPrintOnScreen."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3129,41 +3051,30 @@ void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		FVector NewLoc;
-		UPrimitiveComponent* NewBase;
-		FName NewBaseBoneName;
-		bool bHasBase;
-		bool bBaseRelativePosition;
-		uint8 ServerMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventClientVeryShortAdjustPosition_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_newloc();
-			NewLoc.X = Vector.x();
-			NewLoc.Y = Vector.y();
-			NewLoc.Z = Vector.z();
+			Parameters.NewLoc.X = Vector.x();
+			Parameters.NewLoc.Y = Vector.y();
+			Parameters.NewLoc.Z = Vector.z();
 		}
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_newbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				NewBase = nullptr;
+				Parameters.NewBase = nullptr;
 			}
 			else
 			{
@@ -3172,29 +3083,39 @@ void USpatialTypeBinding_Character::ClientVeryShortAdjustPosition_OnCommandReque
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					NewBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(NewBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.NewBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.NewBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: NewBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: Parameters.NewBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		NewBaseBoneName = FName((Op.Request.field_newbasebonename()).data());
-		bHasBase = Op.Request.field_bhasbase();
-		bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
-		ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
+		Parameters.NewBaseBoneName = FName((Op.Request.field_newbasebonename()).data());
+		Parameters.bHasBase = Op.Request.field_bhasbase();
+		Parameters.bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
+		Parameters.ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientVeryShortAdjustPosition, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientVeryShortAdjustPosition_Implementation(TimeStamp, NewLoc, NewBase, NewBaseBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientVeryShortAdjustPosition"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientVeryShortAdjustPosition_OnCommandRequest: Function not found. Object: %s, Function: ClientVeryShortAdjustPosition."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3217,24 +3138,28 @@ void USpatialTypeBinding_Character::ClientCheatWalk_OnCommandRequest(const worke
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCheatWalk_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCheatWalk_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCheatWalk_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCheatWalk, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCheatWalk_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCheatWalk"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCheatWalk_OnCommandRequest: Function not found. Object: %s, Function: ClientCheatWalk."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3257,24 +3182,28 @@ void USpatialTypeBinding_Character::ClientCheatGhost_OnCommandRequest(const work
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCheatGhost_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCheatGhost_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCheatGhost_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCheatGhost, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCheatGhost_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCheatGhost"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCheatGhost_OnCommandRequest: Function not found. Object: %s, Function: ClientCheatGhost."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3297,24 +3226,28 @@ void USpatialTypeBinding_Character::ClientCheatFly_OnCommandRequest(const worker
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCheatFly_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCheatFly_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCheatFly_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCheatFly, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCheatFly_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCheatFly"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCheatFly_OnCommandRequest: Function not found. Object: %s, Function: ClientCheatFly."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3337,65 +3270,49 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_OnComma
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		FRootMotionSourceGroup ServerRootMotion;
-		bool bHasAnimRootMotion;
-		float ServerMontageTrackPosition;
-		FVector ServerLoc;
-		FVector_NetQuantizeNormal ServerRotation;
-		float ServerVelZ;
-		UPrimitiveComponent* ServerBase;
-		FName ServerBoneName;
-		bool bHasBase;
-		bool bBaseRelativePosition;
-		uint8 ServerMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventClientAdjustRootMotionSourcePosition_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
-		ServerRootMotion.bHasAdditiveSources = Op.Request.field_serverrootmotion_bhasadditivesources();
-		ServerRootMotion.bHasOverrideSources = Op.Request.field_serverrootmotion_bhasoverridesources();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
+		Parameters.ServerRootMotion.bHasAdditiveSources = Op.Request.field_serverrootmotion_bhasadditivesources();
+		Parameters.ServerRootMotion.bHasOverrideSources = Op.Request.field_serverrootmotion_bhasoverridesources();
 		{
 			auto& Vector = Op.Request.field_serverrootmotion_lastpreadditivevelocity();
-			ServerRootMotion.LastPreAdditiveVelocity.X = Vector.x();
-			ServerRootMotion.LastPreAdditiveVelocity.Y = Vector.y();
-			ServerRootMotion.LastPreAdditiveVelocity.Z = Vector.z();
+			Parameters.ServerRootMotion.LastPreAdditiveVelocity.X = Vector.x();
+			Parameters.ServerRootMotion.LastPreAdditiveVelocity.Y = Vector.y();
+			Parameters.ServerRootMotion.LastPreAdditiveVelocity.Z = Vector.z();
 		}
-		ServerRootMotion.bIsAdditiveVelocityApplied = Op.Request.field_serverrootmotion_bisadditivevelocityapplied();
-		ServerRootMotion.LastAccumulatedSettings.Flags = uint8(uint8(Op.Request.field_serverrootmotion_lastaccumulatedsettings_flags()));
-		bHasAnimRootMotion = Op.Request.field_bhasanimrootmotion();
-		ServerMontageTrackPosition = Op.Request.field_servermontagetrackposition();
+		Parameters.ServerRootMotion.bIsAdditiveVelocityApplied = Op.Request.field_serverrootmotion_bisadditivevelocityapplied();
+		Parameters.ServerRootMotion.LastAccumulatedSettings.Flags = uint8(uint8(Op.Request.field_serverrootmotion_lastaccumulatedsettings_flags()));
+		Parameters.bHasAnimRootMotion = Op.Request.field_bhasanimrootmotion();
+		Parameters.ServerMontageTrackPosition = Op.Request.field_servermontagetrackposition();
 		{
 			auto& Vector = Op.Request.field_serverloc();
-			ServerLoc.X = Vector.x();
-			ServerLoc.Y = Vector.y();
-			ServerLoc.Z = Vector.z();
+			Parameters.ServerLoc.X = Vector.x();
+			Parameters.ServerLoc.Y = Vector.y();
+			Parameters.ServerLoc.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_serverrotation();
-			ServerRotation.X = Vector.x();
-			ServerRotation.Y = Vector.y();
-			ServerRotation.Z = Vector.z();
+			Parameters.ServerRotation.X = Vector.x();
+			Parameters.ServerRotation.Y = Vector.y();
+			Parameters.ServerRotation.Z = Vector.z();
 		}
-		ServerVelZ = Op.Request.field_servervelz();
+		Parameters.ServerVelZ = Op.Request.field_servervelz();
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_serverbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ServerBase = nullptr;
+				Parameters.ServerBase = nullptr;
 			}
 			else
 			{
@@ -3404,29 +3321,39 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionSourcePosition_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ServerBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(ServerBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ServerBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.ServerBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: ServerBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: Parameters.ServerBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ServerBoneName = FName((Op.Request.field_serverbonename()).data());
-		bHasBase = Op.Request.field_bhasbase();
-		bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
-		ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
+		Parameters.ServerBoneName = FName((Op.Request.field_serverbonename()).data());
+		Parameters.bHasBase = Op.Request.field_bhasbase();
+		Parameters.bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
+		Parameters.ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAdjustRootMotionSourcePosition, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientAdjustRootMotionSourcePosition_Implementation(TimeStamp, ServerRootMotion, bHasAnimRootMotion, ServerMontageTrackPosition, ServerLoc, ServerRotation, ServerVelZ, ServerBase, ServerBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientAdjustRootMotionSourcePosition"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAdjustRootMotionSourcePosition_OnCommandRequest: Function not found. Object: %s, Function: ClientAdjustRootMotionSourcePosition."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3449,52 +3376,38 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		float ServerMontageTrackPosition;
-		FVector ServerLoc;
-		FVector_NetQuantizeNormal ServerRotation;
-		float ServerVelZ;
-		UPrimitiveComponent* ServerBase;
-		FName ServerBoneName;
-		bool bHasBase;
-		bool bBaseRelativePosition;
-		uint8 ServerMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventClientAdjustRootMotionPosition_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
-		ServerMontageTrackPosition = Op.Request.field_servermontagetrackposition();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
+		Parameters.ServerMontageTrackPosition = Op.Request.field_servermontagetrackposition();
 		{
 			auto& Vector = Op.Request.field_serverloc();
-			ServerLoc.X = Vector.x();
-			ServerLoc.Y = Vector.y();
-			ServerLoc.Z = Vector.z();
+			Parameters.ServerLoc.X = Vector.x();
+			Parameters.ServerLoc.Y = Vector.y();
+			Parameters.ServerLoc.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_serverrotation();
-			ServerRotation.X = Vector.x();
-			ServerRotation.Y = Vector.y();
-			ServerRotation.Z = Vector.z();
+			Parameters.ServerRotation.X = Vector.x();
+			Parameters.ServerRotation.Y = Vector.y();
+			Parameters.ServerRotation.Z = Vector.z();
 		}
-		ServerVelZ = Op.Request.field_servervelz();
+		Parameters.ServerVelZ = Op.Request.field_servervelz();
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_serverbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ServerBase = nullptr;
+				Parameters.ServerBase = nullptr;
 			}
 			else
 			{
@@ -3503,29 +3416,39 @@ void USpatialTypeBinding_Character::ClientAdjustRootMotionPosition_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ServerBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(ServerBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ServerBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.ServerBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: ServerBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: Parameters.ServerBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ServerBoneName = FName((Op.Request.field_serverbonename()).data());
-		bHasBase = Op.Request.field_bhasbase();
-		bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
-		ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
+		Parameters.ServerBoneName = FName((Op.Request.field_serverbonename()).data());
+		Parameters.bHasBase = Op.Request.field_bhasbase();
+		Parameters.bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
+		Parameters.ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAdjustRootMotionPosition, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientAdjustRootMotionPosition_Implementation(TimeStamp, ServerMontageTrackPosition, ServerLoc, ServerRotation, ServerVelZ, ServerBase, ServerBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientAdjustRootMotionPosition"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAdjustRootMotionPosition_OnCommandRequest: Function not found. Object: %s, Function: ClientAdjustRootMotionPosition."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3548,48 +3471,36 @@ void USpatialTypeBinding_Character::ClientAdjustPosition_OnCommandRequest(const 
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientAdjustPosition_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		FVector NewLoc;
-		FVector NewVel;
-		UPrimitiveComponent* NewBase;
-		FName NewBaseBoneName;
-		bool bHasBase;
-		bool bBaseRelativePosition;
-		uint8 ServerMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventClientAdjustPosition_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_newloc();
-			NewLoc.X = Vector.x();
-			NewLoc.Y = Vector.y();
-			NewLoc.Z = Vector.z();
+			Parameters.NewLoc.X = Vector.x();
+			Parameters.NewLoc.Y = Vector.y();
+			Parameters.NewLoc.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_newvel();
-			NewVel.X = Vector.x();
-			NewVel.Y = Vector.y();
-			NewVel.Z = Vector.z();
+			Parameters.NewVel.X = Vector.x();
+			Parameters.NewVel.Y = Vector.y();
+			Parameters.NewVel.Z = Vector.z();
 		}
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_newbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				NewBase = nullptr;
+				Parameters.NewBase = nullptr;
 			}
 			else
 			{
@@ -3598,29 +3509,39 @@ void USpatialTypeBinding_Character::ClientAdjustPosition_OnCommandRequest(const 
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					NewBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(NewBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.NewBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.NewBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustPosition_OnCommandRequest: NewBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAdjustPosition_OnCommandRequest: Parameters.NewBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		NewBaseBoneName = FName((Op.Request.field_newbasebonename()).data());
-		bHasBase = Op.Request.field_bhasbase();
-		bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
-		ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
+		Parameters.NewBaseBoneName = FName((Op.Request.field_newbasebonename()).data());
+		Parameters.bHasBase = Op.Request.field_bhasbase();
+		Parameters.bBaseRelativePosition = Op.Request.field_bbaserelativeposition();
+		Parameters.ServerMovementMode = uint8(uint8(Op.Request.field_servermovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAdjustPosition, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientAdjustPosition_Implementation(TimeStamp, NewLoc, NewVel, NewBase, NewBaseBoneName, bHasBase, bBaseRelativePosition, ServerMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientAdjustPosition"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAdjustPosition_OnCommandRequest: Function not found. Object: %s, Function: ClientAdjustPosition."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3643,30 +3564,35 @@ void USpatialTypeBinding_Character::ClientAckGoodMove_OnCommandRequest(const wor
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientAckGoodMove_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientAckGoodMove_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientAckGoodMove_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventClientAckGoodMove_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAckGoodMove, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientAckGoodMove_Implementation(TimeStamp);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientAckGoodMove"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAckGoodMove_OnCommandRequest: Function not found. Object: %s, Function: ClientAckGoodMove."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3689,39 +3615,42 @@ void USpatialTypeBinding_Character::ServerMoveOld_OnCommandRequest(const worker:
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMoveOld_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMoveOld_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMoveOld_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float OldTimeStamp;
-		FVector_NetQuantize10 OldAccel;
-		uint8 OldMoveFlags;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMoveOld_Parms Parameters;
 
 		// Extract from request data.
-		OldTimeStamp = Op.Request.field_oldtimestamp();
+		Parameters.OldTimeStamp = Op.Request.field_oldtimestamp();
 		{
 			auto& Vector = Op.Request.field_oldaccel();
-			OldAccel.X = Vector.x();
-			OldAccel.Y = Vector.y();
-			OldAccel.Z = Vector.z();
+			Parameters.OldAccel.X = Vector.x();
+			Parameters.OldAccel.Y = Vector.y();
+			Parameters.OldAccel.Z = Vector.z();
 		}
-		OldMoveFlags = uint8(uint8(Op.Request.field_oldmoveflags()));
+		Parameters.OldMoveFlags = uint8(uint8(Op.Request.field_oldmoveflags()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMoveOld, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMoveOld_Implementation(OldTimeStamp, OldAccel, OldMoveFlags);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMoveOld"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMoveOld_OnCommandRequest: Function not found. Object: %s, Function: ServerMoveOld."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3744,52 +3673,51 @@ void USpatialTypeBinding_Character::ServerMoveNoBase_OnCommandRequest(const work
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMoveNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMoveNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMoveNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		FVector_NetQuantize10 InAccel;
-		FVector_NetQuantize100 ClientLoc;
-		uint8 CompressedMoveFlags;
-		uint8 ClientRoll;
-		uint32 View;
-		uint8 ClientMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMoveNoBase_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_inaccel();
-			InAccel.X = Vector.x();
-			InAccel.Y = Vector.y();
-			InAccel.Z = Vector.z();
+			Parameters.InAccel.X = Vector.x();
+			Parameters.InAccel.Y = Vector.y();
+			Parameters.InAccel.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_clientloc();
-			ClientLoc.X = Vector.x();
-			ClientLoc.Y = Vector.y();
-			ClientLoc.Z = Vector.z();
+			Parameters.ClientLoc.X = Vector.x();
+			Parameters.ClientLoc.Y = Vector.y();
+			Parameters.ClientLoc.Z = Vector.z();
 		}
-		CompressedMoveFlags = uint8(uint8(Op.Request.field_compressedmoveflags()));
-		ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
-		View = uint32(Op.Request.field_view());
-		ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
+		Parameters.CompressedMoveFlags = uint8(uint8(Op.Request.field_compressedmoveflags()));
+		Parameters.ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
+		Parameters.View = uint32(Op.Request.field_view());
+		Parameters.ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMoveNoBase, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMoveNoBase_Implementation(TimeStamp, InAccel, ClientLoc, CompressedMoveFlags, ClientRoll, View, ClientMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMoveNoBase"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMoveNoBase_OnCommandRequest: Function not found. Object: %s, Function: ServerMoveNoBase."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3812,65 +3740,60 @@ void USpatialTypeBinding_Character::ServerMoveDualNoBase_OnCommandRequest(const 
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMoveDualNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMoveDualNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMoveDualNoBase_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp0;
-		FVector_NetQuantize10 InAccel0;
-		uint8 PendingFlags;
-		uint32 View0;
-		float TimeStamp;
-		FVector_NetQuantize10 InAccel;
-		FVector_NetQuantize100 ClientLoc;
-		uint8 NewFlags;
-		uint8 ClientRoll;
-		uint32 View;
-		uint8 ClientMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMoveDualNoBase_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp0 = Op.Request.field_timestamp0();
+		Parameters.TimeStamp0 = Op.Request.field_timestamp0();
 		{
 			auto& Vector = Op.Request.field_inaccel0();
-			InAccel0.X = Vector.x();
-			InAccel0.Y = Vector.y();
-			InAccel0.Z = Vector.z();
+			Parameters.InAccel0.X = Vector.x();
+			Parameters.InAccel0.Y = Vector.y();
+			Parameters.InAccel0.Z = Vector.z();
 		}
-		PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
-		View0 = uint32(Op.Request.field_view0());
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
+		Parameters.View0 = uint32(Op.Request.field_view0());
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_inaccel();
-			InAccel.X = Vector.x();
-			InAccel.Y = Vector.y();
-			InAccel.Z = Vector.z();
+			Parameters.InAccel.X = Vector.x();
+			Parameters.InAccel.Y = Vector.y();
+			Parameters.InAccel.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_clientloc();
-			ClientLoc.X = Vector.x();
-			ClientLoc.Y = Vector.y();
-			ClientLoc.Z = Vector.z();
+			Parameters.ClientLoc.X = Vector.x();
+			Parameters.ClientLoc.Y = Vector.y();
+			Parameters.ClientLoc.Z = Vector.z();
 		}
-		NewFlags = uint8(uint8(Op.Request.field_newflags()));
-		ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
-		View = uint32(Op.Request.field_view());
-		ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
+		Parameters.NewFlags = uint8(uint8(Op.Request.field_newflags()));
+		Parameters.ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
+		Parameters.View = uint32(Op.Request.field_view());
+		Parameters.ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMoveDualNoBase, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMoveDualNoBase_Implementation(TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMoveDualNoBase"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMoveDualNoBase_OnCommandRequest: Function not found. Object: %s, Function: ServerMoveDualNoBase."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -3893,65 +3816,48 @@ void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp0;
-		FVector_NetQuantize10 InAccel0;
-		uint8 PendingFlags;
-		uint32 View0;
-		float TimeStamp;
-		FVector_NetQuantize10 InAccel;
-		FVector_NetQuantize100 ClientLoc;
-		uint8 NewFlags;
-		uint8 ClientRoll;
-		uint32 View;
-		UPrimitiveComponent* ClientMovementBase;
-		FName ClientBaseBoneName;
-		uint8 ClientMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMoveDualHybridRootMotion_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp0 = Op.Request.field_timestamp0();
+		Parameters.TimeStamp0 = Op.Request.field_timestamp0();
 		{
 			auto& Vector = Op.Request.field_inaccel0();
-			InAccel0.X = Vector.x();
-			InAccel0.Y = Vector.y();
-			InAccel0.Z = Vector.z();
+			Parameters.InAccel0.X = Vector.x();
+			Parameters.InAccel0.Y = Vector.y();
+			Parameters.InAccel0.Z = Vector.z();
 		}
-		PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
-		View0 = uint32(Op.Request.field_view0());
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
+		Parameters.View0 = uint32(Op.Request.field_view0());
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_inaccel();
-			InAccel.X = Vector.x();
-			InAccel.Y = Vector.y();
-			InAccel.Z = Vector.z();
+			Parameters.InAccel.X = Vector.x();
+			Parameters.InAccel.Y = Vector.y();
+			Parameters.InAccel.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_clientloc();
-			ClientLoc.X = Vector.x();
-			ClientLoc.Y = Vector.y();
-			ClientLoc.Z = Vector.z();
+			Parameters.ClientLoc.X = Vector.x();
+			Parameters.ClientLoc.Y = Vector.y();
+			Parameters.ClientLoc.Z = Vector.z();
 		}
-		NewFlags = uint8(uint8(Op.Request.field_newflags()));
-		ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
-		View = uint32(Op.Request.field_view());
+		Parameters.NewFlags = uint8(uint8(Op.Request.field_newflags()));
+		Parameters.ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
+		Parameters.View = uint32(Op.Request.field_view());
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_clientmovementbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ClientMovementBase = nullptr;
+				Parameters.ClientMovementBase = nullptr;
 			}
 			else
 			{
@@ -3960,27 +3866,37 @@ void USpatialTypeBinding_Character::ServerMoveDualHybridRootMotion_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: ClientMovementBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: Parameters.ClientMovementBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
-		ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
+		Parameters.ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
+		Parameters.ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMoveDualHybridRootMotion, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMoveDualHybridRootMotion_Implementation(TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMoveDualHybridRootMotion"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMoveDualHybridRootMotion_OnCommandRequest: Function not found. Object: %s, Function: ServerMoveDualHybridRootMotion."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4003,65 +3919,48 @@ void USpatialTypeBinding_Character::ServerMoveDual_OnCommandRequest(const worker
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMoveDual_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMoveDual_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMoveDual_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp0;
-		FVector_NetQuantize10 InAccel0;
-		uint8 PendingFlags;
-		uint32 View0;
-		float TimeStamp;
-		FVector_NetQuantize10 InAccel;
-		FVector_NetQuantize100 ClientLoc;
-		uint8 NewFlags;
-		uint8 ClientRoll;
-		uint32 View;
-		UPrimitiveComponent* ClientMovementBase;
-		FName ClientBaseBoneName;
-		uint8 ClientMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMoveDual_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp0 = Op.Request.field_timestamp0();
+		Parameters.TimeStamp0 = Op.Request.field_timestamp0();
 		{
 			auto& Vector = Op.Request.field_inaccel0();
-			InAccel0.X = Vector.x();
-			InAccel0.Y = Vector.y();
-			InAccel0.Z = Vector.z();
+			Parameters.InAccel0.X = Vector.x();
+			Parameters.InAccel0.Y = Vector.y();
+			Parameters.InAccel0.Z = Vector.z();
 		}
-		PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
-		View0 = uint32(Op.Request.field_view0());
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.PendingFlags = uint8(uint8(Op.Request.field_pendingflags()));
+		Parameters.View0 = uint32(Op.Request.field_view0());
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_inaccel();
-			InAccel.X = Vector.x();
-			InAccel.Y = Vector.y();
-			InAccel.Z = Vector.z();
+			Parameters.InAccel.X = Vector.x();
+			Parameters.InAccel.Y = Vector.y();
+			Parameters.InAccel.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_clientloc();
-			ClientLoc.X = Vector.x();
-			ClientLoc.Y = Vector.y();
-			ClientLoc.Z = Vector.z();
+			Parameters.ClientLoc.X = Vector.x();
+			Parameters.ClientLoc.Y = Vector.y();
+			Parameters.ClientLoc.Z = Vector.z();
 		}
-		NewFlags = uint8(uint8(Op.Request.field_newflags()));
-		ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
-		View = uint32(Op.Request.field_view());
+		Parameters.NewFlags = uint8(uint8(Op.Request.field_newflags()));
+		Parameters.ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
+		Parameters.View = uint32(Op.Request.field_view());
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_clientmovementbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ClientMovementBase = nullptr;
+				Parameters.ClientMovementBase = nullptr;
 			}
 			else
 			{
@@ -4070,27 +3969,37 @@ void USpatialTypeBinding_Character::ServerMoveDual_OnCommandRequest(const worker
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMoveDual_OnCommandRequest: ClientMovementBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMoveDual_OnCommandRequest: Parameters.ClientMovementBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
-		ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
+		Parameters.ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
+		Parameters.ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMoveDual, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMoveDual_Implementation(TimeStamp0, InAccel0, PendingFlags, View0, TimeStamp, InAccel, ClientLoc, NewFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMoveDual"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMoveDual_OnCommandRequest: Function not found. Object: %s, Function: ServerMoveDual."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4113,52 +4022,39 @@ void USpatialTypeBinding_Character::ServerMove_OnCommandRequest(const worker::Co
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		ACharacter* TargetObject = Cast<ACharacter>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMove_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMove_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMove_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		float TimeStamp;
-		FVector_NetQuantize10 InAccel;
-		FVector_NetQuantize100 ClientLoc;
-		uint8 CompressedMoveFlags;
-		uint8 ClientRoll;
-		uint32 View;
-		UPrimitiveComponent* ClientMovementBase;
-		FName ClientBaseBoneName;
-		uint8 ClientMovementMode;
+		// This struct is declared in Character.generated.h (in a macro that is then put in Character.h UCLASS macro)
+		Character_eventServerMove_Parms Parameters;
 
 		// Extract from request data.
-		TimeStamp = Op.Request.field_timestamp();
+		Parameters.TimeStamp = Op.Request.field_timestamp();
 		{
 			auto& Vector = Op.Request.field_inaccel();
-			InAccel.X = Vector.x();
-			InAccel.Y = Vector.y();
-			InAccel.Z = Vector.z();
+			Parameters.InAccel.X = Vector.x();
+			Parameters.InAccel.Y = Vector.y();
+			Parameters.InAccel.Z = Vector.z();
 		}
 		{
 			auto& Vector = Op.Request.field_clientloc();
-			ClientLoc.X = Vector.x();
-			ClientLoc.Y = Vector.y();
-			ClientLoc.Z = Vector.z();
+			Parameters.ClientLoc.X = Vector.x();
+			Parameters.ClientLoc.Y = Vector.y();
+			Parameters.ClientLoc.Z = Vector.z();
 		}
-		CompressedMoveFlags = uint8(uint8(Op.Request.field_compressedmoveflags()));
-		ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
-		View = uint32(Op.Request.field_view());
+		Parameters.CompressedMoveFlags = uint8(uint8(Op.Request.field_compressedmoveflags()));
+		Parameters.ClientRoll = uint8(uint8(Op.Request.field_clientroll()));
+		Parameters.View = uint32(Op.Request.field_view());
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_clientmovementbase();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ClientMovementBase = nullptr;
+				Parameters.ClientMovementBase = nullptr;
 			}
 			else
 			{
@@ -4167,27 +4063,37 @@ void USpatialTypeBinding_Character::ServerMove_OnCommandRequest(const worker::Co
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
-					checkf(ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ClientMovementBase = dynamic_cast<UPrimitiveComponent*>(Object_Raw);
+					checkf(Parameters.ClientMovementBase, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMove_OnCommandRequest: ClientMovementBase %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMove_OnCommandRequest: Parameters.ClientMovementBase %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
-		ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
+		Parameters.ClientBaseBoneName = FName((Op.Request.field_clientbasebonename()).data());
+		Parameters.ClientMovementMode = uint8(uint8(Op.Request.field_clientmovementmode()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMove, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMove_Implementation(TimeStamp, InAccel, ClientLoc, CompressedMoveFlags, ClientRoll, View, ClientMovementBase, ClientBaseBoneName, ClientMovementMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMove"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMove_OnCommandRequest: Function not found. Object: %s, Function: ServerMove."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();

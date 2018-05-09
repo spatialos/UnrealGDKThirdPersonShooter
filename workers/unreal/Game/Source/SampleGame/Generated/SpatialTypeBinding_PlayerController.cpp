@@ -17,6 +17,10 @@
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 #include "Camera/CameraAnim.h"
+#include "Camera/CameraShake.h"
+#include "GameFramework/HUD.h"
+#include "GameFramework/LocalMessage.h"
+#include "Particles/EmitterCameraLensEffectBase.h"
 
 #include "UnrealPlayerControllerSingleClientRepDataAddComponentOp.h"
 #include "UnrealPlayerControllerMultiClientRepDataAddComponentOp.h"
@@ -451,12 +455,12 @@ void USpatialTypeBinding_PlayerController::SendComponentUpdates(const FPropertyC
 	}
 }
 
-void USpatialTypeBinding_PlayerController::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, FFrame* const Frame)
+void USpatialTypeBinding_PlayerController::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
-	(this->*(*SenderFuncIterator))(Connection.Get(), Frame, TargetObject);
+	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
 void USpatialTypeBinding_PlayerController::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
@@ -1608,12 +1612,12 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_Migratable(USpatialActo
 	}
 }
 
-void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bIsLogging);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventOnServerStartedVisualLogger_Parms StructuredParams = *static_cast<PlayerController_eventOnServerStartedVisualLogger_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bIsLogging]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1625,7 +1629,7 @@ void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealOnServerStartedVisualLoggerRequest Request;
-		Request.set_field_bislogging(bIsLogging);
+		Request.set_field_bislogging(StructuredParams.bIsLogging);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1639,12 +1643,12 @@ void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendComma
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientWasKicked_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientWasKicked_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UTextProperty, KickReason);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientWasKicked_Parms StructuredParams = *static_cast<PlayerController_eventClientWasKicked_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, KickReason]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1656,7 +1660,7 @@ void USpatialTypeBinding_PlayerController::ClientWasKicked_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealClientWasKickedRequest Request;
-		// UNSUPPORTED UTextProperty (unhandled) Request.set_field_kickreason(KickReason)
+		// UNSUPPORTED UTextProperty (unhandled) Request.set_field_kickreason(StructuredParams.KickReason)
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1670,7 +1674,7 @@ void USpatialTypeBinding_PlayerController::ClientWasKicked_SendCommand(worker::C
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -1697,12 +1701,12 @@ void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_TARRAY(FUpdateLevelStreamingLevelStatus, LevelStatuses)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientUpdateMultipleLevelsStreamingStatus_Parms StructuredParams = *static_cast<PlayerController_eventClientUpdateMultipleLevelsStreamingStatus_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, LevelStatuses]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1716,11 +1720,11 @@ void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingSt
 		improbable::unreal::UnrealClientUpdateMultipleLevelsStreamingStatusRequest Request;
 		{
 			::worker::List<std::string> List;
-			for(int i = 0; i < LevelStatuses.Num(); i++)
+			for(int i = 0; i < StructuredParams.LevelStatuses.Num(); i++)
 			{
 				TArray<uint8> ValueData;
 				FMemoryWriter ValueDataWriter(ValueData);
-				FUpdateLevelStreamingLevelStatus::StaticStruct()->SerializeBin(ValueDataWriter, reinterpret_cast<void*>(const_cast<FUpdateLevelStreamingLevelStatus*>(&LevelStatuses[i])));
+				FUpdateLevelStreamingLevelStatus::StaticStruct()->SerializeBin(ValueDataWriter, reinterpret_cast<void*>(const_cast<FUpdateLevelStreamingLevelStatus*>(&StructuredParams.LevelStatuses[i])));
 				List.emplace_back(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
 			Request.set_field_levelstatuses(List);
@@ -1738,16 +1742,12 @@ void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingSt
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, PackageName);
-	P_GET_UBOOL(bNewShouldBeLoaded);
-	P_GET_UBOOL(bNewShouldBeVisible);
-	P_GET_UBOOL(bNewShouldBlockOnLoad);
-	P_GET_PROPERTY(UIntProperty, LODIndex);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientUpdateLevelStreamingStatus_Parms StructuredParams = *static_cast<PlayerController_eventClientUpdateLevelStreamingStatus_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PackageName, bNewShouldBeLoaded, bNewShouldBeVisible, bNewShouldBlockOnLoad, LODIndex]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1759,11 +1759,11 @@ void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_Send
 
 		// Build request.
 		improbable::unreal::UnrealClientUpdateLevelStreamingStatusRequest Request;
-		Request.set_field_packagename(TCHAR_TO_UTF8(*PackageName.ToString()));
-		Request.set_field_bnewshouldbeloaded(bNewShouldBeLoaded);
-		Request.set_field_bnewshouldbevisible(bNewShouldBeVisible);
-		Request.set_field_bnewshouldblockonload(bNewShouldBlockOnLoad);
-		Request.set_field_lodindex(LODIndex);
+		Request.set_field_packagename(TCHAR_TO_UTF8(*StructuredParams.PackageName.ToString()));
+		Request.set_field_bnewshouldbeloaded(StructuredParams.bNewShouldBeLoaded);
+		Request.set_field_bnewshouldbevisible(StructuredParams.bNewShouldBeVisible);
+		Request.set_field_bnewshouldblockonload(StructuredParams.bNewShouldBlockOnLoad);
+		Request.set_field_lodindex(StructuredParams.LODIndex);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1777,12 +1777,12 @@ void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_Send
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FUniqueNetIdRepl, PlayerId)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientUnmutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventClientUnmutePlayer_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PlayerId]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1798,7 +1798,7 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendCommand(worker
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(StructuredParams.PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -1814,15 +1814,12 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendCommand(worker
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UStrProperty, URL);
-	P_GET_PROPERTY(UByteProperty, TravelType);
-	P_GET_UBOOL(bSeamless);
-	P_GET_STRUCT(FGuid, MapPackageGuid)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientTravelInternal_Parms StructuredParams = *static_cast<PlayerController_eventClientTravelInternal_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, URL, TravelType, bSeamless, MapPackageGuid]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1834,13 +1831,13 @@ void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendCommand(work
 
 		// Build request.
 		improbable::unreal::UnrealClientTravelInternalRequest Request;
-		Request.set_field_url(TCHAR_TO_UTF8(*URL));
-		Request.set_field_traveltype(uint32_t(TravelType));
-		Request.set_field_bseamless(bSeamless);
-		Request.set_field_mappackageguid_a(MapPackageGuid.A);
-		Request.set_field_mappackageguid_b(MapPackageGuid.B);
-		Request.set_field_mappackageguid_c(MapPackageGuid.C);
-		Request.set_field_mappackageguid_d(MapPackageGuid.D);
+		Request.set_field_url(TCHAR_TO_UTF8(*StructuredParams.URL));
+		Request.set_field_traveltype(uint32_t(StructuredParams.TravelType));
+		Request.set_field_bseamless(StructuredParams.bSeamless);
+		Request.set_field_mappackageguid_a(StructuredParams.MapPackageGuid.A);
+		Request.set_field_mappackageguid_b(StructuredParams.MapPackageGuid.B);
+		Request.set_field_mappackageguid_c(StructuredParams.MapPackageGuid.C);
+		Request.set_field_mappackageguid_d(StructuredParams.MapPackageGuid.D);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1854,15 +1851,12 @@ void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendCommand(work
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(APlayerState, SenderPlayerState);
-	P_GET_PROPERTY(UStrProperty, S);
-	P_GET_PROPERTY(UNameProperty, Type);
-	P_GET_PROPERTY(UFloatProperty, MsgLifeTime);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientTeamMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientTeamMessage_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, SenderPlayerState, S, Type, MsgLifeTime]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1874,14 +1868,14 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendCommand(worker:
 
 		// Build request.
 		improbable::unreal::UnrealClientTeamMessageRequest Request;
-		if (SenderPlayerState != nullptr)
+		if (StructuredParams.SenderPlayerState != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(SenderPlayerState);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.SenderPlayerState);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. SenderPlayerState is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {SenderPlayerState};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. StructuredParams.SenderPlayerState is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.SenderPlayerState};
 			}
 			else
 			{
@@ -1892,9 +1886,9 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendCommand(worker:
 		{
 			Request.set_field_senderplayerstate(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_s(TCHAR_TO_UTF8(*S));
-		Request.set_field_type(TCHAR_TO_UTF8(*Type.ToString()));
-		Request.set_field_msglifetime(MsgLifeTime);
+		Request.set_field_s(TCHAR_TO_UTF8(*StructuredParams.S));
+		Request.set_field_type(TCHAR_TO_UTF8(*StructuredParams.Type.ToString()));
+		Request.set_field_msglifetime(StructuredParams.MsgLifeTime);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1908,13 +1902,12 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendCommand(worker:
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UForceFeedbackEffect, ForceFeedbackEffect);
-	P_GET_PROPERTY(UNameProperty, Tag);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientStopForceFeedback_Parms StructuredParams = *static_cast<PlayerController_eventClientStopForceFeedback_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, ForceFeedbackEffect, Tag]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1926,14 +1919,14 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealClientStopForceFeedbackRequest Request;
-		if (ForceFeedbackEffect != nullptr)
+		if (StructuredParams.ForceFeedbackEffect != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ForceFeedbackEffect);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForceFeedbackEffect);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ForceFeedbackEffect};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ForceFeedbackEffect};
 			}
 			else
 			{
@@ -1944,7 +1937,7 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendCommand(w
 		{
 			Request.set_field_forcefeedbackeffect(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_tag(TCHAR_TO_UTF8(*Tag.ToString()));
+		Request.set_field_tag(TCHAR_TO_UTF8(*StructuredParams.Tag.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1958,13 +1951,12 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UClass, Shake);
-	P_GET_UBOOL(bImmediately);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientStopCameraShake_Parms StructuredParams = *static_cast<PlayerController_eventClientStopCameraShake_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Shake, bImmediately]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -1976,8 +1968,8 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientStopCameraShakeRequest Request;
-		Request.set_field_shake(PackageMap->GetHashFromStaticClass(Shake));
-		Request.set_field_bimmediately(bImmediately);
+		Request.set_field_shake(PackageMap->GetHashFromStaticClass(StructuredParams.Shake));
+		Request.set_field_bimmediately(StructuredParams.bImmediately);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1991,12 +1983,12 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UCameraAnim, AnimToStop);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientStopCameraAnim_Parms StructuredParams = *static_cast<PlayerController_eventClientStopCameraAnim_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, AnimToStop]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2008,14 +2000,14 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendCommand(work
 
 		// Build request.
 		improbable::unreal::UnrealClientStopCameraAnimRequest Request;
-		if (AnimToStop != nullptr)
+		if (StructuredParams.AnimToStop != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(AnimToStop);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.AnimToStop);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. AnimToStop is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {AnimToStop};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. StructuredParams.AnimToStop is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.AnimToStop};
 			}
 			else
 			{
@@ -2039,7 +2031,7 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendCommand(work
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2066,12 +2058,12 @@ void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_SendCommand(
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UClass, LensEffectEmitterClass);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSpawnCameraLensEffect_Parms StructuredParams = *static_cast<PlayerController_eventClientSpawnCameraLensEffect_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, LensEffectEmitterClass]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2083,7 +2075,7 @@ void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealClientSpawnCameraLensEffectRequest Request;
-		Request.set_field_lenseffectemitterclass(PackageMap->GetHashFromStaticClass(LensEffectEmitterClass));
+		Request.set_field_lenseffectemitterclass(PackageMap->GetHashFromStaticClass(StructuredParams.LensEffectEmitterClass));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2097,13 +2089,12 @@ void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendComma
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(AActor, A);
-	P_GET_STRUCT(FViewTargetTransitionParams, TransitionParams)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetViewTarget_Parms StructuredParams = *static_cast<PlayerController_eventClientSetViewTarget_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, A, TransitionParams]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2115,14 +2106,14 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendCommand(worke
 
 		// Build request.
 		improbable::unreal::UnrealClientSetViewTargetRequest Request;
-		if (A != nullptr)
+		if (StructuredParams.A != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(A);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.A);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. A is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {A};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. StructuredParams.A is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.A};
 			}
 			else
 			{
@@ -2133,10 +2124,10 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendCommand(worke
 		{
 			Request.set_field_a(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_transitionparams_blendtime(TransitionParams.BlendTime);
-		Request.set_field_transitionparams_blendfunction(uint32_t(TransitionParams.BlendFunction));
-		Request.set_field_transitionparams_blendexp(TransitionParams.BlendExp);
-		Request.set_field_transitionparams_blockoutgoing(TransitionParams.bLockOutgoing);
+		Request.set_field_transitionparams_blendtime(StructuredParams.TransitionParams.BlendTime);
+		Request.set_field_transitionparams_blendfunction(uint32_t(StructuredParams.TransitionParams.BlendFunction));
+		Request.set_field_transitionparams_blendexp(StructuredParams.TransitionParams.BlendExp);
+		Request.set_field_transitionparams_blockoutgoing(StructuredParams.TransitionParams.bLockOutgoing);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2150,12 +2141,12 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendCommand(worke
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bWaiting);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetSpectatorWaiting_Parms StructuredParams = *static_cast<PlayerController_eventClientSetSpectatorWaiting_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bWaiting]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2167,7 +2158,7 @@ void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendCommand
 
 		// Build request.
 		improbable::unreal::UnrealClientSetSpectatorWaitingRequest Request;
-		Request.set_field_bwaiting(bWaiting);
+		Request.set_field_bwaiting(StructuredParams.bWaiting);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2181,12 +2172,12 @@ void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendCommand
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetHUD_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetHUD_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UClass, NewHUDClass);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetHUD_Parms StructuredParams = *static_cast<PlayerController_eventClientSetHUD_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewHUDClass]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2198,7 +2189,7 @@ void USpatialTypeBinding_PlayerController::ClientSetHUD_SendCommand(worker::Conn
 
 		// Build request.
 		improbable::unreal::UnrealClientSetHUDRequest Request;
-		Request.set_field_newhudclass(PackageMap->GetHashFromStaticClass(NewHUDClass));
+		Request.set_field_newhudclass(PackageMap->GetHashFromStaticClass(StructuredParams.NewHUDClass));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2212,14 +2203,12 @@ void USpatialTypeBinding_PlayerController::ClientSetHUD_SendCommand(worker::Conn
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UMaterialInterface, Material);
-	P_GET_PROPERTY(UFloatProperty, ForceDuration);
-	P_GET_PROPERTY(UIntProperty, CinematicTextureGroups);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetForceMipLevelsToBeResident_Parms StructuredParams = *static_cast<PlayerController_eventClientSetForceMipLevelsToBeResident_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Material, ForceDuration, CinematicTextureGroups]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2231,14 +2220,14 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_S
 
 		// Build request.
 		improbable::unreal::UnrealClientSetForceMipLevelsToBeResidentRequest Request;
-		if (Material != nullptr)
+		if (StructuredParams.Material != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Material);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Material);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. Material is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {Material};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. StructuredParams.Material is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.Material};
 			}
 			else
 			{
@@ -2249,8 +2238,8 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_S
 		{
 			Request.set_field_material(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_forceduration(ForceDuration);
-		Request.set_field_cinematictexturegroups(CinematicTextureGroups);
+		Request.set_field_forceduration(StructuredParams.ForceDuration);
+		Request.set_field_cinematictexturegroups(StructuredParams.CinematicTextureGroups);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2264,15 +2253,12 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_S
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bInCinematicMode);
-	P_GET_UBOOL(bAffectsMovement);
-	P_GET_UBOOL(bAffectsTurning);
-	P_GET_UBOOL(bAffectsHUD);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetCinematicMode_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCinematicMode_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bInCinematicMode, bAffectsMovement, bAffectsTurning, bAffectsHUD]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2284,10 +2270,10 @@ void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendCommand(wo
 
 		// Build request.
 		improbable::unreal::UnrealClientSetCinematicModeRequest Request;
-		Request.set_field_bincinematicmode(bInCinematicMode);
-		Request.set_field_baffectsmovement(bAffectsMovement);
-		Request.set_field_baffectsturning(bAffectsTurning);
-		Request.set_field_baffectshud(bAffectsHUD);
+		Request.set_field_bincinematicmode(StructuredParams.bInCinematicMode);
+		Request.set_field_baffectsmovement(StructuredParams.bAffectsMovement);
+		Request.set_field_baffectsturning(StructuredParams.bAffectsTurning);
+		Request.set_field_baffectshud(StructuredParams.bAffectsHUD);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2301,12 +2287,12 @@ void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, NewCamMode);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetCameraMode_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCameraMode_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewCamMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2318,7 +2304,7 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendCommand(worke
 
 		// Build request.
 		improbable::unreal::UnrealClientSetCameraModeRequest Request;
-		Request.set_field_newcammode(TCHAR_TO_UTF8(*NewCamMode.ToString()));
+		Request.set_field_newcammode(TCHAR_TO_UTF8(*StructuredParams.NewCamMode.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2332,16 +2318,12 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendCommand(worke
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bEnableFading);
-	P_GET_STRUCT(FColor, FadeColor)
-	P_GET_STRUCT(FVector2D, FadeAlpha)
-	P_GET_PROPERTY(UFloatProperty, FadeTime);
-	P_GET_UBOOL(bFadeAudio);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientSetCameraFade_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCameraFade_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bEnableFading, FadeColor, FadeAlpha, FadeTime, bFadeAudio]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2353,15 +2335,15 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendCommand(worke
 
 		// Build request.
 		improbable::unreal::UnrealClientSetCameraFadeRequest Request;
-		Request.set_field_benablefading(bEnableFading);
-		Request.set_field_fadecolor_b(uint32_t(FadeColor.B));
-		Request.set_field_fadecolor_g(uint32_t(FadeColor.G));
-		Request.set_field_fadecolor_r(uint32_t(FadeColor.R));
-		Request.set_field_fadecolor_a(uint32_t(FadeColor.A));
-		Request.set_field_fadealpha_x(FadeAlpha.X);
-		Request.set_field_fadealpha_y(FadeAlpha.Y);
-		Request.set_field_fadetime(FadeTime);
-		Request.set_field_bfadeaudio(bFadeAudio);
+		Request.set_field_benablefading(StructuredParams.bEnableFading);
+		Request.set_field_fadecolor_b(uint32_t(StructuredParams.FadeColor.B));
+		Request.set_field_fadecolor_g(uint32_t(StructuredParams.FadeColor.G));
+		Request.set_field_fadecolor_r(uint32_t(StructuredParams.FadeColor.R));
+		Request.set_field_fadecolor_a(uint32_t(StructuredParams.FadeColor.A));
+		Request.set_field_fadealpha_x(StructuredParams.FadeAlpha.X);
+		Request.set_field_fadealpha_y(StructuredParams.FadeAlpha.Y);
+		Request.set_field_fadetime(StructuredParams.FadeTime);
+		Request.set_field_bfadeaudio(StructuredParams.bFadeAudio);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2375,7 +2357,7 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendCommand(worke
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2402,12 +2384,12 @@ void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UTextProperty, ReturnReason);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientReturnToMainMenuWithTextReason_Parms StructuredParams = *static_cast<PlayerController_eventClientReturnToMainMenuWithTextReason_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, ReturnReason]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2419,7 +2401,7 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_
 
 		// Build request.
 		improbable::unreal::UnrealClientReturnToMainMenuWithTextReasonRequest Request;
-		// UNSUPPORTED UTextProperty (unhandled) Request.set_field_returnreason(ReturnReason)
+		// UNSUPPORTED UTextProperty (unhandled) Request.set_field_returnreason(StructuredParams.ReturnReason)
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2433,12 +2415,12 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UStrProperty, ReturnReason);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientReturnToMainMenu_Parms StructuredParams = *static_cast<PlayerController_eventClientReturnToMainMenu_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, ReturnReason]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2450,7 +2432,7 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendCommand(wo
 
 		// Build request.
 		improbable::unreal::UnrealClientReturnToMainMenuRequest Request;
-		Request.set_field_returnreason(TCHAR_TO_UTF8(*ReturnReason));
+		Request.set_field_returnreason(TCHAR_TO_UTF8(*StructuredParams.ReturnReason));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2464,12 +2446,12 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(APawn, NewPawn);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientRetryClientRestart_Parms StructuredParams = *static_cast<PlayerController_eventClientRetryClientRestart_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewPawn]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2481,14 +2463,14 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendCommand(
 
 		// Build request.
 		improbable::unreal::UnrealClientRetryClientRestartRequest Request;
-		if (NewPawn != nullptr)
+		if (StructuredParams.NewPawn != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(NewPawn);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewPawn);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {NewPawn};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.NewPawn};
 			}
 			else
 			{
@@ -2512,12 +2494,12 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendCommand(
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientRestart_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientRestart_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(APawn, NewPawn);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientRestart_Parms StructuredParams = *static_cast<PlayerController_eventClientRestart_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewPawn]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2529,14 +2511,14 @@ void USpatialTypeBinding_PlayerController::ClientRestart_SendCommand(worker::Con
 
 		// Build request.
 		improbable::unreal::UnrealClientRestartRequest Request;
-		if (NewPawn != nullptr)
+		if (StructuredParams.NewPawn != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(NewPawn);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewPawn);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRestart queued. NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {NewPawn};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.NewPawn};
 			}
 			else
 			{
@@ -2560,7 +2542,7 @@ void USpatialTypeBinding_PlayerController::ClientRestart_SendCommand(worker::Con
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientReset_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientReset_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2587,12 +2569,12 @@ void USpatialTypeBinding_PlayerController::ClientReset_SendCommand(worker::Conne
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientRepObjRef_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientRepObjRef_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UObject, Object);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientRepObjRef_Parms StructuredParams = *static_cast<PlayerController_eventClientRepObjRef_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Object]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2604,14 +2586,14 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealClientRepObjRefRequest Request;
-		if (Object != nullptr)
+		if (StructuredParams.Object != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Object);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Object);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. Object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {Object};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. StructuredParams.Object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.Object};
 			}
 			else
 			{
@@ -2635,16 +2617,12 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_SendCommand(worker::C
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UClass, Message);
-	P_GET_PROPERTY(UIntProperty, Switch);
-	P_GET_OBJECT(APlayerState, RelatedPlayerState_1);
-	P_GET_OBJECT(APlayerState, RelatedPlayerState_2);
-	P_GET_OBJECT(UObject, OptionalObject);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientReceiveLocalizedMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientReceiveLocalizedMessage_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Message, Switch, RelatedPlayerState_1, RelatedPlayerState_2, OptionalObject]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2656,16 +2634,16 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 
 		// Build request.
 		improbable::unreal::UnrealClientReceiveLocalizedMessageRequest Request;
-		Request.set_field_message(PackageMap->GetHashFromStaticClass(Message));
-		Request.set_field_switch(Switch);
-		if (RelatedPlayerState_1 != nullptr)
+		Request.set_field_message(PackageMap->GetHashFromStaticClass(StructuredParams.Message));
+		Request.set_field_switch(StructuredParams.Switch);
+		if (StructuredParams.RelatedPlayerState_1 != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(RelatedPlayerState_1);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.RelatedPlayerState_1);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. RelatedPlayerState_1 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {RelatedPlayerState_1};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_1 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.RelatedPlayerState_1};
 			}
 			else
 			{
@@ -2676,14 +2654,14 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 		{
 			Request.set_field_relatedplayerstate1(SpatialConstants::NULL_OBJECT_REF);
 		}
-		if (RelatedPlayerState_2 != nullptr)
+		if (StructuredParams.RelatedPlayerState_2 != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(RelatedPlayerState_2);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.RelatedPlayerState_2);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. RelatedPlayerState_2 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {RelatedPlayerState_2};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_2 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.RelatedPlayerState_2};
 			}
 			else
 			{
@@ -2694,14 +2672,14 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 		{
 			Request.set_field_relatedplayerstate2(SpatialConstants::NULL_OBJECT_REF);
 		}
-		if (OptionalObject != nullptr)
+		if (StructuredParams.OptionalObject != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(OptionalObject);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.OptionalObject);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. OptionalObject is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {OptionalObject};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.OptionalObject is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.OptionalObject};
 			}
 			else
 			{
@@ -2725,15 +2703,12 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(AActor, ForcedActor);
-	P_GET_PROPERTY(UFloatProperty, ForceDuration);
-	P_GET_UBOOL(bEnableStreaming);
-	P_GET_PROPERTY(UIntProperty, CinematicTextureGroups);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPrestreamTextures_Parms StructuredParams = *static_cast<PlayerController_eventClientPrestreamTextures_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, ForcedActor, ForceDuration, bEnableStreaming, CinematicTextureGroups]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2745,14 +2720,14 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealClientPrestreamTexturesRequest Request;
-		if (ForcedActor != nullptr)
+		if (StructuredParams.ForcedActor != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ForcedActor);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForcedActor);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. ForcedActor is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ForcedActor};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. StructuredParams.ForcedActor is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ForcedActor};
 			}
 			else
 			{
@@ -2763,9 +2738,9 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(w
 		{
 			Request.set_field_forcedactor(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_forceduration(ForceDuration);
-		Request.set_field_benablestreaming(bEnableStreaming);
-		Request.set_field_cinematictexturegroups(CinematicTextureGroups);
+		Request.set_field_forceduration(StructuredParams.ForceDuration);
+		Request.set_field_benablestreaming(StructuredParams.bEnableStreaming);
+		Request.set_field_cinematictexturegroups(StructuredParams.CinematicTextureGroups);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2779,14 +2754,12 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, LevelName);
-	P_GET_UBOOL(bFirst);
-	P_GET_UBOOL(bLast);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPrepareMapChange_Parms StructuredParams = *static_cast<PlayerController_eventClientPrepareMapChange_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, LevelName, bFirst, bLast]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2798,9 +2771,9 @@ void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendCommand(wo
 
 		// Build request.
 		improbable::unreal::UnrealClientPrepareMapChangeRequest Request;
-		Request.set_field_levelname(TCHAR_TO_UTF8(*LevelName.ToString()));
-		Request.set_field_bfirst(bFirst);
-		Request.set_field_blast(bLast);
+		Request.set_field_levelname(TCHAR_TO_UTF8(*StructuredParams.LevelName.ToString()));
+		Request.set_field_bfirst(StructuredParams.bFirst);
+		Request.set_field_blast(StructuredParams.bLast);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2814,15 +2787,12 @@ void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(USoundBase, Sound);
-	P_GET_STRUCT(FVector, Location)
-	P_GET_PROPERTY(UFloatProperty, VolumeMultiplier);
-	P_GET_PROPERTY(UFloatProperty, PitchMultiplier);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPlaySoundAtLocation_Parms StructuredParams = *static_cast<PlayerController_eventClientPlaySoundAtLocation_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Sound, Location, VolumeMultiplier, PitchMultiplier]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2834,14 +2804,14 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendCommand
 
 		// Build request.
 		improbable::unreal::UnrealClientPlaySoundAtLocationRequest Request;
-		if (Sound != nullptr)
+		if (StructuredParams.Sound != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Sound);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Sound);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {Sound};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.Sound};
 			}
 			else
 			{
@@ -2852,9 +2822,9 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendCommand
 		{
 			Request.set_field_sound(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_location(improbable::Vector3f(Location.X, Location.Y, Location.Z));
-		Request.set_field_volumemultiplier(VolumeMultiplier);
-		Request.set_field_pitchmultiplier(PitchMultiplier);
+		Request.set_field_location(improbable::Vector3f(StructuredParams.Location.X, StructuredParams.Location.Y, StructuredParams.Location.Z));
+		Request.set_field_volumemultiplier(StructuredParams.VolumeMultiplier);
+		Request.set_field_pitchmultiplier(StructuredParams.PitchMultiplier);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2868,14 +2838,12 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendCommand
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPlaySound_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPlaySound_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(USoundBase, Sound);
-	P_GET_PROPERTY(UFloatProperty, VolumeMultiplier);
-	P_GET_PROPERTY(UFloatProperty, PitchMultiplier);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPlaySound_Parms StructuredParams = *static_cast<PlayerController_eventClientPlaySound_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Sound, VolumeMultiplier, PitchMultiplier]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2887,14 +2855,14 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealClientPlaySoundRequest Request;
-		if (Sound != nullptr)
+		if (StructuredParams.Sound != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Sound);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Sound);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySound queued. Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {Sound};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySound queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.Sound};
 			}
 			else
 			{
@@ -2905,8 +2873,8 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_SendCommand(worker::C
 		{
 			Request.set_field_sound(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_volumemultiplier(VolumeMultiplier);
-		Request.set_field_pitchmultiplier(PitchMultiplier);
+		Request.set_field_volumemultiplier(StructuredParams.VolumeMultiplier);
+		Request.set_field_pitchmultiplier(StructuredParams.PitchMultiplier);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2920,15 +2888,12 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_SendCommand(worker::C
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UForceFeedbackEffect, ForceFeedbackEffect);
-	P_GET_UBOOL(bLooping);
-	P_GET_UBOOL(bIgnoreTimeDilation);
-	P_GET_PROPERTY(UNameProperty, Tag);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPlayForceFeedback_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayForceFeedback_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, ForceFeedbackEffect, bLooping, bIgnoreTimeDilation, Tag]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2940,14 +2905,14 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealClientPlayForceFeedbackRequest Request;
-		if (ForceFeedbackEffect != nullptr)
+		if (StructuredParams.ForceFeedbackEffect != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(ForceFeedbackEffect);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForceFeedbackEffect);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {ForceFeedbackEffect};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.ForceFeedbackEffect};
 			}
 			else
 			{
@@ -2958,9 +2923,9 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendCommand(w
 		{
 			Request.set_field_forcefeedbackeffect(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_blooping(bLooping);
-		Request.set_field_bignoretimedilation(bIgnoreTimeDilation);
-		Request.set_field_tag(TCHAR_TO_UTF8(*Tag.ToString()));
+		Request.set_field_blooping(StructuredParams.bLooping);
+		Request.set_field_bignoretimedilation(StructuredParams.bIgnoreTimeDilation);
+		Request.set_field_tag(TCHAR_TO_UTF8(*StructuredParams.Tag.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2974,15 +2939,12 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UClass, Shake);
-	P_GET_PROPERTY(UFloatProperty, Scale);
-	P_GET_PROPERTY(UByteProperty, PlaySpace);
-	P_GET_STRUCT(FRotator, UserPlaySpaceRot)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPlayCameraShake_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayCameraShake_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Shake, Scale, PlaySpace, UserPlaySpaceRot]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -2994,10 +2956,10 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientPlayCameraShakeRequest Request;
-		Request.set_field_shake(PackageMap->GetHashFromStaticClass(Shake));
-		Request.set_field_scale(Scale);
-		Request.set_field_playspace(uint32_t(PlaySpace));
-		Request.set_field_userplayspacerot(improbable::unreal::UnrealFRotator(UserPlaySpaceRot.Yaw, UserPlaySpaceRot.Pitch, UserPlaySpaceRot.Roll));
+		Request.set_field_shake(PackageMap->GetHashFromStaticClass(StructuredParams.Shake));
+		Request.set_field_scale(StructuredParams.Scale);
+		Request.set_field_playspace(uint32_t(StructuredParams.PlaySpace));
+		Request.set_field_userplayspacerot(improbable::unreal::UnrealFRotator(StructuredParams.UserPlaySpaceRot.Yaw, StructuredParams.UserPlaySpaceRot.Pitch, StructuredParams.UserPlaySpaceRot.Roll));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3011,20 +2973,12 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(UCameraAnim, AnimToPlay);
-	P_GET_PROPERTY(UFloatProperty, Scale);
-	P_GET_PROPERTY(UFloatProperty, Rate);
-	P_GET_PROPERTY(UFloatProperty, BlendInTime);
-	P_GET_PROPERTY(UFloatProperty, BlendOutTime);
-	P_GET_UBOOL(bLoop);
-	P_GET_UBOOL(bRandomStartTime);
-	P_GET_PROPERTY(UByteProperty, Space);
-	P_GET_STRUCT(FRotator, CustomPlaySpace)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientPlayCameraAnim_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayCameraAnim_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, AnimToPlay, Scale, Rate, BlendInTime, BlendOutTime, bLoop, bRandomStartTime, Space, CustomPlaySpace]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3036,14 +2990,14 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendCommand(work
 
 		// Build request.
 		improbable::unreal::UnrealClientPlayCameraAnimRequest Request;
-		if (AnimToPlay != nullptr)
+		if (StructuredParams.AnimToPlay != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(AnimToPlay);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.AnimToPlay);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. AnimToPlay is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {AnimToPlay};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. StructuredParams.AnimToPlay is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.AnimToPlay};
 			}
 			else
 			{
@@ -3054,14 +3008,14 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendCommand(work
 		{
 			Request.set_field_animtoplay(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_scale(Scale);
-		Request.set_field_rate(Rate);
-		Request.set_field_blendintime(BlendInTime);
-		Request.set_field_blendouttime(BlendOutTime);
-		Request.set_field_bloop(bLoop);
-		Request.set_field_brandomstarttime(bRandomStartTime);
-		Request.set_field_space(uint32_t(Space));
-		Request.set_field_customplayspace(improbable::unreal::UnrealFRotator(CustomPlaySpace.Yaw, CustomPlaySpace.Pitch, CustomPlaySpace.Roll));
+		Request.set_field_scale(StructuredParams.Scale);
+		Request.set_field_rate(StructuredParams.Rate);
+		Request.set_field_blendintime(StructuredParams.BlendInTime);
+		Request.set_field_blendouttime(StructuredParams.BlendOutTime);
+		Request.set_field_bloop(StructuredParams.bLoop);
+		Request.set_field_brandomstarttime(StructuredParams.bRandomStartTime);
+		Request.set_field_space(uint32_t(StructuredParams.Space));
+		Request.set_field_customplayspace(improbable::unreal::UnrealFRotator(StructuredParams.CustomPlaySpace.Yaw, StructuredParams.CustomPlaySpace.Pitch, StructuredParams.CustomPlaySpace.Roll));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3075,12 +3029,12 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendCommand(work
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FUniqueNetIdRepl, PlayerId)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientMutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventClientMutePlayer_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PlayerId]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3096,7 +3050,7 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendCommand(worker::
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(StructuredParams.PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -3112,14 +3066,12 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendCommand(worker::
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientMessage_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientMessage_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UStrProperty, S);
-	P_GET_PROPERTY(UNameProperty, Type);
-	P_GET_PROPERTY(UFloatProperty, MsgLifeTime);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientMessage_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, S, Type, MsgLifeTime]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3131,9 +3083,9 @@ void USpatialTypeBinding_PlayerController::ClientMessage_SendCommand(worker::Con
 
 		// Build request.
 		improbable::unreal::UnrealClientMessageRequest Request;
-		Request.set_field_s(TCHAR_TO_UTF8(*S));
-		Request.set_field_type(TCHAR_TO_UTF8(*Type.ToString()));
-		Request.set_field_msglifetime(MsgLifeTime);
+		Request.set_field_s(TCHAR_TO_UTF8(*StructuredParams.S));
+		Request.set_field_type(TCHAR_TO_UTF8(*StructuredParams.Type.ToString()));
+		Request.set_field_msglifetime(StructuredParams.MsgLifeTime);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3147,12 +3099,12 @@ void USpatialTypeBinding_PlayerController::ClientMessage_SendCommand(worker::Con
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bIgnore);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientIgnoreMoveInput_Parms StructuredParams = *static_cast<PlayerController_eventClientIgnoreMoveInput_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bIgnore]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3164,7 +3116,7 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientIgnoreMoveInputRequest Request;
-		Request.set_field_bignore(bIgnore);
+		Request.set_field_bignore(StructuredParams.bIgnore);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3178,12 +3130,12 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bIgnore);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientIgnoreLookInput_Parms StructuredParams = *static_cast<PlayerController_eventClientIgnoreLookInput_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bIgnore]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3195,7 +3147,7 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendCommand(wor
 
 		// Build request.
 		improbable::unreal::UnrealClientIgnoreLookInputRequest Request;
-		Request.set_field_bignore(bIgnore);
+		Request.set_field_bignore(StructuredParams.bIgnore);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3209,12 +3161,12 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientGotoState_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientGotoState_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, NewState);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientGotoState_Parms StructuredParams = *static_cast<PlayerController_eventClientGotoState_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewState]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3226,7 +3178,7 @@ void USpatialTypeBinding_PlayerController::ClientGotoState_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealClientGotoStateRequest Request;
-		Request.set_field_newstate(TCHAR_TO_UTF8(*NewState.ToString()));
+		Request.set_field_newstate(TCHAR_TO_UTF8(*StructuredParams.NewState.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3240,13 +3192,12 @@ void USpatialTypeBinding_PlayerController::ClientGotoState_SendCommand(worker::C
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientGameEnded_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientGameEnded_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(AActor, EndGameFocus);
-	P_GET_UBOOL(bIsWinner);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientGameEnded_Parms StructuredParams = *static_cast<PlayerController_eventClientGameEnded_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, EndGameFocus, bIsWinner]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3258,14 +3209,14 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_SendCommand(worker::C
 
 		// Build request.
 		improbable::unreal::UnrealClientGameEndedRequest Request;
-		if (EndGameFocus != nullptr)
+		if (StructuredParams.EndGameFocus != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(EndGameFocus);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.EndGameFocus);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientGameEnded queued. EndGameFocus is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {EndGameFocus};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientGameEnded queued. StructuredParams.EndGameFocus is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.EndGameFocus};
 			}
 			else
 			{
@@ -3276,7 +3227,7 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_SendCommand(worker::C
 		{
 			Request.set_field_endgamefocus(SpatialConstants::NULL_OBJECT_REF);
 		}
-		Request.set_field_biswinner(bIsWinner);
+		Request.set_field_biswinner(StructuredParams.bIsWinner);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3290,7 +3241,7 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_SendCommand(worker::C
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3317,7 +3268,7 @@ void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3344,7 +3295,7 @@ void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_SendCommand
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3371,12 +3322,12 @@ void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bEnable);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientEnableNetworkVoice_Parms StructuredParams = *static_cast<PlayerController_eventClientEnableNetworkVoice_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bEnable]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3388,7 +3339,7 @@ void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendCommand(
 
 		// Build request.
 		improbable::unreal::UnrealClientEnableNetworkVoiceRequest Request;
-		Request.set_field_benable(bEnable);
+		Request.set_field_benable(StructuredParams.bEnable);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3402,7 +3353,7 @@ void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendCommand(
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientCommitMapChange_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientCommitMapChange_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3429,7 +3380,7 @@ void USpatialTypeBinding_PlayerController::ClientCommitMapChange_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3456,12 +3407,12 @@ void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UIntProperty, Cap);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientCapBandwidth_Parms StructuredParams = *static_cast<PlayerController_eventClientCapBandwidth_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, Cap]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3473,7 +3424,7 @@ void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendCommand(worker
 
 		// Build request.
 		improbable::unreal::UnrealClientCapBandwidthRequest Request;
-		Request.set_field_cap(Cap);
+		Request.set_field_cap(StructuredParams.Cap);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3487,7 +3438,7 @@ void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendCommand(worker
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3514,14 +3465,12 @@ void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FVector, InLoc)
-	P_GET_PROPERTY(UFloatProperty, Duration);
-	P_GET_UBOOL(bOverrideLocation);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventClientAddTextureStreamingLoc_Parms StructuredParams = *static_cast<PlayerController_eventClientAddTextureStreamingLoc_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, InLoc, Duration, bOverrideLocation]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3533,9 +3482,9 @@ void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendComm
 
 		// Build request.
 		improbable::unreal::UnrealClientAddTextureStreamingLocRequest Request;
-		Request.set_field_inloc(improbable::Vector3f(InLoc.X, InLoc.Y, InLoc.Z));
-		Request.set_field_duration(Duration);
-		Request.set_field_boverridelocation(bOverrideLocation);
+		Request.set_field_inloc(improbable::Vector3f(StructuredParams.InLoc.X, StructuredParams.InLoc.Y, StructuredParams.InLoc.Z));
+		Request.set_field_duration(StructuredParams.Duration);
+		Request.set_field_boverridelocation(StructuredParams.bOverrideLocation);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3549,13 +3498,12 @@ void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendComm
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetRotation_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetRotation_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FRotator, NewRotation)
-	P_GET_UBOOL(bResetCamera);
+	// This struct is declared in Controller.generated.h (in a macro that is then put in Controller.h UCLASS macro)
+	Controller_eventClientSetRotation_Parms StructuredParams = *static_cast<Controller_eventClientSetRotation_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewRotation, bResetCamera]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3567,8 +3515,8 @@ void USpatialTypeBinding_PlayerController::ClientSetRotation_SendCommand(worker:
 
 		// Build request.
 		improbable::unreal::UnrealClientSetRotationRequest Request;
-		Request.set_field_newrotation(improbable::unreal::UnrealFRotator(NewRotation.Yaw, NewRotation.Pitch, NewRotation.Roll));
-		Request.set_field_bresetcamera(bResetCamera);
+		Request.set_field_newrotation(improbable::unreal::UnrealFRotator(StructuredParams.NewRotation.Yaw, StructuredParams.NewRotation.Pitch, StructuredParams.NewRotation.Roll));
+		Request.set_field_bresetcamera(StructuredParams.bResetCamera);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3582,13 +3530,12 @@ void USpatialTypeBinding_PlayerController::ClientSetRotation_SendCommand(worker:
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ClientSetLocation_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ClientSetLocation_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FVector, NewLocation)
-	P_GET_STRUCT(FRotator, NewRotation)
+	// This struct is declared in Controller.generated.h (in a macro that is then put in Controller.h UCLASS macro)
+	Controller_eventClientSetLocation_Parms StructuredParams = *static_cast<Controller_eventClientSetLocation_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewLocation, NewRotation]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3600,8 +3547,8 @@ void USpatialTypeBinding_PlayerController::ClientSetLocation_SendCommand(worker:
 
 		// Build request.
 		improbable::unreal::UnrealClientSetLocationRequest Request;
-		Request.set_field_newlocation(improbable::Vector3f(NewLocation.X, NewLocation.Y, NewLocation.Z));
-		Request.set_field_newrotation(improbable::unreal::UnrealFRotator(NewRotation.Yaw, NewRotation.Pitch, NewRotation.Roll));
+		Request.set_field_newlocation(improbable::Vector3f(StructuredParams.NewLocation.X, StructuredParams.NewLocation.Y, StructuredParams.NewLocation.Z));
+		Request.set_field_newrotation(improbable::unreal::UnrealFRotator(StructuredParams.NewRotation.Yaw, StructuredParams.NewRotation.Pitch, StructuredParams.NewRotation.Roll));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3615,12 +3562,12 @@ void USpatialTypeBinding_PlayerController::ClientSetLocation_SendCommand(worker:
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerViewSelf_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerViewSelf_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FViewTargetTransitionParams, TransitionParams)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerViewSelf_Parms StructuredParams = *static_cast<PlayerController_eventServerViewSelf_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, TransitionParams]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3632,10 +3579,10 @@ void USpatialTypeBinding_PlayerController::ServerViewSelf_SendCommand(worker::Co
 
 		// Build request.
 		improbable::unreal::UnrealServerViewSelfRequest Request;
-		Request.set_field_transitionparams_blendtime(TransitionParams.BlendTime);
-		Request.set_field_transitionparams_blendfunction(uint32_t(TransitionParams.BlendFunction));
-		Request.set_field_transitionparams_blendexp(TransitionParams.BlendExp);
-		Request.set_field_transitionparams_blockoutgoing(TransitionParams.bLockOutgoing);
+		Request.set_field_transitionparams_blendtime(StructuredParams.TransitionParams.BlendTime);
+		Request.set_field_transitionparams_blendfunction(uint32_t(StructuredParams.TransitionParams.BlendFunction));
+		Request.set_field_transitionparams_blendexp(StructuredParams.TransitionParams.BlendExp);
+		Request.set_field_transitionparams_blockoutgoing(StructuredParams.TransitionParams.bLockOutgoing);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3649,7 +3596,7 @@ void USpatialTypeBinding_PlayerController::ServerViewSelf_SendCommand(worker::Co
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3676,7 +3623,7 @@ void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_SendCommand(work
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3703,7 +3650,7 @@ void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_SendCommand(work
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3730,12 +3677,12 @@ void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_SendCommand(wo
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_TARRAY(FUpdateLevelVisibilityLevelInfo, LevelVisibilities)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerUpdateMultipleLevelsVisibility_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateMultipleLevelsVisibility_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, LevelVisibilities]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3749,11 +3696,11 @@ void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_
 		improbable::unreal::UnrealServerUpdateMultipleLevelsVisibilityRequest Request;
 		{
 			::worker::List<std::string> List;
-			for(int i = 0; i < LevelVisibilities.Num(); i++)
+			for(int i = 0; i < StructuredParams.LevelVisibilities.Num(); i++)
 			{
 				TArray<uint8> ValueData;
 				FMemoryWriter ValueDataWriter(ValueData);
-				FUpdateLevelVisibilityLevelInfo::StaticStruct()->SerializeBin(ValueDataWriter, reinterpret_cast<void*>(const_cast<FUpdateLevelVisibilityLevelInfo*>(&LevelVisibilities[i])));
+				FUpdateLevelVisibilityLevelInfo::StaticStruct()->SerializeBin(ValueDataWriter, reinterpret_cast<void*>(const_cast<FUpdateLevelVisibilityLevelInfo*>(&StructuredParams.LevelVisibilities[i])));
 				List.emplace_back(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
 			Request.set_field_levelvisibilities(List);
@@ -3771,13 +3718,12 @@ void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, PackageName);
-	P_GET_UBOOL(bIsVisible);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerUpdateLevelVisibility_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateLevelVisibility_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PackageName, bIsVisible]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3789,8 +3735,8 @@ void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealServerUpdateLevelVisibilityRequest Request;
-		Request.set_field_packagename(TCHAR_TO_UTF8(*PackageName.ToString()));
-		Request.set_field_bisvisible(bIsVisible);
+		Request.set_field_packagename(TCHAR_TO_UTF8(*StructuredParams.PackageName.ToString()));
+		Request.set_field_bisvisible(StructuredParams.bIsVisible);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3804,13 +3750,12 @@ void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendComma
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FVector_NetQuantize, CamLoc)
-	P_GET_PROPERTY(UIntProperty, CamPitchAndYaw);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerUpdateCamera_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateCamera_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, CamLoc, CamPitchAndYaw]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3822,8 +3767,8 @@ void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendCommand(worker
 
 		// Build request.
 		improbable::unreal::UnrealServerUpdateCameraRequest Request;
-		Request.set_field_camloc(improbable::Vector3f(CamLoc.X, CamLoc.Y, CamLoc.Z));
-		Request.set_field_campitchandyaw(CamPitchAndYaw);
+		Request.set_field_camloc(improbable::Vector3f(StructuredParams.CamLoc.X, StructuredParams.CamLoc.Y, StructuredParams.CamLoc.Z));
+		Request.set_field_campitchandyaw(StructuredParams.CamPitchAndYaw);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3837,12 +3782,12 @@ void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendCommand(worker
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FUniqueNetIdRepl, PlayerId)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerUnmutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventServerUnmutePlayer_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PlayerId]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3858,7 +3803,7 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendCommand(worker
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(StructuredParams.PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -3874,7 +3819,7 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendCommand(worker
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerToggleAILogging_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerToggleAILogging_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3901,7 +3846,7 @@ void USpatialTypeBinding_PlayerController::ServerToggleAILogging_SendCommand(wor
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerShortTimeout_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerShortTimeout_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3928,12 +3873,12 @@ void USpatialTypeBinding_PlayerController::ServerShortTimeout_SendCommand(worker
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_UBOOL(bWaiting);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerSetSpectatorWaiting_Parms StructuredParams = *static_cast<PlayerController_eventServerSetSpectatorWaiting_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, bWaiting]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3945,7 +3890,7 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendCommand
 
 		// Build request.
 		improbable::unreal::UnrealServerSetSpectatorWaitingRequest Request;
-		Request.set_field_bwaiting(bWaiting);
+		Request.set_field_bwaiting(StructuredParams.bWaiting);
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3959,13 +3904,12 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendCommand
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FVector, NewLoc)
-	P_GET_STRUCT(FRotator, NewRot)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerSetSpectatorLocation_Parms StructuredParams = *static_cast<PlayerController_eventServerSetSpectatorLocation_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewLoc, NewRot]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -3977,8 +3921,8 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendComman
 
 		// Build request.
 		improbable::unreal::UnrealServerSetSpectatorLocationRequest Request;
-		Request.set_field_newloc(improbable::Vector3f(NewLoc.X, NewLoc.Y, NewLoc.Z));
-		Request.set_field_newrot(improbable::unreal::UnrealFRotator(NewRot.Yaw, NewRot.Pitch, NewRot.Roll));
+		Request.set_field_newloc(improbable::Vector3f(StructuredParams.NewLoc.X, StructuredParams.NewLoc.Y, StructuredParams.NewLoc.Z));
+		Request.set_field_newrot(improbable::unreal::UnrealFRotator(StructuredParams.NewRot.Yaw, StructuredParams.NewRot.Pitch, StructuredParams.NewRot.Roll));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3992,7 +3936,7 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendComman
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerRestartPlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerRestartPlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4019,7 +3963,7 @@ void USpatialTypeBinding_PlayerController::ServerRestartPlayer_SendCommand(worke
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerPause_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerPause_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4046,12 +3990,12 @@ void USpatialTypeBinding_PlayerController::ServerPause_SendCommand(worker::Conne
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, WorldPackageName);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerNotifyLoadedWorld_Parms StructuredParams = *static_cast<PlayerController_eventServerNotifyLoadedWorld_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, WorldPackageName]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -4063,7 +4007,7 @@ void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendCommand(w
 
 		// Build request.
 		improbable::unreal::UnrealServerNotifyLoadedWorldRequest Request;
-		Request.set_field_worldpackagename(TCHAR_TO_UTF8(*WorldPackageName.ToString()));
+		Request.set_field_worldpackagename(TCHAR_TO_UTF8(*StructuredParams.WorldPackageName.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4077,12 +4021,12 @@ void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendCommand(w
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_STRUCT(FUniqueNetIdRepl, PlayerId)
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerMutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventServerMutePlayer_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, PlayerId]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -4098,7 +4042,7 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendCommand(worker::
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
 			bool Success;
-			(const_cast<FUniqueNetIdRepl&>(PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
+			(const_cast<FUniqueNetIdRepl&>(StructuredParams.PlayerId)).NetSerialize(ValueDataWriter, PackageMap, Success);
 			Request.set_field_playerid(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
@@ -4114,7 +4058,7 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendCommand(worker::
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4141,7 +4085,7 @@ void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_S
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4168,12 +4112,12 @@ void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_SendComma
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
 }
 
-void USpatialTypeBinding_PlayerController::ServerChangeName_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerChangeName_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UStrProperty, S);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerChangeName_Parms StructuredParams = *static_cast<PlayerController_eventServerChangeName_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, S]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -4185,7 +4129,7 @@ void USpatialTypeBinding_PlayerController::ServerChangeName_SendCommand(worker::
 
 		// Build request.
 		improbable::unreal::UnrealServerChangeNameRequest Request;
-		Request.set_field_s(TCHAR_TO_UTF8(*S));
+		Request.set_field_s(TCHAR_TO_UTF8(*StructuredParams.S));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4199,12 +4143,12 @@ void USpatialTypeBinding_PlayerController::ServerChangeName_SendCommand(worker::
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerCamera_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerCamera_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_PROPERTY(UNameProperty, NewMode);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerCamera_Parms StructuredParams = *static_cast<PlayerController_eventServerCamera_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, NewMode]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -4216,7 +4160,7 @@ void USpatialTypeBinding_PlayerController::ServerCamera_SendCommand(worker::Conn
 
 		// Build request.
 		improbable::unreal::UnrealServerCameraRequest Request;
-		Request.set_field_newmode(TCHAR_TO_UTF8(*NewMode.ToString()));
+		Request.set_field_newmode(TCHAR_TO_UTF8(*StructuredParams.NewMode.ToString()));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4230,12 +4174,12 @@ void USpatialTypeBinding_PlayerController::ServerCamera_SendCommand(worker::Conn
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_SendCommand(worker::Connection* const Connection, struct FFrame* const RPCFrame, UObject* TargetObject)
+void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
-	FFrame& Stack = *RPCFrame;
-	P_GET_OBJECT(APawn, P);
+	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+	PlayerController_eventServerAcknowledgePossession_Parms StructuredParams = *static_cast<PlayerController_eventServerAcknowledgePossession_Parms*>(Parameters);
 
-	auto Sender = [this, Connection, TargetObject, P]() mutable -> FRPCCommandRequestResult
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
 	{
 		// Resolve TargetObject.
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
@@ -4247,14 +4191,14 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_SendComma
 
 		// Build request.
 		improbable::unreal::UnrealServerAcknowledgePossessionRequest Request;
-		if (P != nullptr)
+		if (StructuredParams.P != nullptr)
 		{
-			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(P);
+			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.P);
 			improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 			if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. P is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-				return {P};
+				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. StructuredParams.P is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+				return {StructuredParams.P};
 			}
 			else
 			{
@@ -4291,30 +4235,35 @@ void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: OnServerStartedVisualLogger_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: OnServerStartedVisualLogger_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: OnServerStartedVisualLogger_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bIsLogging;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventOnServerStartedVisualLogger_Parms Parameters;
 
 		// Extract from request data.
-		bIsLogging = Op.Request.field_bislogging();
+		Parameters.bIsLogging = Op.Request.field_bislogging();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: OnServerStartedVisualLogger, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->OnServerStartedVisualLogger_Implementation(bIsLogging);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("OnServerStartedVisualLogger"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: OnServerStartedVisualLogger_OnCommandRequest: Function not found. Object: %s, Function: OnServerStartedVisualLogger."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4337,30 +4286,35 @@ void USpatialTypeBinding_PlayerController::ClientWasKicked_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientWasKicked_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientWasKicked_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientWasKicked_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FText KickReason;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientWasKicked_Parms Parameters;
 
 		// Extract from request data.
-		// UNSUPPORTED UTextProperty (unhandled) KickReason Op.Request.field_kickreason()
+		// UNSUPPORTED UTextProperty (unhandled) Parameters.KickReason Op.Request.field_kickreason()
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientWasKicked, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientWasKicked_Implementation(KickReason);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientWasKicked"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientWasKicked_OnCommandRequest: Function not found. Object: %s, Function: ClientWasKicked."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4383,24 +4337,28 @@ void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientVoiceHandshakeComplete_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientVoiceHandshakeComplete_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientVoiceHandshakeComplete_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientVoiceHandshakeComplete, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientVoiceHandshakeComplete_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientVoiceHandshakeComplete"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientVoiceHandshakeComplete_OnCommandRequest: Function not found. Object: %s, Function: ClientVoiceHandshakeComplete."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4423,32 +4381,27 @@ void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingSt
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TArray<FUpdateLevelStreamingLevelStatus> LevelStatuses;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientUpdateMultipleLevelsStreamingStatus_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& List = Op.Request.field_levelstatuses();
-			LevelStatuses.SetNum(List.size());
+			Parameters.LevelStatuses.SetNum(List.size());
 			for(int i = 0; i < List.size(); i++)
 			{
 				auto& ValueDataStr = List[i];
 				TArray<uint8> ValueData;
 				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 				FMemoryReader ValueDataReader(ValueData);
-				FUpdateLevelStreamingLevelStatus::StaticStruct()->SerializeBin(ValueDataReader, reinterpret_cast<void*>(&LevelStatuses[i]));
+				FUpdateLevelStreamingLevelStatus::StaticStruct()->SerializeBin(ValueDataReader, reinterpret_cast<void*>(&Parameters.LevelStatuses[i]));
 			}
 		}
 
@@ -4457,7 +4410,17 @@ void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingSt
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientUpdateMultipleLevelsStreamingStatus_Implementation(LevelStatuses);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientUpdateMultipleLevelsStreamingStatus"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnCommandRequest: Function not found. Object: %s, Function: ClientUpdateMultipleLevelsStreamingStatus."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4480,38 +4443,39 @@ void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_OnCo
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientUpdateLevelStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientUpdateLevelStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientUpdateLevelStreamingStatus_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName PackageName;
-		bool bNewShouldBeLoaded;
-		bool bNewShouldBeVisible;
-		bool bNewShouldBlockOnLoad;
-		int32 LODIndex;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientUpdateLevelStreamingStatus_Parms Parameters;
 
 		// Extract from request data.
-		PackageName = FName((Op.Request.field_packagename()).data());
-		bNewShouldBeLoaded = Op.Request.field_bnewshouldbeloaded();
-		bNewShouldBeVisible = Op.Request.field_bnewshouldbevisible();
-		bNewShouldBlockOnLoad = Op.Request.field_bnewshouldblockonload();
-		LODIndex = Op.Request.field_lodindex();
+		Parameters.PackageName = FName((Op.Request.field_packagename()).data());
+		Parameters.bNewShouldBeLoaded = Op.Request.field_bnewshouldbeloaded();
+		Parameters.bNewShouldBeVisible = Op.Request.field_bnewshouldbevisible();
+		Parameters.bNewShouldBlockOnLoad = Op.Request.field_bnewshouldblockonload();
+		Parameters.LODIndex = Op.Request.field_lodindex();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientUpdateLevelStreamingStatus, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientUpdateLevelStreamingStatus_Implementation(PackageName, bNewShouldBeLoaded, bNewShouldBeVisible, bNewShouldBlockOnLoad, LODIndex);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientUpdateLevelStreamingStatus"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUpdateLevelStreamingStatus_OnCommandRequest: Function not found. Object: %s, Function: ClientUpdateLevelStreamingStatus."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4534,20 +4498,15 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnCommandRequest(c
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FUniqueNetIdRepl PlayerId;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientUnmutePlayer_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -4556,7 +4515,7 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnCommandRequest(c
 			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 			FMemoryReader ValueDataReader(ValueData);
 			bool bSuccess;
-			PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			Parameters.PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 		}
 
 		// Call implementation.
@@ -4564,7 +4523,17 @@ void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnCommandRequest(c
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientUnmutePlayer_Implementation(PlayerId);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientUnmutePlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUnmutePlayer_OnCommandRequest: Function not found. Object: %s, Function: ClientUnmutePlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4587,39 +4556,41 @@ void USpatialTypeBinding_PlayerController::ClientTravelInternal_OnCommandRequest
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientTravelInternal_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientTravelInternal_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientTravelInternal_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FString URL;
-		TEnumAsByte<ETravelType> TravelType;
-		bool bSeamless;
-		FGuid MapPackageGuid;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientTravelInternal_Parms Parameters;
 
 		// Extract from request data.
-		URL = FString(UTF8_TO_TCHAR(Op.Request.field_url().c_str()));
-		TravelType = TEnumAsByte<ETravelType>(uint8(Op.Request.field_traveltype()));
-		bSeamless = Op.Request.field_bseamless();
-		MapPackageGuid.A = Op.Request.field_mappackageguid_a();
-		MapPackageGuid.B = Op.Request.field_mappackageguid_b();
-		MapPackageGuid.C = Op.Request.field_mappackageguid_c();
-		MapPackageGuid.D = Op.Request.field_mappackageguid_d();
+		Parameters.URL = FString(UTF8_TO_TCHAR(Op.Request.field_url().c_str()));
+		Parameters.TravelType = TEnumAsByte<ETravelType>(uint8(Op.Request.field_traveltype()));
+		Parameters.bSeamless = Op.Request.field_bseamless();
+		Parameters.MapPackageGuid.A = Op.Request.field_mappackageguid_a();
+		Parameters.MapPackageGuid.B = Op.Request.field_mappackageguid_b();
+		Parameters.MapPackageGuid.C = Op.Request.field_mappackageguid_c();
+		Parameters.MapPackageGuid.D = Op.Request.field_mappackageguid_d();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientTravelInternal, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientTravelInternal_Implementation(URL, TravelType, bSeamless, MapPackageGuid);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientTravelInternal"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientTravelInternal_OnCommandRequest: Function not found. Object: %s, Function: ClientTravelInternal."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4642,23 +4613,15 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_OnCommandRequest(co
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientTeamMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientTeamMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientTeamMessage_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		APlayerState* SenderPlayerState;
-		FString S;
-		FName Type;
-		float MsgLifeTime;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientTeamMessage_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -4666,7 +4629,7 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_OnCommandRequest(co
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				SenderPlayerState = nullptr;
+				Parameters.SenderPlayerState = nullptr;
 			}
 			else
 			{
@@ -4675,28 +4638,38 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_OnCommandRequest(co
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					SenderPlayerState = dynamic_cast<APlayerState*>(Object_Raw);
-					checkf(SenderPlayerState, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.SenderPlayerState = dynamic_cast<APlayerState*>(Object_Raw);
+					checkf(Parameters.SenderPlayerState, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientTeamMessage_OnCommandRequest: SenderPlayerState %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientTeamMessage_OnCommandRequest: Parameters.SenderPlayerState %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
-		Type = FName((Op.Request.field_type()).data());
-		MsgLifeTime = Op.Request.field_msglifetime();
+		Parameters.S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
+		Parameters.Type = FName((Op.Request.field_type()).data());
+		Parameters.MsgLifeTime = Op.Request.field_msglifetime();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientTeamMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientTeamMessage_Implementation(SenderPlayerState, S, Type, MsgLifeTime);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientTeamMessage"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientTeamMessage_OnCommandRequest: Function not found. Object: %s, Function: ClientTeamMessage."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4719,21 +4692,15 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UForceFeedbackEffect* ForceFeedbackEffect;
-		FName Tag;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientStopForceFeedback_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -4741,7 +4708,7 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnCommandRequ
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ForceFeedbackEffect = nullptr;
+				Parameters.ForceFeedbackEffect = nullptr;
 			}
 			else
 			{
@@ -4750,26 +4717,36 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
-					checkf(ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
+					checkf(Parameters.ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: ForceFeedbackEffect %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		Tag = FName((Op.Request.field_tag()).data());
+		Parameters.Tag = FName((Op.Request.field_tag()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStopForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientStopForceFeedback_Implementation(ForceFeedbackEffect, Tag);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientStopForceFeedback"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopForceFeedback_OnCommandRequest: Function not found. Object: %s, Function: ClientStopForceFeedback."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4792,32 +4769,36 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraShake_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientStopCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientStopCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientStopCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TSubclassOf<UCameraShake>  Shake;
-		bool bImmediately;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientStopCameraShake_Parms Parameters;
 
 		// Extract from request data.
-		Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
-		bImmediately = Op.Request.field_bimmediately();
+		Parameters.Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
+		Parameters.bImmediately = Op.Request.field_bimmediately();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStopCameraShake, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientStopCameraShake_Implementation(Shake, bImmediately);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientStopCameraShake"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopCameraShake_OnCommandRequest: Function not found. Object: %s, Function: ClientStopCameraShake."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4840,20 +4821,15 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandRequest
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UCameraAnim* AnimToStop;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientStopCameraAnim_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -4861,7 +4837,7 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandRequest
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				AnimToStop = nullptr;
+				Parameters.AnimToStop = nullptr;
 			}
 			else
 			{
@@ -4870,12 +4846,12 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandRequest
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					AnimToStop = dynamic_cast<UCameraAnim*>(Object_Raw);
-					checkf(AnimToStop, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.AnimToStop = dynamic_cast<UCameraAnim*>(Object_Raw);
+					checkf(Parameters.AnimToStop, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: AnimToStop %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: Parameters.AnimToStop %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -4888,7 +4864,17 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandRequest
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientStopCameraAnim_Implementation(AnimToStop);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientStopCameraAnim"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopCameraAnim_OnCommandRequest: Function not found. Object: %s, Function: ClientStopCameraAnim."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4911,24 +4897,28 @@ void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_OnCommandReq
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientStartOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientStartOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientStartOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStartOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientStartOnlineSession_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientStartOnlineSession"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStartOnlineSession_OnCommandRequest: Function not found. Object: %s, Function: ClientStartOnlineSession."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4951,30 +4941,35 @@ void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSpawnCameraLensEffect_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSpawnCameraLensEffect_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSpawnCameraLensEffect_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TSubclassOf<AEmitterCameraLensEffectBase>  LensEffectEmitterClass;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSpawnCameraLensEffect_Parms Parameters;
 
 		// Extract from request data.
-		LensEffectEmitterClass = PackageMap->GetStaticClassFromHash(Op.Request.field_lenseffectemitterclass());
+		Parameters.LensEffectEmitterClass = PackageMap->GetStaticClassFromHash(Op.Request.field_lenseffectemitterclass());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSpawnCameraLensEffect, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSpawnCameraLensEffect_Implementation(LensEffectEmitterClass);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSpawnCameraLensEffect"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSpawnCameraLensEffect_OnCommandRequest: Function not found. Object: %s, Function: ClientSpawnCameraLensEffect."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -4997,21 +4992,15 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnCommandRequest(
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		AActor* A;
-		FViewTargetTransitionParams TransitionParams;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetViewTarget_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5019,7 +5008,7 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnCommandRequest(
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				A = nullptr;
+				Parameters.A = nullptr;
 			}
 			else
 			{
@@ -5028,29 +5017,39 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnCommandRequest(
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					A = dynamic_cast<AActor*>(Object_Raw);
-					checkf(A, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.A = dynamic_cast<AActor*>(Object_Raw);
+					checkf(Parameters.A, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetViewTarget_OnCommandRequest: A %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetViewTarget_OnCommandRequest: Parameters.A %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		TransitionParams.BlendTime = Op.Request.field_transitionparams_blendtime();
-		TransitionParams.BlendFunction = TEnumAsByte<EViewTargetBlendFunction>(uint8(Op.Request.field_transitionparams_blendfunction()));
-		TransitionParams.BlendExp = Op.Request.field_transitionparams_blendexp();
-		TransitionParams.bLockOutgoing = Op.Request.field_transitionparams_blockoutgoing();
+		Parameters.TransitionParams.BlendTime = Op.Request.field_transitionparams_blendtime();
+		Parameters.TransitionParams.BlendFunction = TEnumAsByte<EViewTargetBlendFunction>(uint8(Op.Request.field_transitionparams_blendfunction()));
+		Parameters.TransitionParams.BlendExp = Op.Request.field_transitionparams_blendexp();
+		Parameters.TransitionParams.bLockOutgoing = Op.Request.field_transitionparams_blockoutgoing();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetViewTarget_Implementation(A, TransitionParams);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetViewTarget"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetViewTarget_OnCommandRequest: Function not found. Object: %s, Function: ClientSetViewTarget."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5073,30 +5072,35 @@ void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_OnCommandRe
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bWaiting;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetSpectatorWaiting_Parms Parameters;
 
 		// Extract from request data.
-		bWaiting = Op.Request.field_bwaiting();
+		Parameters.bWaiting = Op.Request.field_bwaiting();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetSpectatorWaiting_Implementation(bWaiting);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetSpectatorWaiting"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetSpectatorWaiting_OnCommandRequest: Function not found. Object: %s, Function: ClientSetSpectatorWaiting."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5119,30 +5123,35 @@ void USpatialTypeBinding_PlayerController::ClientSetHUD_OnCommandRequest(const w
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetHUD_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetHUD_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetHUD_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TSubclassOf<AHUD>  NewHUDClass;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetHUD_Parms Parameters;
 
 		// Extract from request data.
-		NewHUDClass = PackageMap->GetStaticClassFromHash(Op.Request.field_newhudclass());
+		Parameters.NewHUDClass = PackageMap->GetStaticClassFromHash(Op.Request.field_newhudclass());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetHUD, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetHUD_Implementation(NewHUDClass);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetHUD"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetHUD_OnCommandRequest: Function not found. Object: %s, Function: ClientSetHUD."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5165,22 +5174,15 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_O
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UMaterialInterface* Material;
-		float ForceDuration;
-		int32 CinematicTextureGroups;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetForceMipLevelsToBeResident_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5188,7 +5190,7 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_O
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				Material = nullptr;
+				Parameters.Material = nullptr;
 			}
 			else
 			{
@@ -5197,27 +5199,37 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_O
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Material = dynamic_cast<UMaterialInterface*>(Object_Raw);
-					checkf(Material, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.Material = dynamic_cast<UMaterialInterface*>(Object_Raw);
+					checkf(Parameters.Material, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Material %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Parameters.Material %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ForceDuration = Op.Request.field_forceduration();
-		CinematicTextureGroups = Op.Request.field_cinematictexturegroups();
+		Parameters.ForceDuration = Op.Request.field_forceduration();
+		Parameters.CinematicTextureGroups = Op.Request.field_cinematictexturegroups();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetForceMipLevelsToBeResident, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetForceMipLevelsToBeResident_Implementation(Material, ForceDuration, CinematicTextureGroups);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetForceMipLevelsToBeResident"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnCommandRequest: Function not found. Object: %s, Function: ClientSetForceMipLevelsToBeResident."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5240,36 +5252,38 @@ void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetCinematicMode_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetCinematicMode_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetCinematicMode_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bInCinematicMode;
-		bool bAffectsMovement;
-		bool bAffectsTurning;
-		bool bAffectsHUD;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetCinematicMode_Parms Parameters;
 
 		// Extract from request data.
-		bInCinematicMode = Op.Request.field_bincinematicmode();
-		bAffectsMovement = Op.Request.field_baffectsmovement();
-		bAffectsTurning = Op.Request.field_baffectsturning();
-		bAffectsHUD = Op.Request.field_baffectshud();
+		Parameters.bInCinematicMode = Op.Request.field_bincinematicmode();
+		Parameters.bAffectsMovement = Op.Request.field_baffectsmovement();
+		Parameters.bAffectsTurning = Op.Request.field_baffectsturning();
+		Parameters.bAffectsHUD = Op.Request.field_baffectshud();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCinematicMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetCinematicMode_Implementation(bInCinematicMode, bAffectsMovement, bAffectsTurning, bAffectsHUD);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetCinematicMode"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCinematicMode_OnCommandRequest: Function not found. Object: %s, Function: ClientSetCinematicMode."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5292,30 +5306,35 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraMode_OnCommandRequest(
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetCameraMode_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetCameraMode_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetCameraMode_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName NewCamMode;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetCameraMode_Parms Parameters;
 
 		// Extract from request data.
-		NewCamMode = FName((Op.Request.field_newcammode()).data());
+		Parameters.NewCamMode = FName((Op.Request.field_newcammode()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetCameraMode_Implementation(NewCamMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetCameraMode"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCameraMode_OnCommandRequest: Function not found. Object: %s, Function: ClientSetCameraMode."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5338,42 +5357,43 @@ void USpatialTypeBinding_PlayerController::ClientSetCameraFade_OnCommandRequest(
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetCameraFade_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetCameraFade_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetCameraFade_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bEnableFading;
-		FColor FadeColor;
-		FVector2D FadeAlpha;
-		float FadeTime;
-		bool bFadeAudio;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientSetCameraFade_Parms Parameters;
 
 		// Extract from request data.
-		bEnableFading = Op.Request.field_benablefading();
-		FadeColor.B = uint8(uint8(Op.Request.field_fadecolor_b()));
-		FadeColor.G = uint8(uint8(Op.Request.field_fadecolor_g()));
-		FadeColor.R = uint8(uint8(Op.Request.field_fadecolor_r()));
-		FadeColor.A = uint8(uint8(Op.Request.field_fadecolor_a()));
-		FadeAlpha.X = Op.Request.field_fadealpha_x();
-		FadeAlpha.Y = Op.Request.field_fadealpha_y();
-		FadeTime = Op.Request.field_fadetime();
-		bFadeAudio = Op.Request.field_bfadeaudio();
+		Parameters.bEnableFading = Op.Request.field_benablefading();
+		Parameters.FadeColor.B = uint8(uint8(Op.Request.field_fadecolor_b()));
+		Parameters.FadeColor.G = uint8(uint8(Op.Request.field_fadecolor_g()));
+		Parameters.FadeColor.R = uint8(uint8(Op.Request.field_fadecolor_r()));
+		Parameters.FadeColor.A = uint8(uint8(Op.Request.field_fadecolor_a()));
+		Parameters.FadeAlpha.X = Op.Request.field_fadealpha_x();
+		Parameters.FadeAlpha.Y = Op.Request.field_fadealpha_y();
+		Parameters.FadeTime = Op.Request.field_fadetime();
+		Parameters.bFadeAudio = Op.Request.field_bfadeaudio();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraFade, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetCameraFade_Implementation(bEnableFading, FadeColor, FadeAlpha, FadeTime, bFadeAudio);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetCameraFade"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCameraFade_OnCommandRequest: Function not found. Object: %s, Function: ClientSetCameraFade."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5396,24 +5416,28 @@ void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetBlockOnAsyncLoading_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetBlockOnAsyncLoading_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetBlockOnAsyncLoading_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetBlockOnAsyncLoading, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetBlockOnAsyncLoading_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetBlockOnAsyncLoading"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetBlockOnAsyncLoading_OnCommandRequest: Function not found. Object: %s, Function: ClientSetBlockOnAsyncLoading."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5436,30 +5460,35 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FText ReturnReason;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientReturnToMainMenuWithTextReason_Parms Parameters;
 
 		// Extract from request data.
-		// UNSUPPORTED UTextProperty (unhandled) ReturnReason Op.Request.field_returnreason()
+		// UNSUPPORTED UTextProperty (unhandled) Parameters.ReturnReason Op.Request.field_returnreason()
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenuWithTextReason, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientReturnToMainMenuWithTextReason_Implementation(ReturnReason);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientReturnToMainMenuWithTextReason"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnCommandRequest: Function not found. Object: %s, Function: ClientReturnToMainMenuWithTextReason."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5482,30 +5511,35 @@ void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientReturnToMainMenu_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientReturnToMainMenu_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientReturnToMainMenu_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FString ReturnReason;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientReturnToMainMenu_Parms Parameters;
 
 		// Extract from request data.
-		ReturnReason = FString(UTF8_TO_TCHAR(Op.Request.field_returnreason().c_str()));
+		Parameters.ReturnReason = FString(UTF8_TO_TCHAR(Op.Request.field_returnreason().c_str()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenu, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientReturnToMainMenu_Implementation(ReturnReason);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientReturnToMainMenu"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReturnToMainMenu_OnCommandRequest: Function not found. Object: %s, Function: ClientReturnToMainMenu."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5528,20 +5562,15 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandReq
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		APawn* NewPawn;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientRetryClientRestart_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5549,7 +5578,7 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandReq
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				NewPawn = nullptr;
+				Parameters.NewPawn = nullptr;
 			}
 			else
 			{
@@ -5558,12 +5587,12 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandReq
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					NewPawn = dynamic_cast<APawn*>(Object_Raw);
-					checkf(NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.NewPawn = dynamic_cast<APawn*>(Object_Raw);
+					checkf(Parameters.NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: NewPawn %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: Parameters.NewPawn %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5576,7 +5605,17 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandReq
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientRetryClientRestart_Implementation(NewPawn);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientRetryClientRestart"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRetryClientRestart_OnCommandRequest: Function not found. Object: %s, Function: ClientRetryClientRestart."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5599,20 +5638,15 @@ void USpatialTypeBinding_PlayerController::ClientRestart_OnCommandRequest(const 
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientRestart_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		APawn* NewPawn;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientRestart_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5620,7 +5654,7 @@ void USpatialTypeBinding_PlayerController::ClientRestart_OnCommandRequest(const 
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				NewPawn = nullptr;
+				Parameters.NewPawn = nullptr;
 			}
 			else
 			{
@@ -5629,12 +5663,12 @@ void USpatialTypeBinding_PlayerController::ClientRestart_OnCommandRequest(const 
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					NewPawn = dynamic_cast<APawn*>(Object_Raw);
-					checkf(NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.NewPawn = dynamic_cast<APawn*>(Object_Raw);
+					checkf(Parameters.NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRestart_OnCommandRequest: NewPawn %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRestart_OnCommandRequest: Parameters.NewPawn %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5647,7 +5681,17 @@ void USpatialTypeBinding_PlayerController::ClientRestart_OnCommandRequest(const 
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientRestart_Implementation(NewPawn);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientRestart"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRestart_OnCommandRequest: Function not found. Object: %s, Function: ClientRestart."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5670,24 +5714,28 @@ void USpatialTypeBinding_PlayerController::ClientReset_OnCommandRequest(const wo
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientReset_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientReset_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientReset_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReset, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientReset_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientReset"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReset_OnCommandRequest: Function not found. Object: %s, Function: ClientReset."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5710,20 +5758,15 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientRepObjRef_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientRepObjRef_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientRepObjRef_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UObject* Object;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientRepObjRef_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5731,7 +5774,7 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandRequest(cons
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				Object = nullptr;
+				Parameters.Object = nullptr;
 			}
 			else
 			{
@@ -5740,12 +5783,12 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Object = dynamic_cast<UObject*>(Object_Raw);
-					checkf(Object, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.Object = dynamic_cast<UObject*>(Object_Raw);
+					checkf(Parameters.Object, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRepObjRef_OnCommandRequest: Object %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRepObjRef_OnCommandRequest: Parameters.Object %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5758,7 +5801,17 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandRequest(cons
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientRepObjRef_Implementation(Object);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientRepObjRef"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRepObjRef_OnCommandRequest: Function not found. Object: %s, Function: ClientRepObjRef."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5781,34 +5834,25 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TSubclassOf<ULocalMessage>  Message;
-		int32 Switch;
-		APlayerState* RelatedPlayerState_1;
-		APlayerState* RelatedPlayerState_2;
-		UObject* OptionalObject;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientReceiveLocalizedMessage_Parms Parameters;
 
 		// Extract from request data.
-		Message = PackageMap->GetStaticClassFromHash(Op.Request.field_message());
-		Switch = Op.Request.field_switch();
+		Parameters.Message = PackageMap->GetStaticClassFromHash(Op.Request.field_message());
+		Parameters.Switch = Op.Request.field_switch();
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_relatedplayerstate1();
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				RelatedPlayerState_1 = nullptr;
+				Parameters.RelatedPlayerState_1 = nullptr;
 			}
 			else
 			{
@@ -5817,12 +5861,12 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					RelatedPlayerState_1 = dynamic_cast<APlayerState*>(Object_Raw);
-					checkf(RelatedPlayerState_1, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.RelatedPlayerState_1 = dynamic_cast<APlayerState*>(Object_Raw);
+					checkf(Parameters.RelatedPlayerState_1, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: RelatedPlayerState_1 %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Parameters.RelatedPlayerState_1 %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5834,7 +5878,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				RelatedPlayerState_2 = nullptr;
+				Parameters.RelatedPlayerState_2 = nullptr;
 			}
 			else
 			{
@@ -5843,12 +5887,12 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					RelatedPlayerState_2 = dynamic_cast<APlayerState*>(Object_Raw);
-					checkf(RelatedPlayerState_2, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.RelatedPlayerState_2 = dynamic_cast<APlayerState*>(Object_Raw);
+					checkf(Parameters.RelatedPlayerState_2, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: RelatedPlayerState_2 %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Parameters.RelatedPlayerState_2 %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5860,7 +5904,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				OptionalObject = nullptr;
+				Parameters.OptionalObject = nullptr;
 			}
 			else
 			{
@@ -5869,12 +5913,12 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					OptionalObject = dynamic_cast<UObject*>(Object_Raw);
-					checkf(OptionalObject, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.OptionalObject = dynamic_cast<UObject*>(Object_Raw);
+					checkf(Parameters.OptionalObject, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: OptionalObject %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Parameters.OptionalObject %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5887,7 +5931,17 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientReceiveLocalizedMessage_Implementation(Message, Switch, RelatedPlayerState_1, RelatedPlayerState_2, OptionalObject);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientReceiveLocalizedMessage"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReceiveLocalizedMessage_OnCommandRequest: Function not found. Object: %s, Function: ClientReceiveLocalizedMessage."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5910,23 +5964,15 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		AActor* ForcedActor;
-		float ForceDuration;
-		bool bEnableStreaming;
-		int32 CinematicTextureGroups;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPrestreamTextures_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -5934,7 +5980,7 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnCommandRequ
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ForcedActor = nullptr;
+				Parameters.ForcedActor = nullptr;
 			}
 			else
 			{
@@ -5943,28 +5989,38 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ForcedActor = dynamic_cast<AActor*>(Object_Raw);
-					checkf(ForcedActor, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ForcedActor = dynamic_cast<AActor*>(Object_Raw);
+					checkf(Parameters.ForcedActor, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: ForcedActor %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: Parameters.ForcedActor %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		ForceDuration = Op.Request.field_forceduration();
-		bEnableStreaming = Op.Request.field_benablestreaming();
-		CinematicTextureGroups = Op.Request.field_cinematictexturegroups();
+		Parameters.ForceDuration = Op.Request.field_forceduration();
+		Parameters.bEnableStreaming = Op.Request.field_benablestreaming();
+		Parameters.CinematicTextureGroups = Op.Request.field_cinematictexturegroups();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPrestreamTextures, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPrestreamTextures_Implementation(ForcedActor, ForceDuration, bEnableStreaming, CinematicTextureGroups);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPrestreamTextures"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPrestreamTextures_OnCommandRequest: Function not found. Object: %s, Function: ClientPrestreamTextures."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -5987,34 +6043,37 @@ void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPrepareMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPrepareMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPrepareMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName LevelName;
-		bool bFirst;
-		bool bLast;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPrepareMapChange_Parms Parameters;
 
 		// Extract from request data.
-		LevelName = FName((Op.Request.field_levelname()).data());
-		bFirst = Op.Request.field_bfirst();
-		bLast = Op.Request.field_blast();
+		Parameters.LevelName = FName((Op.Request.field_levelname()).data());
+		Parameters.bFirst = Op.Request.field_bfirst();
+		Parameters.bLast = Op.Request.field_blast();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPrepareMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPrepareMapChange_Implementation(LevelName, bFirst, bLast);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPrepareMapChange"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPrepareMapChange_OnCommandRequest: Function not found. Object: %s, Function: ClientPrepareMapChange."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6037,23 +6096,15 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandRe
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		USoundBase* Sound;
-		FVector Location;
-		float VolumeMultiplier;
-		float PitchMultiplier;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPlaySoundAtLocation_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6061,7 +6112,7 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandRe
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				Sound = nullptr;
+				Parameters.Sound = nullptr;
 			}
 			else
 			{
@@ -6070,12 +6121,12 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandRe
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Sound = dynamic_cast<USoundBase*>(Object_Raw);
-					checkf(Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.Sound = dynamic_cast<USoundBase*>(Object_Raw);
+					checkf(Parameters.Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Sound %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Parameters.Sound %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6084,19 +6135,29 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandRe
 		}
 		{
 			auto& Vector = Op.Request.field_location();
-			Location.X = Vector.x();
-			Location.Y = Vector.y();
-			Location.Z = Vector.z();
+			Parameters.Location.X = Vector.x();
+			Parameters.Location.Y = Vector.y();
+			Parameters.Location.Z = Vector.z();
 		}
-		VolumeMultiplier = Op.Request.field_volumemultiplier();
-		PitchMultiplier = Op.Request.field_pitchmultiplier();
+		Parameters.VolumeMultiplier = Op.Request.field_volumemultiplier();
+		Parameters.PitchMultiplier = Op.Request.field_pitchmultiplier();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySoundAtLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPlaySoundAtLocation_Implementation(Sound, Location, VolumeMultiplier, PitchMultiplier);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPlaySoundAtLocation"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlaySoundAtLocation_OnCommandRequest: Function not found. Object: %s, Function: ClientPlaySoundAtLocation."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6119,22 +6180,15 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPlaySound_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPlaySound_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPlaySound_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		USoundBase* Sound;
-		float VolumeMultiplier;
-		float PitchMultiplier;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPlaySound_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6142,7 +6196,7 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_OnCommandRequest(cons
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				Sound = nullptr;
+				Parameters.Sound = nullptr;
 			}
 			else
 			{
@@ -6151,27 +6205,37 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Sound = dynamic_cast<USoundBase*>(Object_Raw);
-					checkf(Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.Sound = dynamic_cast<USoundBase*>(Object_Raw);
+					checkf(Parameters.Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySound_OnCommandRequest: Sound %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySound_OnCommandRequest: Parameters.Sound %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		VolumeMultiplier = Op.Request.field_volumemultiplier();
-		PitchMultiplier = Op.Request.field_pitchmultiplier();
+		Parameters.VolumeMultiplier = Op.Request.field_volumemultiplier();
+		Parameters.PitchMultiplier = Op.Request.field_pitchmultiplier();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySound, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPlaySound_Implementation(Sound, VolumeMultiplier, PitchMultiplier);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPlaySound"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlaySound_OnCommandRequest: Function not found. Object: %s, Function: ClientPlaySound."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6194,23 +6258,15 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UForceFeedbackEffect* ForceFeedbackEffect;
-		bool bLooping;
-		bool bIgnoreTimeDilation;
-		FName Tag;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPlayForceFeedback_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6218,7 +6274,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnCommandRequ
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				ForceFeedbackEffect = nullptr;
+				Parameters.ForceFeedbackEffect = nullptr;
 			}
 			else
 			{
@@ -6227,28 +6283,38 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
-					checkf(ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
+					checkf(Parameters.ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: ForceFeedbackEffect %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		bLooping = Op.Request.field_blooping();
-		bIgnoreTimeDilation = Op.Request.field_bignoretimedilation();
-		Tag = FName((Op.Request.field_tag()).data());
+		Parameters.bLooping = Op.Request.field_blooping();
+		Parameters.bIgnoreTimeDilation = Op.Request.field_bignoretimedilation();
+		Parameters.Tag = FName((Op.Request.field_tag()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlayForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPlayForceFeedback_Implementation(ForceFeedbackEffect, bLooping, bIgnoreTimeDilation, Tag);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPlayForceFeedback"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayForceFeedback_OnCommandRequest: Function not found. Object: %s, Function: ClientPlayForceFeedback."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6271,33 +6337,25 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPlayCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPlayCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPlayCameraShake_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TSubclassOf<UCameraShake>  Shake;
-		float Scale;
-		TEnumAsByte<ECameraAnimPlaySpace::Type> PlaySpace;
-		FRotator UserPlaySpaceRot;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPlayCameraShake_Parms Parameters;
 
 		// Extract from request data.
-		Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
-		Scale = Op.Request.field_scale();
-		PlaySpace = TEnumAsByte<ECameraAnimPlaySpace::Type>(uint8(Op.Request.field_playspace()));
+		Parameters.Shake = PackageMap->GetStaticClassFromHash(Op.Request.field_shake());
+		Parameters.Scale = Op.Request.field_scale();
+		Parameters.PlaySpace = TEnumAsByte<ECameraAnimPlaySpace::Type>(uint8(Op.Request.field_playspace()));
 		{
 			auto& Rotator = Op.Request.field_userplayspacerot();
-			UserPlaySpaceRot.Yaw = Rotator.yaw();
-			UserPlaySpaceRot.Pitch = Rotator.pitch();
-			UserPlaySpaceRot.Roll = Rotator.roll();
+			Parameters.UserPlaySpaceRot.Yaw = Rotator.yaw();
+			Parameters.UserPlaySpaceRot.Pitch = Rotator.pitch();
+			Parameters.UserPlaySpaceRot.Roll = Rotator.roll();
 		}
 
 		// Call implementation.
@@ -6305,7 +6363,17 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnCommandReques
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPlayCameraShake_Implementation(Shake, Scale, PlaySpace, UserPlaySpaceRot);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPlayCameraShake"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayCameraShake_OnCommandRequest: Function not found. Object: %s, Function: ClientPlayCameraShake."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6328,28 +6396,15 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandRequest
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		UCameraAnim* AnimToPlay;
-		float Scale;
-		float Rate;
-		float BlendInTime;
-		float BlendOutTime;
-		bool bLoop;
-		bool bRandomStartTime;
-		TEnumAsByte<ECameraAnimPlaySpace::Type> Space;
-		FRotator CustomPlaySpace;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientPlayCameraAnim_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6357,7 +6412,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandRequest
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				AnimToPlay = nullptr;
+				Parameters.AnimToPlay = nullptr;
 			}
 			else
 			{
@@ -6366,30 +6421,30 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandRequest
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					AnimToPlay = dynamic_cast<UCameraAnim*>(Object_Raw);
-					checkf(AnimToPlay, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.AnimToPlay = dynamic_cast<UCameraAnim*>(Object_Raw);
+					checkf(Parameters.AnimToPlay, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: AnimToPlay %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: Parameters.AnimToPlay %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		Scale = Op.Request.field_scale();
-		Rate = Op.Request.field_rate();
-		BlendInTime = Op.Request.field_blendintime();
-		BlendOutTime = Op.Request.field_blendouttime();
-		bLoop = Op.Request.field_bloop();
-		bRandomStartTime = Op.Request.field_brandomstarttime();
-		Space = TEnumAsByte<ECameraAnimPlaySpace::Type>(uint8(Op.Request.field_space()));
+		Parameters.Scale = Op.Request.field_scale();
+		Parameters.Rate = Op.Request.field_rate();
+		Parameters.BlendInTime = Op.Request.field_blendintime();
+		Parameters.BlendOutTime = Op.Request.field_blendouttime();
+		Parameters.bLoop = Op.Request.field_bloop();
+		Parameters.bRandomStartTime = Op.Request.field_brandomstarttime();
+		Parameters.Space = TEnumAsByte<ECameraAnimPlaySpace::Type>(uint8(Op.Request.field_space()));
 		{
 			auto& Rotator = Op.Request.field_customplayspace();
-			CustomPlaySpace.Yaw = Rotator.yaw();
-			CustomPlaySpace.Pitch = Rotator.pitch();
-			CustomPlaySpace.Roll = Rotator.roll();
+			Parameters.CustomPlaySpace.Yaw = Rotator.yaw();
+			Parameters.CustomPlaySpace.Pitch = Rotator.pitch();
+			Parameters.CustomPlaySpace.Roll = Rotator.roll();
 		}
 
 		// Call implementation.
@@ -6397,7 +6452,17 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandRequest
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientPlayCameraAnim_Implementation(AnimToPlay, Scale, Rate, BlendInTime, BlendOutTime, bLoop, bRandomStartTime, Space, CustomPlaySpace);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientPlayCameraAnim"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayCameraAnim_OnCommandRequest: Function not found. Object: %s, Function: ClientPlayCameraAnim."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6420,20 +6485,15 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_OnCommandRequest(con
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FUniqueNetIdRepl PlayerId;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientMutePlayer_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6442,7 +6502,7 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_OnCommandRequest(con
 			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 			FMemoryReader ValueDataReader(ValueData);
 			bool bSuccess;
-			PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			Parameters.PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 		}
 
 		// Call implementation.
@@ -6450,7 +6510,17 @@ void USpatialTypeBinding_PlayerController::ClientMutePlayer_OnCommandRequest(con
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientMutePlayer_Implementation(PlayerId);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientMutePlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientMutePlayer_OnCommandRequest: Function not found. Object: %s, Function: ClientMutePlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6473,34 +6543,37 @@ void USpatialTypeBinding_PlayerController::ClientMessage_OnCommandRequest(const 
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientMessage_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientMessage_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FString S;
-		FName Type;
-		float MsgLifeTime;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientMessage_Parms Parameters;
 
 		// Extract from request data.
-		S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
-		Type = FName((Op.Request.field_type()).data());
-		MsgLifeTime = Op.Request.field_msglifetime();
+		Parameters.S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
+		Parameters.Type = FName((Op.Request.field_type()).data());
+		Parameters.MsgLifeTime = Op.Request.field_msglifetime();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientMessage_Implementation(S, Type, MsgLifeTime);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientMessage"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientMessage_OnCommandRequest: Function not found. Object: %s, Function: ClientMessage."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6523,30 +6596,35 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientIgnoreMoveInput_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientIgnoreMoveInput_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientIgnoreMoveInput_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bIgnore;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientIgnoreMoveInput_Parms Parameters;
 
 		// Extract from request data.
-		bIgnore = Op.Request.field_bignore();
+		Parameters.bIgnore = Op.Request.field_bignore();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreMoveInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientIgnoreMoveInput_Implementation(bIgnore);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientIgnoreMoveInput"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientIgnoreMoveInput_OnCommandRequest: Function not found. Object: %s, Function: ClientIgnoreMoveInput."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6569,30 +6647,35 @@ void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientIgnoreLookInput_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientIgnoreLookInput_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientIgnoreLookInput_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bIgnore;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientIgnoreLookInput_Parms Parameters;
 
 		// Extract from request data.
-		bIgnore = Op.Request.field_bignore();
+		Parameters.bIgnore = Op.Request.field_bignore();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreLookInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientIgnoreLookInput_Implementation(bIgnore);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientIgnoreLookInput"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientIgnoreLookInput_OnCommandRequest: Function not found. Object: %s, Function: ClientIgnoreLookInput."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6615,30 +6698,35 @@ void USpatialTypeBinding_PlayerController::ClientGotoState_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientGotoState_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientGotoState_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientGotoState_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName NewState;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientGotoState_Parms Parameters;
 
 		// Extract from request data.
-		NewState = FName((Op.Request.field_newstate()).data());
+		Parameters.NewState = FName((Op.Request.field_newstate()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientGotoState, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientGotoState_Implementation(NewState);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientGotoState"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientGotoState_OnCommandRequest: Function not found. Object: %s, Function: ClientGotoState."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6661,21 +6749,15 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_OnCommandRequest(cons
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientGameEnded_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientGameEnded_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientGameEnded_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		AActor* EndGameFocus;
-		bool bIsWinner;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientGameEnded_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -6683,7 +6765,7 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_OnCommandRequest(cons
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				EndGameFocus = nullptr;
+				Parameters.EndGameFocus = nullptr;
 			}
 			else
 			{
@@ -6692,26 +6774,36 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					EndGameFocus = dynamic_cast<AActor*>(Object_Raw);
-					checkf(EndGameFocus, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.EndGameFocus = dynamic_cast<AActor*>(Object_Raw);
+					checkf(Parameters.EndGameFocus, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientGameEnded_OnCommandRequest: EndGameFocus %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientGameEnded_OnCommandRequest: Parameters.EndGameFocus %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
 		}
-		bIsWinner = Op.Request.field_biswinner();
+		Parameters.bIsWinner = Op.Request.field_biswinner();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientGameEnded, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientGameEnded_Implementation(EndGameFocus, bIsWinner);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientGameEnded"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientGameEnded_OnCommandRequest: Function not found. Object: %s, Function: ClientGameEnded."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6734,24 +6826,28 @@ void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientForceGarbageCollection_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientForceGarbageCollection_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientForceGarbageCollection_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientForceGarbageCollection, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientForceGarbageCollection_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientForceGarbageCollection"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientForceGarbageCollection_OnCommandRequest: Function not found. Object: %s, Function: ClientForceGarbageCollection."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6774,24 +6870,28 @@ void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_OnCommandRe
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientFlushLevelStreaming_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientFlushLevelStreaming_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientFlushLevelStreaming_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientFlushLevelStreaming, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientFlushLevelStreaming_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientFlushLevelStreaming"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientFlushLevelStreaming_OnCommandRequest: Function not found. Object: %s, Function: ClientFlushLevelStreaming."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6814,24 +6914,28 @@ void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientEndOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientEndOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientEndOnlineSession_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientEndOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientEndOnlineSession_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientEndOnlineSession"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientEndOnlineSession_OnCommandRequest: Function not found. Object: %s, Function: ClientEndOnlineSession."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6854,30 +6958,35 @@ void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_OnCommandReq
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientEnableNetworkVoice_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientEnableNetworkVoice_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientEnableNetworkVoice_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bEnable;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientEnableNetworkVoice_Parms Parameters;
 
 		// Extract from request data.
-		bEnable = Op.Request.field_benable();
+		Parameters.bEnable = Op.Request.field_benable();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientEnableNetworkVoice, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientEnableNetworkVoice_Implementation(bEnable);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientEnableNetworkVoice"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientEnableNetworkVoice_OnCommandRequest: Function not found. Object: %s, Function: ClientEnableNetworkVoice."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6900,24 +7009,28 @@ void USpatialTypeBinding_PlayerController::ClientCommitMapChange_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCommitMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCommitMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCommitMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCommitMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCommitMapChange_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCommitMapChange"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCommitMapChange_OnCommandRequest: Function not found. Object: %s, Function: ClientCommitMapChange."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6940,24 +7053,28 @@ void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientClearCameraLensEffects_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientClearCameraLensEffects_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientClearCameraLensEffects_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientClearCameraLensEffects, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientClearCameraLensEffects_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientClearCameraLensEffects"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientClearCameraLensEffects_OnCommandRequest: Function not found. Object: %s, Function: ClientClearCameraLensEffects."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -6980,30 +7097,35 @@ void USpatialTypeBinding_PlayerController::ClientCapBandwidth_OnCommandRequest(c
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCapBandwidth_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCapBandwidth_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCapBandwidth_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		int32 Cap;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientCapBandwidth_Parms Parameters;
 
 		// Extract from request data.
-		Cap = Op.Request.field_cap();
+		Parameters.Cap = Op.Request.field_cap();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCapBandwidth, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCapBandwidth_Implementation(Cap);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCapBandwidth"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCapBandwidth_OnCommandRequest: Function not found. Object: %s, Function: ClientCapBandwidth."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7026,24 +7148,28 @@ void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientCancelPendingMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientCancelPendingMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientCancelPendingMapChange_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCancelPendingMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientCancelPendingMapChange_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientCancelPendingMapChange"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCancelPendingMapChange_OnCommandRequest: Function not found. Object: %s, Function: ClientCancelPendingMapChange."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7066,39 +7192,42 @@ void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_OnComman
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientAddTextureStreamingLoc_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientAddTextureStreamingLoc_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientAddTextureStreamingLoc_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FVector InLoc;
-		float Duration;
-		bool bOverrideLocation;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventClientAddTextureStreamingLoc_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& Vector = Op.Request.field_inloc();
-			InLoc.X = Vector.x();
-			InLoc.Y = Vector.y();
-			InLoc.Z = Vector.z();
+			Parameters.InLoc.X = Vector.x();
+			Parameters.InLoc.Y = Vector.y();
+			Parameters.InLoc.Z = Vector.z();
 		}
-		Duration = Op.Request.field_duration();
-		bOverrideLocation = Op.Request.field_boverridelocation();
+		Parameters.Duration = Op.Request.field_duration();
+		Parameters.bOverrideLocation = Op.Request.field_boverridelocation();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAddTextureStreamingLoc, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientAddTextureStreamingLoc_Implementation(InLoc, Duration, bOverrideLocation);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientAddTextureStreamingLoc"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAddTextureStreamingLoc_OnCommandRequest: Function not found. Object: %s, Function: ClientAddTextureStreamingLoc."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7121,37 +7250,41 @@ void USpatialTypeBinding_PlayerController::ClientSetRotation_OnCommandRequest(co
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetRotation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetRotation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetRotation_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FRotator NewRotation;
-		bool bResetCamera;
+		// This struct is declared in Controller.generated.h (in a macro that is then put in Controller.h UCLASS macro)
+		Controller_eventClientSetRotation_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& Rotator = Op.Request.field_newrotation();
-			NewRotation.Yaw = Rotator.yaw();
-			NewRotation.Pitch = Rotator.pitch();
-			NewRotation.Roll = Rotator.roll();
+			Parameters.NewRotation.Yaw = Rotator.yaw();
+			Parameters.NewRotation.Pitch = Rotator.pitch();
+			Parameters.NewRotation.Roll = Rotator.roll();
 		}
-		bResetCamera = Op.Request.field_bresetcamera();
+		Parameters.bResetCamera = Op.Request.field_bresetcamera();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetRotation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetRotation_Implementation(NewRotation, bResetCamera);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetRotation"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetRotation_OnCommandRequest: Function not found. Object: %s, Function: ClientSetRotation."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7174,34 +7307,28 @@ void USpatialTypeBinding_PlayerController::ClientSetLocation_OnCommandRequest(co
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ClientSetLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ClientSetLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ClientSetLocation_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FVector NewLocation;
-		FRotator NewRotation;
+		// This struct is declared in Controller.generated.h (in a macro that is then put in Controller.h UCLASS macro)
+		Controller_eventClientSetLocation_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& Vector = Op.Request.field_newlocation();
-			NewLocation.X = Vector.x();
-			NewLocation.Y = Vector.y();
-			NewLocation.Z = Vector.z();
+			Parameters.NewLocation.X = Vector.x();
+			Parameters.NewLocation.Y = Vector.y();
+			Parameters.NewLocation.Z = Vector.z();
 		}
 		{
 			auto& Rotator = Op.Request.field_newrotation();
-			NewRotation.Yaw = Rotator.yaw();
-			NewRotation.Pitch = Rotator.pitch();
-			NewRotation.Roll = Rotator.roll();
+			Parameters.NewRotation.Yaw = Rotator.yaw();
+			Parameters.NewRotation.Pitch = Rotator.pitch();
+			Parameters.NewRotation.Roll = Rotator.roll();
 		}
 
 		// Call implementation.
@@ -7209,7 +7336,17 @@ void USpatialTypeBinding_PlayerController::ClientSetLocation_OnCommandRequest(co
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ClientSetLocation_Implementation(NewLocation, NewRotation);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ClientSetLocation"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetLocation_OnCommandRequest: Function not found. Object: %s, Function: ClientSetLocation."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7232,33 +7369,38 @@ void USpatialTypeBinding_PlayerController::ServerViewSelf_OnCommandRequest(const
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerViewSelf_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerViewSelf_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerViewSelf_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FViewTargetTransitionParams TransitionParams;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerViewSelf_Parms Parameters;
 
 		// Extract from request data.
-		TransitionParams.BlendTime = Op.Request.field_transitionparams_blendtime();
-		TransitionParams.BlendFunction = TEnumAsByte<EViewTargetBlendFunction>(uint8(Op.Request.field_transitionparams_blendfunction()));
-		TransitionParams.BlendExp = Op.Request.field_transitionparams_blendexp();
-		TransitionParams.bLockOutgoing = Op.Request.field_transitionparams_blockoutgoing();
+		Parameters.TransitionParams.BlendTime = Op.Request.field_transitionparams_blendtime();
+		Parameters.TransitionParams.BlendFunction = TEnumAsByte<EViewTargetBlendFunction>(uint8(Op.Request.field_transitionparams_blendfunction()));
+		Parameters.TransitionParams.BlendExp = Op.Request.field_transitionparams_blendexp();
+		Parameters.TransitionParams.bLockOutgoing = Op.Request.field_transitionparams_blockoutgoing();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewSelf, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerViewSelf_Implementation(TransitionParams);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerViewSelf"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewSelf_OnCommandRequest: Function not found. Object: %s, Function: ServerViewSelf."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7281,24 +7423,28 @@ void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_OnCommandRequest
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerViewPrevPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerViewPrevPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerViewPrevPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewPrevPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerViewPrevPlayer_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerViewPrevPlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewPrevPlayer_OnCommandRequest: Function not found. Object: %s, Function: ServerViewPrevPlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7321,24 +7467,28 @@ void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_OnCommandRequest
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerViewNextPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerViewNextPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerViewNextPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewNextPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerViewNextPlayer_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerViewNextPlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewNextPlayer_OnCommandRequest: Function not found. Object: %s, Function: ServerViewNextPlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7361,24 +7511,28 @@ void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_OnCommandReque
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerVerifyViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerVerifyViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerVerifyViewTarget_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerVerifyViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerVerifyViewTarget_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerVerifyViewTarget"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerVerifyViewTarget_OnCommandRequest: Function not found. Object: %s, Function: ServerVerifyViewTarget."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7401,32 +7555,27 @@ void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		TArray<FUpdateLevelVisibilityLevelInfo> LevelVisibilities;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerUpdateMultipleLevelsVisibility_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& List = Op.Request.field_levelvisibilities();
-			LevelVisibilities.SetNum(List.size());
+			Parameters.LevelVisibilities.SetNum(List.size());
 			for(int i = 0; i < List.size(); i++)
 			{
 				auto& ValueDataStr = List[i];
 				TArray<uint8> ValueData;
 				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 				FMemoryReader ValueDataReader(ValueData);
-				FUpdateLevelVisibilityLevelInfo::StaticStruct()->SerializeBin(ValueDataReader, reinterpret_cast<void*>(&LevelVisibilities[i]));
+				FUpdateLevelVisibilityLevelInfo::StaticStruct()->SerializeBin(ValueDataReader, reinterpret_cast<void*>(&Parameters.LevelVisibilities[i]));
 			}
 		}
 
@@ -7435,7 +7584,17 @@ void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerUpdateMultipleLevelsVisibility_Implementation(LevelVisibilities);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerUpdateMultipleLevelsVisibility"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnCommandRequest: Function not found. Object: %s, Function: ServerUpdateMultipleLevelsVisibility."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7458,32 +7617,36 @@ void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerUpdateLevelVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerUpdateLevelVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerUpdateLevelVisibility_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName PackageName;
-		bool bIsVisible;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerUpdateLevelVisibility_Parms Parameters;
 
 		// Extract from request data.
-		PackageName = FName((Op.Request.field_packagename()).data());
-		bIsVisible = Op.Request.field_bisvisible();
+		Parameters.PackageName = FName((Op.Request.field_packagename()).data());
+		Parameters.bIsVisible = Op.Request.field_bisvisible();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateLevelVisibility, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerUpdateLevelVisibility_Implementation(PackageName, bIsVisible);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerUpdateLevelVisibility"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateLevelVisibility_OnCommandRequest: Function not found. Object: %s, Function: ServerUpdateLevelVisibility."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7506,37 +7669,41 @@ void USpatialTypeBinding_PlayerController::ServerUpdateCamera_OnCommandRequest(c
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerUpdateCamera_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerUpdateCamera_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerUpdateCamera_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FVector_NetQuantize CamLoc;
-		int32 CamPitchAndYaw;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerUpdateCamera_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& Vector = Op.Request.field_camloc();
-			CamLoc.X = Vector.x();
-			CamLoc.Y = Vector.y();
-			CamLoc.Z = Vector.z();
+			Parameters.CamLoc.X = Vector.x();
+			Parameters.CamLoc.Y = Vector.y();
+			Parameters.CamLoc.Z = Vector.z();
 		}
-		CamPitchAndYaw = Op.Request.field_campitchandyaw();
+		Parameters.CamPitchAndYaw = Op.Request.field_campitchandyaw();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerUpdateCamera_Implementation(CamLoc, CamPitchAndYaw);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerUpdateCamera"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateCamera_OnCommandRequest: Function not found. Object: %s, Function: ServerUpdateCamera."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7559,20 +7726,15 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnCommandRequest(c
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerUnmutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FUniqueNetIdRepl PlayerId;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerUnmutePlayer_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -7581,7 +7743,7 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnCommandRequest(c
 			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 			FMemoryReader ValueDataReader(ValueData);
 			bool bSuccess;
-			PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			Parameters.PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 		}
 
 		// Call implementation.
@@ -7589,7 +7751,17 @@ void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnCommandRequest(c
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerUnmutePlayer_Implementation(PlayerId);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerUnmutePlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUnmutePlayer_OnCommandRequest: Function not found. Object: %s, Function: ServerUnmutePlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7612,24 +7784,28 @@ void USpatialTypeBinding_PlayerController::ServerToggleAILogging_OnCommandReques
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerToggleAILogging_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerToggleAILogging_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerToggleAILogging_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerToggleAILogging, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerToggleAILogging_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerToggleAILogging"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerToggleAILogging_OnCommandRequest: Function not found. Object: %s, Function: ServerToggleAILogging."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7652,24 +7828,28 @@ void USpatialTypeBinding_PlayerController::ServerShortTimeout_OnCommandRequest(c
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerShortTimeout_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerShortTimeout_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerShortTimeout_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerShortTimeout, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerShortTimeout_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerShortTimeout"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerShortTimeout_OnCommandRequest: Function not found. Object: %s, Function: ServerShortTimeout."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7692,30 +7872,35 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_OnCommandRe
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerSetSpectatorWaiting_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		bool bWaiting;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerSetSpectatorWaiting_Parms Parameters;
 
 		// Extract from request data.
-		bWaiting = Op.Request.field_bwaiting();
+		Parameters.bWaiting = Op.Request.field_bwaiting();
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerSetSpectatorWaiting_Implementation(bWaiting);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerSetSpectatorWaiting"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerSetSpectatorWaiting_OnCommandRequest: Function not found. Object: %s, Function: ServerSetSpectatorWaiting."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7738,34 +7923,28 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_OnCommandR
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerSetSpectatorLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerSetSpectatorLocation_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerSetSpectatorLocation_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FVector NewLoc;
-		FRotator NewRot;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerSetSpectatorLocation_Parms Parameters;
 
 		// Extract from request data.
 		{
 			auto& Vector = Op.Request.field_newloc();
-			NewLoc.X = Vector.x();
-			NewLoc.Y = Vector.y();
-			NewLoc.Z = Vector.z();
+			Parameters.NewLoc.X = Vector.x();
+			Parameters.NewLoc.Y = Vector.y();
+			Parameters.NewLoc.Z = Vector.z();
 		}
 		{
 			auto& Rotator = Op.Request.field_newrot();
-			NewRot.Yaw = Rotator.yaw();
-			NewRot.Pitch = Rotator.pitch();
-			NewRot.Roll = Rotator.roll();
+			Parameters.NewRot.Yaw = Rotator.yaw();
+			Parameters.NewRot.Pitch = Rotator.pitch();
+			Parameters.NewRot.Roll = Rotator.roll();
 		}
 
 		// Call implementation.
@@ -7773,7 +7952,17 @@ void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_OnCommandR
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerSetSpectatorLocation_Implementation(NewLoc, NewRot);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerSetSpectatorLocation"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerSetSpectatorLocation_OnCommandRequest: Function not found. Object: %s, Function: ServerSetSpectatorLocation."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7796,24 +7985,28 @@ void USpatialTypeBinding_PlayerController::ServerRestartPlayer_OnCommandRequest(
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerRestartPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerRestartPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerRestartPlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerRestartPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerRestartPlayer_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerRestartPlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerRestartPlayer_OnCommandRequest: Function not found. Object: %s, Function: ServerRestartPlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7836,24 +8029,28 @@ void USpatialTypeBinding_PlayerController::ServerPause_OnCommandRequest(const wo
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerPause_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerPause_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerPause_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerPause, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerPause_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerPause"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerPause_OnCommandRequest: Function not found. Object: %s, Function: ServerPause."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7876,30 +8073,35 @@ void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_OnCommandRequ
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerNotifyLoadedWorld_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerNotifyLoadedWorld_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerNotifyLoadedWorld_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName WorldPackageName;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerNotifyLoadedWorld_Parms Parameters;
 
 		// Extract from request data.
-		WorldPackageName = FName((Op.Request.field_worldpackagename()).data());
+		Parameters.WorldPackageName = FName((Op.Request.field_worldpackagename()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerNotifyLoadedWorld, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerNotifyLoadedWorld_Implementation(WorldPackageName);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerNotifyLoadedWorld"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerNotifyLoadedWorld_OnCommandRequest: Function not found. Object: %s, Function: ServerNotifyLoadedWorld."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7922,20 +8124,15 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_OnCommandRequest(con
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerMutePlayer_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FUniqueNetIdRepl PlayerId;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerMutePlayer_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -7944,7 +8141,7 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_OnCommandRequest(con
 			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 			FMemoryReader ValueDataReader(ValueData);
 			bool bSuccess;
-			PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			Parameters.PlayerId.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 		}
 
 		// Call implementation.
@@ -7952,7 +8149,17 @@ void USpatialTypeBinding_PlayerController::ServerMutePlayer_OnCommandRequest(con
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerMutePlayer_Implementation(PlayerId);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerMutePlayer"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMutePlayer_OnCommandRequest: Function not found. Object: %s, Function: ServerMutePlayer."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -7975,24 +8182,28 @@ void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_O
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerCheckClientPossessionReliable_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerCheckClientPossessionReliable_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerCheckClientPossessionReliable_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossessionReliable, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerCheckClientPossessionReliable_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerCheckClientPossessionReliable"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCheckClientPossessionReliable_OnCommandRequest: Function not found. Object: %s, Function: ServerCheckClientPossessionReliable."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -8015,24 +8226,28 @@ void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerCheckClientPossession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerCheckClientPossession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerCheckClientPossession_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerCheckClientPossession_Implementation();
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerCheckClientPossession"))))
+		{
+			TargetObject->ProcessEvent(Function, nullptr);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCheckClientPossession_OnCommandRequest: Function not found. Object: %s, Function: ServerCheckClientPossession."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -8055,30 +8270,35 @@ void USpatialTypeBinding_PlayerController::ServerChangeName_OnCommandRequest(con
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerChangeName_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerChangeName_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerChangeName_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FString S;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerChangeName_Parms Parameters;
 
 		// Extract from request data.
-		S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
+		Parameters.S = FString(UTF8_TO_TCHAR(Op.Request.field_s().c_str()));
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerChangeName, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerChangeName_Implementation(S);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerChangeName"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerChangeName_OnCommandRequest: Function not found. Object: %s, Function: ServerChangeName."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -8101,30 +8321,35 @@ void USpatialTypeBinding_PlayerController::ServerCamera_OnCommandRequest(const w
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerCamera_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerCamera_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerCamera_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		FName NewMode;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerCamera_Parms Parameters;
 
 		// Extract from request data.
-		NewMode = FName((Op.Request.field_newmode()).data());
+		Parameters.NewMode = FName((Op.Request.field_newmode()).data());
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerCamera_Implementation(NewMode);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerCamera"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCamera_OnCommandRequest: Function not found. Object: %s, Function: ServerCamera."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -8147,20 +8372,15 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommand
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
-		UObject* TargetObjectUntyped = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		APlayerController* TargetObject = Cast<APlayerController>(TargetObjectUntyped);
-		checkf(TargetObjectUntyped, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
-		checkf(TargetObject, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: Object Ref %s (NetGUID %s) is the wrong type. Name: %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString(),
-			*TargetObjectUntyped->GetName());
 
 		// Declare parameters.
-		APawn* P;
+		// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
+		PlayerController_eventServerAcknowledgePossession_Parms Parameters;
 
 		// Extract from request data.
 		{
@@ -8168,7 +8388,7 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommand
 			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
 			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				P = nullptr;
+				Parameters.P = nullptr;
 			}
 			else
 			{
@@ -8177,12 +8397,12 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommand
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					P = dynamic_cast<APawn*>(Object_Raw);
-					checkf(P, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.P = dynamic_cast<APawn*>(Object_Raw);
+					checkf(Parameters.P, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: P %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: Parameters.P %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -8195,7 +8415,17 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommand
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		TargetObject->ServerAcknowledgePossession_Implementation(P);
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerAcknowledgePossession"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerAcknowledgePossession_OnCommandRequest: Function not found. Object: %s, Function: ServerAcknowledgePossession."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
