@@ -5,6 +5,7 @@ set SPATIALGDK_PLUGINSPATH="%1\Plugins\SpatialGDK"
 set SPATIALGDK_MODULEPATH="%1\Source\SpatialGDK"
 set SPATIALGDK_SCRIPTSPATH="%1\Scripts"
 set SPATIALGDK_BINARIESPATH="%1\Binaries\ThirdParty\Improbable"
+set SPATIALGDK_SCHEMAPATH="%1\schema\improbable\unreal\gdk"
 
 if %SPATIALGDK_PATH% == "" (
 	echo Error: Please specify the SpatialGDK path.
@@ -20,6 +21,7 @@ if not exist %SPATIALGDK_PATH%\ (
 set PATH_VALID=true
 if not exist %SPATIALGDK_PLUGINSPATH% set PATH_VALID=false
 if not exist %SPATIALGDK_MODULEPATH% set PATH_VALID=false
+if not exist %SPATIALGDK_SCHEMAPATH% set PATH_VALID=false
 
 if %PATH_VALID%==false (
 	echo Error: SpatialGDK path %SPATIALGDK_PATH% is invalid. Provide path to cloned SpatialGDK git repository.
@@ -40,6 +42,7 @@ rmdir "%~dp0\workers\unreal\Game\Plugins\SpatialGDK" 2>NUL
 rmdir "%~dp0\workers\unreal\Game\Source\SpatialGDK" 2>NUL
 rmdir "%~dp0\workers\unreal\Game\Scripts" 2>NUL
 rmdir "%~dp0\workers\unreal\Game\Binaries\ThirdParty\Improbable" 2>NUL
+rmdir "%~dp0\schema\improbable\unreal\gdk" 2>NUL
 
 REM Ensure plugins folder exists, mklink doesn't recursively create
 if not exist %~dp0\workers\unreal\Game\Plugins\ (
@@ -51,11 +54,17 @@ if not exist %~dp0\workers\unreal\Game\Binaries\ThirdParty\ (
 	mkdir %~dp0\workers\unreal\Game\Binaries\ThirdParty\
 )
 
+REM Ensure schema folder exists, mklink doesn't recursively create
+if not exist %~dp0\schema\improbable\unreal\ (
+	mkdir %~dp0\schema\improbable\unreal\
+)
+
 REM Make new symlinks
 mklink /J "%~dp0\workers\unreal\Game\Plugins\SpatialGDK" %SPATIALGDK_PLUGINSPATH%
 mklink /J "%~dp0\workers\unreal\Game\Source\SpatialGDK" %SPATIALGDK_MODULEPATH%
 mklink /J "%~dp0\workers\unreal\Game\Scripts" %SPATIALGDK_SCRIPTSPATH%
 mklink /J "%~dp0\workers\unreal\Game\Binaries\ThirdParty\Improbable" %SPATIALGDK_BINARIESPATH%
+mklink /J "%~dp0\schema\improbable\unreal\gdk" %SPATIALGDK_SCHEMAPATH%
 
 echo Successfully created symlinks to %SPATIALGDK_PATH%
 

@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include <improbable/worker.h>
 #include <improbable/view.h>
-#include <improbable/unreal/core_types.h>
-#include <improbable/unreal/unreal_metadata.h>
+#include <improbable/unreal/gdk/core_types.h>
+#include <improbable/unreal/gdk/unreal_metadata.h>
 #include <improbable/unreal/generated/UnrealPlayerController.h>
 #include "ScopedViewCallbacks.h"
 #include "SpatialTypeBinding.h"
