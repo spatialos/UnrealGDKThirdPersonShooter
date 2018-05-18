@@ -68,4 +68,3 @@ mklink /J "%~dp0\schema\improbable\unreal\gdk" %SPATIALGDK_SCHEMAPATH%
 
 echo Successfully created symlinks to %SPATIALGDK_PATH%
 
-exit 0

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
+#include "TestCube.h"
 #include "SampleGameCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -19,6 +20,7 @@ class ASampleGameCharacter : public ACharacter
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
 public:
 	ASampleGameCharacter();
 
@@ -52,18 +54,58 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
+public:
+	// Returns a position from which to start a line trace.
+	// Use this so your line trace doesn't collide with the player character.
+	FVector GetLineTraceStart() const;
 
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
+	// Returns the direction in which to perform a line trace so it lines up with the center of the crosshair.
+	FVector GetLineTraceDirection() const;
 
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	// End of APawn interface
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+private:
+	// [client] Checks if the crosshair is pointing at an interactable object, and if so, calls Interact() on it.
 	void Interact();
+
+	// [client] Tells the server to spawn a test cube.
+	void SpawnCube();
+
+	// [server] Spawns a starter weapon and attaches it to the character.
+	void SpawnStarterWeapon();
+
+	// [client] Triggers the equipped weapon to start firing.
+	void StartFire();
+
+	// [client] Triggers the equipped weapon to stop firing.
+	void StopFire();
+
+	// Returns the currently equipped weapon, or nullptr if there isn't one.
+	class AWeapon* GetEquippedWeapon() const;
+
+	// RPC to tell the server to spawn a test cube.
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerSpawnCube();
+
+	UPROPERTY(VisibleAnywhere, Replicated)
+	class AWeapon* EquippedWeapon;
+
+	// Weapon to spawn the player with initially.
+	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	TSubclassOf<AWeapon> StarterWeaponTemplate;
+
+	// Cube to spawn when the player presses "SpawnCube".
+	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	TSubclassOf<ATestCube> TestCubeTemplate;
+
+	// Maximum distance at which the player can interact with objects.
+	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	float InteractDistance;
 
 public:
 	/** Returns CameraBoom subobject **/

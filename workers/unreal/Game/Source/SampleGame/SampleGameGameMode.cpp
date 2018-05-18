@@ -3,6 +3,8 @@
 #include "SampleGameGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 
+#include "SampleGameHUD.h"
+
 ASampleGameGameMode::ASampleGameGameMode()
 {
 	//set default pawn class to our Blueprinted character
@@ -11,4 +13,6 @@ ASampleGameGameMode::ASampleGameGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	HUDClass = ASampleGameHUD::StaticClass();
 }

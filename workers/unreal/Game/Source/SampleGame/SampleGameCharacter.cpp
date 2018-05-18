@@ -1,6 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "SampleGameCharacter.h"
+
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -10,9 +11,12 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "SampleGameGameStateBase.h"
+#include "SampleGameLogging.h"
 #include "SpatialNetDriver.h"
-
+#include "TestCube.h"
 #include "UnrealNetwork.h"
+#include "Weapons/Weapon.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // ASampleGameCharacter
@@ -52,22 +56,39 @@ ASampleGameCharacter::ASampleGameCharacter()
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
-												// Create a follow camera
+	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	EquippedWeapon = nullptr;
+	InteractDistance = 500.0f;
 }
 
 void ASampleGameCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
-//////////////////////////////////////////////////////////////////////////
-// Input
+	// Only spawn a new starter weapon if we're authoritative and don't already have one.
+	if (HasAuthority())
+	{
+		// Short delay as a workaround for UNR-218, which prevents replicated variables from being set when BeginPlay is called.
+		// TODO(UNR-218): fix this once UNR-218 is solved
+		FTimerHandle timerHandle;
+		FTimerDelegate timerDelegate;
+		timerDelegate.BindLambda([this]() {
+			UE_LOG(LogSampleGame, Log, TEXT("%s EquippedWeapon: %s"), *this->GetName(), EquippedWeapon == nullptr ? TEXT("nullptr") : *EquippedWeapon->GetName());
+			if (GetEquippedWeapon() == nullptr)
+			{
+				SpawnStarterWeapon();
+			}
+		});
+		GetWorld()->GetTimerManager().SetTimer(timerHandle, timerDelegate, 0.2f, false);
+	}
+}
 
 void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
@@ -87,19 +108,132 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASampleGameCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ASampleGameCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ASampleGameCharacter::TouchStopped);
+    PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ASampleGameCharacter::Interact);
+	PlayerInputComponent->BindAction("SpawnCube", IE_Pressed, this, &ASampleGameCharacter::SpawnCube);
+
+	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASampleGameCharacter::StartFire);
+	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASampleGameCharacter::StopFire);
 }
 
-void ASampleGameCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
+void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
-	Jump();
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
 }
 
-void ASampleGameCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
+void ASampleGameCharacter::Interact()
 {
-	StopJumping();
+    FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("SampleGame_Trace")), true, this);
+    TraceParams.bTraceComplex = true;
+    TraceParams.bTraceAsyncScene = true;
+    TraceParams.bReturnPhysicalMaterial = false;
+
+    FHitResult HitResult(ForceInit);
+    FVector TraceStart = GetFollowCamera()->GetComponentLocation();
+    FVector TraceEnd = TraceStart + GetFollowCamera()->GetForwardVector() * InteractDistance;
+
+    bool bDidHit = GetWorld()->LineTraceSingleByChannel(
+        HitResult,
+        TraceStart,
+        TraceEnd,
+        ECC_Visibility,
+        TraceParams);
+
+    if (!bDidHit)
+    {
+        return;
+    }
+
+    if (GEngine != nullptr)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
+            FString::Printf(TEXT("Interact with actor: %s"), *HitResult.GetActor()->GetName()));
+    }
+
+    ATestCube* InteractableObject = Cast<ATestCube>(HitResult.GetActor());
+    if (InteractableObject != nullptr)
+    {
+        InteractableObject->Interact(this);
+    }
+}
+
+void ASampleGameCharacter::SpawnCube()
+{
+	ServerSpawnCube();
+}
+
+void ASampleGameCharacter::SpawnStarterWeapon()
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (StarterWeaponTemplate == nullptr)
+	{
+		UE_LOG(LogSampleGame, Warning, TEXT("No starter weapon defined."));
+		return;
+	}
+
+	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform());
+	StartWeapon->SetOwningCharacter(this);
+	StartWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+	UE_LOG(LogSampleGame, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());
+	EquippedWeapon = StartWeapon;
+}
+
+void ASampleGameCharacter::StartFire()
+{
+	AWeapon* Weapon = GetEquippedWeapon();
+	if (Weapon != nullptr)
+	{
+		Weapon->StartFire();
+	}
+}
+
+void ASampleGameCharacter::StopFire()
+{
+	AWeapon* Weapon = GetEquippedWeapon();
+	if (Weapon != nullptr)
+	{
+		Weapon->StopFire();
+	}
+}
+
+AWeapon* ASampleGameCharacter::GetEquippedWeapon() const
+{
+	return EquippedWeapon;
+}
+
+bool ASampleGameCharacter::ServerSpawnCube_Validate()
+{
+	return true;
+}
+
+void ASampleGameCharacter::ServerSpawnCube_Implementation()
+{
+	if (TestCubeTemplate == nullptr)
+	{
+		return;
+	}
+
+	FVector CameraCenter = GetFollowCamera()->GetComponentLocation();
+	FVector SpawnLocation = CameraCenter + GetFollowCamera()->GetForwardVector() * InteractDistance;
+	FTransform SpawnTranform(FRotator::ZeroRotator, SpawnLocation);
+
+	GetWorld()->SpawnActor<ATestCube>(TestCubeTemplate, SpawnTranform);
+}
+
+FVector ASampleGameCharacter::GetLineTraceStart() const
+{
+	return GetFollowCamera()->GetComponentLocation();
+}
+
+FVector ASampleGameCharacter::GetLineTraceDirection() const
+{
+	return GetFollowCamera()->GetForwardVector();
 }
 
 void ASampleGameCharacter::TurnAtRate(float Rate)
