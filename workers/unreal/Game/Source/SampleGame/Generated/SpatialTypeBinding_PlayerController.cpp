@@ -1107,7 +1107,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1266,7 +1266,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<USceneComponent*>(Object_Raw);
+						Value = Cast<USceneComponent>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1322,7 +1322,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1407,7 +1407,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APawn*>(Object_Raw);
+						Value = Cast<APawn>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1463,7 +1463,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APlayerState*>(Object_Raw);
+						Value = Cast<APlayerState>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1519,7 +1519,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_MultiClient(USpatialAct
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APawn*>(Object_Raw);
+						Value = Cast<APawn>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1580,7 +1580,7 @@ void USpatialTypeBinding_PlayerController::ReceiveUpdate_Migratable(USpatialActo
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Value = dynamic_cast<APawn*>(Object_Raw);
+					Value = Cast<APawn>(Object_Raw);
 					checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -4638,7 +4638,7 @@ void USpatialTypeBinding_PlayerController::ClientTeamMessage_OnCommandRequest(co
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.SenderPlayerState = dynamic_cast<APlayerState*>(Object_Raw);
+					Parameters.SenderPlayerState = Cast<APlayerState>(Object_Raw);
 					checkf(Parameters.SenderPlayerState, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -4717,7 +4717,7 @@ void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
+					Parameters.ForceFeedbackEffect = Cast<UForceFeedbackEffect>(Object_Raw);
 					checkf(Parameters.ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -4846,7 +4846,7 @@ void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandRequest
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.AnimToStop = dynamic_cast<UCameraAnim*>(Object_Raw);
+					Parameters.AnimToStop = Cast<UCameraAnim>(Object_Raw);
 					checkf(Parameters.AnimToStop, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5017,7 +5017,7 @@ void USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnCommandRequest(
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.A = dynamic_cast<AActor*>(Object_Raw);
+					Parameters.A = Cast<AActor>(Object_Raw);
 					checkf(Parameters.A, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5199,7 +5199,7 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_O
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.Material = dynamic_cast<UMaterialInterface*>(Object_Raw);
+					Parameters.Material = Cast<UMaterialInterface>(Object_Raw);
 					checkf(Parameters.Material, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5587,7 +5587,7 @@ void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandReq
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.NewPawn = dynamic_cast<APawn*>(Object_Raw);
+					Parameters.NewPawn = Cast<APawn>(Object_Raw);
 					checkf(Parameters.NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5663,7 +5663,7 @@ void USpatialTypeBinding_PlayerController::ClientRestart_OnCommandRequest(const 
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.NewPawn = dynamic_cast<APawn*>(Object_Raw);
+					Parameters.NewPawn = Cast<APawn>(Object_Raw);
 					checkf(Parameters.NewPawn, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5783,7 +5783,7 @@ void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.Object = dynamic_cast<UObject*>(Object_Raw);
+					Parameters.Object = Cast<UObject>(Object_Raw);
 					checkf(Parameters.Object, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5861,7 +5861,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.RelatedPlayerState_1 = dynamic_cast<APlayerState*>(Object_Raw);
+					Parameters.RelatedPlayerState_1 = Cast<APlayerState>(Object_Raw);
 					checkf(Parameters.RelatedPlayerState_1, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5887,7 +5887,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.RelatedPlayerState_2 = dynamic_cast<APlayerState*>(Object_Raw);
+					Parameters.RelatedPlayerState_2 = Cast<APlayerState>(Object_Raw);
 					checkf(Parameters.RelatedPlayerState_2, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5913,7 +5913,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnComma
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.OptionalObject = dynamic_cast<UObject*>(Object_Raw);
+					Parameters.OptionalObject = Cast<UObject>(Object_Raw);
 					checkf(Parameters.OptionalObject, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -5989,7 +5989,7 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.ForcedActor = dynamic_cast<AActor*>(Object_Raw);
+					Parameters.ForcedActor = Cast<AActor>(Object_Raw);
 					checkf(Parameters.ForcedActor, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -6121,7 +6121,7 @@ void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandRe
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.Sound = dynamic_cast<USoundBase*>(Object_Raw);
+					Parameters.Sound = Cast<USoundBase>(Object_Raw);
 					checkf(Parameters.Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -6205,7 +6205,7 @@ void USpatialTypeBinding_PlayerController::ClientPlaySound_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.Sound = dynamic_cast<USoundBase*>(Object_Raw);
+					Parameters.Sound = Cast<USoundBase>(Object_Raw);
 					checkf(Parameters.Sound, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -6283,7 +6283,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnCommandRequ
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.ForceFeedbackEffect = dynamic_cast<UForceFeedbackEffect*>(Object_Raw);
+					Parameters.ForceFeedbackEffect = Cast<UForceFeedbackEffect>(Object_Raw);
 					checkf(Parameters.ForceFeedbackEffect, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -6421,7 +6421,7 @@ void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandRequest
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.AnimToPlay = dynamic_cast<UCameraAnim*>(Object_Raw);
+					Parameters.AnimToPlay = Cast<UCameraAnim>(Object_Raw);
 					checkf(Parameters.AnimToPlay, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -6774,7 +6774,7 @@ void USpatialTypeBinding_PlayerController::ClientGameEnded_OnCommandRequest(cons
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.EndGameFocus = dynamic_cast<AActor*>(Object_Raw);
+					Parameters.EndGameFocus = Cast<AActor>(Object_Raw);
 					checkf(Parameters.EndGameFocus, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
@@ -8397,7 +8397,7 @@ void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommand
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					Parameters.P = dynamic_cast<APawn*>(Object_Raw);
+					Parameters.P = Cast<APawn>(Object_Raw);
 					checkf(Parameters.P, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else

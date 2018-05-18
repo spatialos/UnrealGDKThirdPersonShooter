@@ -778,7 +778,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -937,7 +937,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<USceneComponent*>(Object_Raw);
+						Value = Cast<USceneComponent>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -993,7 +993,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1078,7 +1078,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APawn*>(Object_Raw);
+						Value = Cast<APawn>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1134,7 +1134,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APlayerState*>(Object_Raw);
+						Value = Cast<APlayerState>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1212,7 +1212,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AController*>(Object_Raw);
+						Value = Cast<AController>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
