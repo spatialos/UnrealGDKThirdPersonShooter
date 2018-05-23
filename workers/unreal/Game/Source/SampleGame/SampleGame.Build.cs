@@ -18,6 +18,9 @@ public class SampleGame : ModuleRules
 				"Sockets",
 				"OnlineSubsystemUtils",
 				"PhysXVehicles",
+				"UMG",
+				"Slate",
+				"SlateCore",
 				"SpatialGDK"
 			});
 	}

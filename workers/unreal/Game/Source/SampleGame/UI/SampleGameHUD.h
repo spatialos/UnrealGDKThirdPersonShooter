@@ -25,7 +25,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	float CrosshairHeight;
 	
-protected:
+private:
+	// Draws a crosshair on the center of the screen.
 	void DrawCrosshair();
 	
 };

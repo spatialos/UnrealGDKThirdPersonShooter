@@ -115,6 +115,11 @@ void AInstantWeapon::DoFire()
 bool AInstantWeapon::DoLineTrace(FInstantHitInfo& OutHitInfo)
 {
 	ASampleGameCharacter* Character = GetOwningCharacter();
+	if (Character == nullptr)
+	{
+		UE_LOG(LogSampleGame, Verbose, TEXT("Weapon %s does not have an owning character"), *this->GetName());
+		return false;
+	}
 
 	FCollisionQueryParams TraceParams;
 	TraceParams.bTraceComplex = true;
@@ -201,6 +206,14 @@ bool AInstantWeapon::ValidateHit(const FInstantHitInfo& HitInfo)
 	return true;
 }
 
+void AInstantWeapon::DealDamage(const FInstantHitInfo& HitInfo)
+{
+	FDamageEvent DmgEvent;
+	DmgEvent.DamageTypeClass = DamageTypeClass;
+
+	HitInfo.HitActor->TakeDamage(ShotBaseDamage, DmgEvent, GetOwningCharacter()->GetController(), this);
+}
+
 bool AInstantWeapon::ServerDidHit_Validate(const FInstantHitInfo& HitInfo)
 {
 	return true;
@@ -218,11 +231,7 @@ void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 	{
 		if (ValidateHit(HitInfo))
 		{
-
-			FDamageEvent DmgEvent;
-			DmgEvent.DamageTypeClass = DamageTypeClass;
-
-			HitInfo.HitActor->TakeDamage(ShotBaseDamage, DmgEvent, GetOwningCharacter()->GetController(), this);
+			DealDamage(HitInfo);
 			bDoNotifyHit = true;
 		}
 		else

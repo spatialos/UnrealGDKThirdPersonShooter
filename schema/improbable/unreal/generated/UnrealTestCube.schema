@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal;
+package improbable.unreal.generated;
 
 import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
@@ -37,5 +37,5 @@ component UnrealTestCubeClientRPCs {
 }
 component UnrealTestCubeServerRPCs {
 	id = 100034;
-	command UnrealRPCCommandResponse serverinteract(UnrealServerInteractRequest);
+	command UnrealRPCCommandResponse testcubeserverinteract(UnrealServerInteractRequest);
 }

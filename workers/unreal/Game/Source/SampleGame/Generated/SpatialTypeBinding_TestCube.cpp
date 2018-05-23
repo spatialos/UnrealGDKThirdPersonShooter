@@ -73,11 +73,11 @@ void USpatialTypeBinding_TestCube::BindToView()
 
 	if (Interop->GetNetDriver()->GetNetMode() == NM_Client)
 	{
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::UnrealTestCubeSingleClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::UnrealTestCubeSingleClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealTestCubeSingleClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealTestCubeSingleClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::UnrealTestCubeSingleClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealTestCubeSingleClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -85,11 +85,11 @@ void USpatialTypeBinding_TestCube::BindToView()
 			check(ActorChannel);
 			ReceiveUpdate_SingleClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::UnrealTestCubeMultiClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::UnrealTestCubeMultiClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealTestCubeMultiClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealTestCubeMultiClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::UnrealTestCubeMultiClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealTestCubeMultiClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -97,11 +97,11 @@ void USpatialTypeBinding_TestCube::BindToView()
 			check(ActorChannel);
 			ReceiveUpdate_MultiClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::UnrealTestCubeMigratableData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::UnrealTestCubeMigratableData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealTestCubeMigratableData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealTestCubeMigratableData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::UnrealTestCubeMigratableData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealTestCubeMigratableData::ComponentId))
 			{
 				return;
 			}
@@ -111,9 +111,9 @@ void USpatialTypeBinding_TestCube::BindToView()
 		}));
 	}
 
-	using ServerRPCCommandTypes = improbable::unreal::UnrealTestCubeServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube::ServerInteract_OnCommandRequest, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube::ServerInteract_OnCommandResponse, this, std::placeholders::_1)));
+	using ServerRPCCommandTypes = improbable::unreal::generated::UnrealTestCubeServerRPCs::Commands;
+	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Testcubeserverinteract>(std::bind(&USpatialTypeBinding_TestCube::ServerInteract_OnCommandRequest, this, std::placeholders::_1)));
+	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Testcubeserverinteract>(std::bind(&USpatialTypeBinding_TestCube::ServerInteract_OnCommandResponse, this, std::placeholders::_1)));
 }
 
 void USpatialTypeBinding_TestCube::UnbindFromView()
@@ -131,14 +131,14 @@ worker::Entity USpatialTypeBinding_TestCube::CreateActorEntity(const FString& Cl
 	}
 
 	// Setup initial data.
-	improbable::unreal::UnrealTestCubeSingleClientRepData::Data SingleClientData;
-	improbable::unreal::UnrealTestCubeSingleClientRepData::Update SingleClientUpdate;
+	improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Data SingleClientData;
+	improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update SingleClientUpdate;
 	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::UnrealTestCubeMultiClientRepData::Data MultiClientData;
-	improbable::unreal::UnrealTestCubeMultiClientRepData::Update MultiClientUpdate;
+	improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Data MultiClientData;
+	improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::UnrealTestCubeMigratableData::Data MigratableData;
-	improbable::unreal::UnrealTestCubeMigratableData::Update MigratableDataUpdate;
+	improbable::unreal::generated::UnrealTestCubeMigratableData::Data MigratableData;
+	improbable::unreal::generated::UnrealTestCubeMigratableData::Update MigratableDataUpdate;
 	bool bMigratableDataUpdateChanged = false;
 	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
 	SingleClientUpdate.ApplyTo(SingleClientData);
@@ -190,22 +190,22 @@ worker::Entity USpatialTypeBinding_TestCube::CreateActorEntity(const FString& Cl
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-		.AddComponent<improbable::unreal::UnrealTestCubeSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::UnrealTestCubeMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::UnrealTestCubeMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::UnrealTestCubeClientRPCs>(improbable::unreal::UnrealTestCubeClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::UnrealTestCubeServerRPCs>(improbable::unreal::UnrealTestCubeServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealTestCubeSingleClientRepData>(SingleClientData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealTestCubeMultiClientRepData>(MultiClientData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealTestCubeMigratableData>(MigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealTestCubeClientRPCs>(improbable::unreal::generated::UnrealTestCubeClientRPCs::Data{}, OwningClientOnly)
+		.AddComponent<improbable::unreal::generated::UnrealTestCubeServerRPCs>(improbable::unreal::generated::UnrealTestCubeServerRPCs::Data{}, WorkersOnly)
 		.Build();
 }
 
 void USpatialTypeBinding_TestCube::SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const
 {
 	// Build SpatialOS updates.
-	improbable::unreal::UnrealTestCubeSingleClientRepData::Update SingleClientUpdate;
+	improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update SingleClientUpdate;
 	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::UnrealTestCubeMultiClientRepData::Update MultiClientUpdate;
+	improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::UnrealTestCubeMigratableData::Update MigratableDataUpdate;
+	improbable::unreal::generated::UnrealTestCubeMigratableData::Update MigratableDataUpdate;
 	bool bMigratableDataUpdateChanged = false;
 	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
 
@@ -213,15 +213,15 @@ void USpatialTypeBinding_TestCube::SendComponentUpdates(const FPropertyChangeSta
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	if (bSingleClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::UnrealTestCubeSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealTestCubeSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
 	}
 	if (bMultiClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::UnrealTestCubeMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealTestCubeMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
 	}
 	if (bMigratableDataUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::UnrealTestCubeMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealTestCubeMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
 	}
 }
 
@@ -238,19 +238,19 @@ void USpatialTypeBinding_TestCube::ReceiveAddComponent(USpatialActorChannel* Cha
 	auto* SingleClientAddOp = Cast<UUnrealTestCubeSingleClientRepDataAddComponentOp>(AddComponentOp);
 	if (SingleClientAddOp)
 	{
-		auto Update = improbable::unreal::UnrealTestCubeSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
 		ReceiveUpdate_SingleClient(Channel, Update);
 	}
 	auto* MultiClientAddOp = Cast<UUnrealTestCubeMultiClientRepDataAddComponentOp>(AddComponentOp);
 	if (MultiClientAddOp)
 	{
-		auto Update = improbable::unreal::UnrealTestCubeMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
 		ReceiveUpdate_MultiClient(Channel, Update);
 	}
 	auto* MigratableDataAddOp = Cast<UUnrealTestCubeMigratableDataAddComponentOp>(AddComponentOp);
 	if (MigratableDataAddOp)
 	{
-		auto Update = improbable::unreal::UnrealTestCubeMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealTestCubeMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
 		ReceiveUpdate_Migratable(Channel, Update);
 	}
 }
@@ -262,9 +262,9 @@ worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_T
 	{
 		if (!bAutonomousProxy)
 		{
-			Interest.emplace(improbable::unreal::UnrealTestCubeSingleClientRepData::ComponentId, worker::InterestOverride{false});
+			Interest.emplace(improbable::unreal::generated::UnrealTestCubeSingleClientRepData::ComponentId, worker::InterestOverride{false});
 		}
-		Interest.emplace(improbable::unreal::UnrealTestCubeMigratableData::ComponentId, worker::InterestOverride{false});
+		Interest.emplace(improbable::unreal::generated::UnrealTestCubeMigratableData::ComponentId, worker::InterestOverride{false});
 	}
 	return Interest;
 }
@@ -272,11 +272,11 @@ worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_T
 void USpatialTypeBinding_TestCube::BuildSpatialComponentUpdate(
 	const FPropertyChangeState& Changes,
 	USpatialActorChannel* Channel,
-	improbable::unreal::UnrealTestCubeSingleClientRepData::Update& SingleClientUpdate,
+	improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update& SingleClientUpdate,
 	bool& bSingleClientUpdateChanged,
-	improbable::unreal::UnrealTestCubeMultiClientRepData::Update& MultiClientUpdate,
+	improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update& MultiClientUpdate,
 	bool& bMultiClientUpdateChanged,
-	improbable::unreal::UnrealTestCubeMigratableData::Update& MigratableDataUpdate,
+	improbable::unreal::generated::UnrealTestCubeMigratableData::Update& MigratableDataUpdate,
 	bool& bMigratableDataUpdateChanged) const
 {
 	const FRepHandlePropertyMap& RepPropertyMap = GetRepHandlePropertyMap();
@@ -334,11 +334,11 @@ void USpatialTypeBinding_TestCube::BuildSpatialComponentUpdate(
 	}
 }
 
-void USpatialTypeBinding_TestCube::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealTestCubeSingleClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_TestCube::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_TestCube::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealTestCubeMultiClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_TestCube::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update& OutUpdate) const
 {
 	switch (Handle)
 	{
@@ -530,24 +530,24 @@ void USpatialTypeBinding_TestCube::ServerSendUpdate_MultiClient(const uint8* RES
 	}
 }
 
-void USpatialTypeBinding_TestCube::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealTestCubeMigratableData::Update& OutUpdate) const
+void USpatialTypeBinding_TestCube::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealTestCubeMigratableData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_TestCube::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealTestCubeSingleClientRepData::Update& Update) const
+void USpatialTypeBinding_TestCube::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeSingleClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
 	TArray<UProperty*> RepNotifies;
 	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies);
 }
 
-void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealTestCubeMultiClientRepData::Update& Update) const
+void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeMultiClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
-	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::UnrealTestCubeClientRPCs::ComponentId);
+	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::generated::UnrealTestCubeClientRPCs::ComponentId);
 	const FRepHandlePropertyMap& HandleToPropertyMap = GetRepHandlePropertyMap();
 	FSpatialConditionMapFilter ConditionMap(ActorChannel, bAutonomousProxy);
 
@@ -729,7 +729,7 @@ void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChanne
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -888,7 +888,7 @@ void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChanne
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<USceneComponent*>(Object_Raw);
+						Value = Cast<USceneComponent>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -944,7 +944,7 @@ void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChanne
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<AActor*>(Object_Raw);
+						Value = Cast<AActor>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1029,7 +1029,7 @@ void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChanne
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						Value = dynamic_cast<APawn*>(Object_Raw);
+						Value = Cast<APawn>(Object_Raw);
 						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
@@ -1085,7 +1085,7 @@ void USpatialTypeBinding_TestCube::ReceiveUpdate_MultiClient(USpatialActorChanne
 	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
 }
 
-void USpatialTypeBinding_TestCube::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealTestCubeMigratableData::Update& Update) const
+void USpatialTypeBinding_TestCube::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeMigratableData::Update& Update) const
 {
 }
 
@@ -1102,7 +1102,7 @@ void USpatialTypeBinding_TestCube::ServerInteract_SendCommand(worker::Connection
 		}
 
 		// Build request.
-		improbable::unreal::UnrealServerInteractRequest Request;
+		improbable::unreal::generated::UnrealServerInteractRequest Request;
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1110,13 +1110,13 @@ void USpatialTypeBinding_TestCube::ServerInteract_SendCommand(worker::Connection
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		auto RequestId = Connection->SendCommandRequest<improbable::unreal::UnrealTestCubeServerRPCs::Commands::Serverinteract>(TargetObjectRef.entity(), Request, 0);
+		auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealTestCubeServerRPCs::Commands::Testcubeserverinteract>(TargetObjectRef.entity(), Request, 0);
 		return {RequestId.Id};
 	};
 	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
 }
 
-void USpatialTypeBinding_TestCube::ServerInteract_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::UnrealTestCubeServerRPCs::Commands::Serverinteract>& Op)
+void USpatialTypeBinding_TestCube::ServerInteract_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealTestCubeServerRPCs::Commands::Testcubeserverinteract>& Op)
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -1154,13 +1154,13 @@ void USpatialTypeBinding_TestCube::ServerInteract_OnCommandRequest(const worker:
 
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
-		Connection->SendCommandResponse<improbable::unreal::UnrealTestCubeServerRPCs::Commands::Serverinteract>(Op.RequestId, {});
+		Connection->SendCommandResponse<improbable::unreal::generated::UnrealTestCubeServerRPCs::Commands::Testcubeserverinteract>(Op.RequestId, {});
 		return {};
 	};
 	Interop->SendCommandResponse_Internal(Receiver);
 }
 
-void USpatialTypeBinding_TestCube::ServerInteract_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::UnrealTestCubeServerRPCs::Commands::Serverinteract>& Op)
+void USpatialTypeBinding_TestCube::ServerInteract_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealTestCubeServerRPCs::Commands::Testcubeserverinteract>& Op)
 {
 	Interop->HandleCommandResponse_Internal(TEXT("ServerInteract"), Op.RequestId.Id, Op.EntityId, Op.StatusCode, FString(UTF8_TO_TCHAR(Op.Message.c_str())));
 }

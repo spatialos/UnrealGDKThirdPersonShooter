@@ -12,6 +12,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
+#include "SampleGamePlayerController.h"
 #include "SpatialNetDriver.h"
 #include "TestCube.h"
 #include "UnrealNetwork.h"
@@ -66,6 +67,8 @@ ASampleGameCharacter::ASampleGameCharacter()
 
 	EquippedWeapon = nullptr;
 	InteractDistance = 500.0f;
+	MaxHealth = 100;
+	CurrentHealth = 0;
 }
 
 void ASampleGameCharacter::BeginPlay()
@@ -75,18 +78,19 @@ void ASampleGameCharacter::BeginPlay()
 	// Only spawn a new starter weapon if we're authoritative and don't already have one.
 	if (HasAuthority())
 	{
-		// Short delay as a workaround for UNR-218, which prevents replicated variables from being set when BeginPlay is called.
-		// TODO(UNR-218): fix this once UNR-218 is solved
-		FTimerHandle timerHandle;
-		FTimerDelegate timerDelegate;
-		timerDelegate.BindLambda([this]() {
+		// Short delay as a workaround for actor references potentially not being resolved when this actor gets checked out.
+		FTimerHandle TimerHandle;
+		FTimerDelegate TimerDelegate;
+		TimerDelegate.BindLambda([this]() {
 			UE_LOG(LogSampleGame, Log, TEXT("%s EquippedWeapon: %s"), *this->GetName(), EquippedWeapon == nullptr ? TEXT("nullptr") : *EquippedWeapon->GetName());
 			if (GetEquippedWeapon() == nullptr)
 			{
 				SpawnStarterWeapon();
 			}
 		});
-		GetWorld()->GetTimerManager().SetTimer(timerHandle, timerDelegate, 0.2f, false);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
+
+		CurrentHealth = MaxHealth;
 	}
 }
 
@@ -110,6 +114,7 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
     PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ASampleGameCharacter::Interact);
 	PlayerInputComponent->BindAction("SpawnCube", IE_Pressed, this, &ASampleGameCharacter::SpawnCube);
+	PlayerInputComponent->BindAction("DebugResetCharacter", IE_Pressed, this, &ASampleGameCharacter::DebugResetCharacter);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASampleGameCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASampleGameCharacter::StopFire);
@@ -120,6 +125,9 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
+
+	// Only replicate health to the owning client.
+	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
 }
 
 void ASampleGameCharacter::Interact()
@@ -226,6 +234,32 @@ void ASampleGameCharacter::ServerSpawnCube_Implementation()
 	GetWorld()->SpawnActor<ATestCube>(TestCubeTemplate, SpawnTranform);
 }
 
+bool ASampleGameCharacter::DebugResetCharacter_Validate()
+{
+	return true;
+}
+
+void ASampleGameCharacter::DebugResetCharacter_Implementation()
+{
+	CurrentHealth = MaxHealth;
+}
+
+void ASampleGameCharacter::OnRep_CurrentHealth()
+{
+	if (GetNetMode() != NM_DedicatedServer)
+	{
+		ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController());
+		if (PC)
+		{
+			PC->UpdateHealthUI(CurrentHealth, MaxHealth);
+		}
+		else
+		{
+			UE_LOG(LogSampleGame, Warning, TEXT("Couldn't find a player controller for character: %s"), *this->GetName());
+		}
+	}
+}
+
 FVector ASampleGameCharacter::GetLineTraceStart() const
 {
 	return GetFollowCamera()->GetComponentLocation();
@@ -234,6 +268,13 @@ FVector ASampleGameCharacter::GetLineTraceStart() const
 FVector ASampleGameCharacter::GetLineTraceDirection() const
 {
 	return GetFollowCamera()->GetForwardVector();
+}
+
+float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);
+	CurrentHealth -= DamageDealt;
+	return DamageDealt;
 }
 
 void ASampleGameCharacter::TurnAtRate(float Rate)

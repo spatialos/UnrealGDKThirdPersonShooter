@@ -45,28 +45,28 @@ private:
 	void BuildSpatialComponentUpdate(
 		const FPropertyChangeState& Changes,
 		USpatialActorChannel* Channel,
-		improbable::unreal::UnrealInstantWeaponSingleClientRepData::Update& SingleClientUpdate,
+		improbable::unreal::generated::UnrealInstantWeaponSingleClientRepData::Update& SingleClientUpdate,
 		bool& bSingleClientUpdateChanged,
-		improbable::unreal::UnrealInstantWeaponMultiClientRepData::Update& MultiClientUpdate,
+		improbable::unreal::generated::UnrealInstantWeaponMultiClientRepData::Update& MultiClientUpdate,
 		bool& bMultiClientUpdateChanged,
-		improbable::unreal::UnrealInstantWeaponMigratableData::Update& MigratableDataUpdate,
+		improbable::unreal::generated::UnrealInstantWeaponMigratableData::Update& MigratableDataUpdate,
 		bool& bMigratableDataUpdateChanged) const;
-	void ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealInstantWeaponSingleClientRepData::Update& OutUpdate) const;
-	void ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealInstantWeaponMultiClientRepData::Update& OutUpdate) const;
-	void ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::UnrealInstantWeaponMigratableData::Update& OutUpdate) const;
-	void ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealInstantWeaponSingleClientRepData::Update& Update) const;
-	void ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealInstantWeaponMultiClientRepData::Update& Update) const;
-	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::UnrealInstantWeaponMigratableData::Update& Update) const;
+	void ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealInstantWeaponSingleClientRepData::Update& OutUpdate) const;
+	void ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealInstantWeaponMultiClientRepData::Update& OutUpdate) const;
+	void ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealInstantWeaponMigratableData::Update& OutUpdate) const;
+	void ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponSingleClientRepData::Update& Update) const;
+	void ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponMultiClientRepData::Update& Update) const;
+	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponMigratableData::Update& Update) const;
 
 	// RPC command sender functions.
 	void ServerDidMiss_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 	void ServerDidHit_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 
 	// RPC command request handler functions.
-	void ServerDidMiss_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::UnrealInstantWeaponServerRPCs::Commands::Serverdidmiss>& Op);
-	void ServerDidHit_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::UnrealInstantWeaponServerRPCs::Commands::Serverdidhit>& Op);
+	void ServerDidMiss_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op);
+	void ServerDidHit_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op);
 
 	// RPC command response handler functions.
-	void ServerDidMiss_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::UnrealInstantWeaponServerRPCs::Commands::Serverdidmiss>& Op);
-	void ServerDidHit_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::UnrealInstantWeaponServerRPCs::Commands::Serverdidhit>& Op);
+	void ServerDidMiss_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op);
+	void ServerDidHit_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op);
 };

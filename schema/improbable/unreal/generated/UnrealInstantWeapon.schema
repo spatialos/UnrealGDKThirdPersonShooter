@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal;
+package improbable.unreal.generated;
 
 import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
@@ -40,6 +40,6 @@ component UnrealInstantWeaponClientRPCs {
 }
 component UnrealInstantWeaponServerRPCs {
 	id = 100039;
-	command UnrealRPCCommandResponse serverdidmiss(UnrealServerDidMissRequest);
-	command UnrealRPCCommandResponse serverdidhit(UnrealServerDidHitRequest);
+	command UnrealRPCCommandResponse instantweaponserverdidmiss(UnrealServerDidMissRequest);
+	command UnrealRPCCommandResponse instantweaponserverdidhit(UnrealServerDidHitRequest);
 }

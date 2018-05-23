@@ -87,6 +87,9 @@ private:
 	// [server] Validates the hit. Returns true if it's valid, false otherwise.
 	bool ValidateHit(const FInstantHitInfo& HitInfo);
 
+	// [server] Actually deals damage to the actor we hit.
+	void DealDamage(const FInstantHitInfo& HitInfo);
+
 	// [client] Responds to a change in the HitNotify property, used as a broadcast event for displaying hit effects.
 	UFUNCTION()
 	virtual void OnRep_HitNotify();

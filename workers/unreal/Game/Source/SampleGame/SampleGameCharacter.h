@@ -62,6 +62,18 @@ public:
 	// Returns the direction in which to perform a line trace so it lines up with the center of the crosshair.
 	FVector GetLineTraceDirection() const;
 
+	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
+	FORCEINLINE float GetCurrentHealth() const
+	{
+		return CurrentHealth;
+	}
+
+	FORCEINLINE float GetMaxHealth() const
+	{
+		return MaxHealth;
+	}
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -92,20 +104,35 @@ private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerSpawnCube();
 
+	// Debug RPC to tell the server to reset all of the characters stats (weapons, health, etc.)
+	UFUNCTION(Server, Reliable, WithValidation)
+	void DebugResetCharacter();
+
+	UFUNCTION()
+	void OnRep_CurrentHealth();
+
 	UPROPERTY(VisibleAnywhere, Replicated)
 	class AWeapon* EquippedWeapon;
 
 	// Weapon to spawn the player with initially.
-	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapons")
 	TSubclassOf<AWeapon> StarterWeaponTemplate;
 
 	// Cube to spawn when the player presses "SpawnCube".
-	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	UPROPERTY(EditDefaultsOnly, Category = "SampleGameDebugging")
 	TSubclassOf<ATestCube> TestCubeTemplate;
 
 	// Maximum distance at which the player can interact with objects.
-	UPROPERTY(EditAnywhere, Category = "SampleGame")
+	UPROPERTY(EditDefaultsOnly, Category = "Interaction", meta = (ClampMin = "0.0"))
 	float InteractDistance;
+
+	// Max health this character can have.
+	UPROPERTY(EditDefaultsOnly, Category = "Health", meta = (ClampMin = "1"))
+	int32 MaxHealth;
+
+	// Current health of the character, can be at most MaxHealth.
+	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
+	int32 CurrentHealth;
 
 public:
 	/** Returns CameraBoom subobject **/
