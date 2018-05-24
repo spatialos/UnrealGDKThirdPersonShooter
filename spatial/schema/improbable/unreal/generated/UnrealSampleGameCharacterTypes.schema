@@ -1,0 +1,13 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated;
+
+import "improbable/vector3.schema";
+import "improbable/unreal/gdk/core_types.schema";
+
+type UnrealServerSpawnCubeRequest {
+	uint32 target_subobject_offset = 1;
+}
+type UnrealDebugResetCharacterRequest {
+	uint32 target_subobject_offset = 1;
+}
