@@ -38,20 +38,20 @@ if %REPO_PREPARED%==false (
 )
 
 REM Cleanup old symlinks
-rmdir "%~dp0\workers\unreal\Game\Plugins\SpatialGDK" 2>NUL
-rmdir "%~dp0\workers\unreal\Game\Source\SpatialGDK" 2>NUL
-rmdir "%~dp0\workers\unreal\Game\Scripts" 2>NUL
-rmdir "%~dp0\workers\unreal\Game\Binaries\ThirdParty\Improbable" 2>NUL
-rmdir "%~dp0\schema\improbable\unreal\gdk" 2>NUL
+rmdir "%~dp0\Game\Plugins\SpatialGDK" 2>NUL
+rmdir "%~dp0\Game\Source\SpatialGDK" 2>NUL
+rmdir "%~dp0\Game\Scripts" 2>NUL
+rmdir "%~dp0\Game\Binaries\ThirdParty\Improbable" 2>NUL
+rmdir "%~dp0\spatial\schema\improbable\unreal\gdk" 2>NUL
 
 REM Ensure plugins folder exists, mklink doesn't recursively create
-if not exist %~dp0\workers\unreal\Game\Plugins\ (
-	mkdir %~dp0\workers\unreal\Game\Plugins\
+if not exist %~dp0\Game\Plugins\ (
+	mkdir %~dp0\Game\Plugins\
 )
 
 REM Ensure codegen folder exists, mklink doesn't recursively create
-if not exist %~dp0\workers\unreal\Game\Binaries\ThirdParty\ (
-	mkdir %~dp0\workers\unreal\Game\Binaries\ThirdParty\
+if not exist %~dp0\Game\Binaries\ThirdParty\ (
+	mkdir %~dp0\Game\Binaries\ThirdParty\
 )
 
 REM Ensure schema folder exists, mklink doesn't recursively create
@@ -60,11 +60,11 @@ if not exist %~dp0\schema\improbable\unreal\ (
 )
 
 REM Make new symlinks
-mklink /J "%~dp0\workers\unreal\Game\Plugins\SpatialGDK" %SPATIALGDK_PLUGINSPATH%
-mklink /J "%~dp0\workers\unreal\Game\Source\SpatialGDK" %SPATIALGDK_MODULEPATH%
-mklink /J "%~dp0\workers\unreal\Game\Scripts" %SPATIALGDK_SCRIPTSPATH%
-mklink /J "%~dp0\workers\unreal\Game\Binaries\ThirdParty\Improbable" %SPATIALGDK_BINARIESPATH%
-mklink /J "%~dp0\schema\improbable\unreal\gdk" %SPATIALGDK_SCHEMAPATH%
+mklink /J "%~dp0\Game\Plugins\SpatialGDK" %SPATIALGDK_PLUGINSPATH%
+mklink /J "%~dp0\Game\Source\SpatialGDK" %SPATIALGDK_MODULEPATH%
+mklink /J "%~dp0\Game\Scripts" %SPATIALGDK_SCRIPTSPATH%
+mklink /J "%~dp0\Game\Binaries\ThirdParty\Improbable" %SPATIALGDK_BINARIESPATH%
+mklink /J "%~dp0\spatial\schema\improbable\unreal\gdk" %SPATIALGDK_SCHEMAPATH%
 
 echo Successfully created symlinks to %SPATIALGDK_PATH%
 
