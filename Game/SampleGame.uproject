@@ -1,0 +1,22 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{3CEB792D-4973-1B96-9E4E-DFA70AD979C7}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "SampleGame",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"SpatialGDK"
+			]
+		},
+		{
+			"Name": "SpatialGDK",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}

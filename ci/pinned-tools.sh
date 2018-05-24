@@ -31,15 +31,6 @@ function getPlatformName() {
   fi
 }
 
-function runSpatial() {
-  local default_flags=(
-    "--log_level=debug"
-  )
-
-  forceSpatialCliStructureV2
-  spatial "$@" "${default_flags[@]}"
-}
-
 # The current version of Unreal.
 if [ -z "${UNREAL_HOME+x}" ]; then
   UNREAL_VERSION="419-SpatialGDK"
@@ -47,7 +38,7 @@ if [ -z "${UNREAL_HOME+x}" ]; then
 fi
 
 # LINUX_MULTIARCH_ROOT is used by Unreal when cross compiling Linux workers
-# as Unreal only builds on windows otherwise. The Linux cross compiling tools
+# as Unreal only builds on Windows otherwise. The Linux cross compiling tools
 # should be automatically installed by puppet as part of the Unreal Engine
 # installation.
 if [ -z "${LINUX_MULTIARCH_ROOT+x}" ]; then

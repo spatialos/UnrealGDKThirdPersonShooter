@@ -1,0 +1,85 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated;
+
+import "improbable/vector3.schema";
+import "improbable/unreal/gdk/core_types.schema";
+
+component UnrealCharacterSingleClientRepData {
+	id = 100020;
+}
+component UnrealCharacterMultiClientRepData {
+	id = 100021;
+	bool field_bhidden = 1; // COND_None // ::Actor
+	bool field_breplicatemovement = 2; // COND_None // ::Actor
+	bool field_btearoff = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged = 4; // COND_None // ::Actor
+	uint32 field_remoterole = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysicsNoReplay // ::Actor
+	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication_attachsocket = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner = 13; // COND_None // ::Actor
+	uint32 field_role = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator = 15; // COND_None // ::Actor
+	UnrealObjectRef field_playerstate = 16; // COND_None // ::Pawn
+	uint32 field_remoteviewpitch = 17; // COND_SkipOwner // ::Pawn
+	UnrealObjectRef field_controller = 18; // COND_None // ::Pawn
+	UnrealObjectRef field_replicatedbasedmovement_movementbase = 19; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	string field_replicatedbasedmovement_bonename = 20; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	improbable.Vector3f field_replicatedbasedmovement_location = 21; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	UnrealFRotator field_replicatedbasedmovement_rotation = 22; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	bool field_replicatedbasedmovement_bserverhasbasecomponent = 23; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	bool field_replicatedbasedmovement_brelativerotation = 24; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	bool field_replicatedbasedmovement_bserverhasvelocity = 25; // COND_SimulatedOnly // BasedMovementInfo::ReplicatedBasedMovement::Character
+	float field_animrootmotiontranslationscale = 26; // COND_SimulatedOnly // ::Character
+	float field_replicatedserverlasttransformupdatetimestamp = 27; // COND_SimulatedOnlyNoReplay // ::Character
+	uint32 field_replicatedmovementmode = 28; // COND_SimulatedOnly // ::Character
+	bool field_biscrouched = 29; // COND_SimulatedOnly // ::Character
+	float field_jumpmaxholdtime = 30; // COND_None // ::Character
+	int32 field_jumpmaxcount = 31; // COND_None // ::Character
+	bool field_reprootmotion_bisactive = 32; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	UnrealObjectRef field_reprootmotion_animmontage = 33; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	float field_reprootmotion_position = 34; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	improbable.Vector3f field_reprootmotion_location = 35; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	UnrealFRotator field_reprootmotion_rotation = 36; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	UnrealObjectRef field_reprootmotion_movementbase = 37; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	string field_reprootmotion_movementbasebonename = 38; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	bool field_reprootmotion_brelativeposition = 39; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	bool field_reprootmotion_brelativerotation = 40; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	bytes field_reprootmotion_authoritativerootmotion = 41; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	improbable.Vector3f field_reprootmotion_acceleration = 42; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+	improbable.Vector3f field_reprootmotion_linearvelocity = 43; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
+}
+component UnrealCharacterMigratableData {
+	id = 100022;
+	uint32 field_charactermovement_groundmovementmode = 1;
+	uint32 field_charactermovement_movementmode = 2;
+	uint32 field_charactermovement_custommovementmode = 3;
+}
+import "improbable/unreal/generated/UnrealCharacterTypes.schema";
+
+component UnrealCharacterClientRPCs {
+	id = 100023;
+	command UnrealRPCCommandResponse characterrootmotiondebugclientprintonscreen(UnrealRootMotionDebugClientPrintOnScreenRequest);
+	command UnrealRPCCommandResponse characterclientveryshortadjustposition(UnrealClientVeryShortAdjustPositionRequest);
+	command UnrealRPCCommandResponse characterclientcheatwalk(UnrealClientCheatWalkRequest);
+	command UnrealRPCCommandResponse characterclientcheatghost(UnrealClientCheatGhostRequest);
+	command UnrealRPCCommandResponse characterclientcheatfly(UnrealClientCheatFlyRequest);
+	command UnrealRPCCommandResponse characterclientadjustrootmotionsourceposition(UnrealClientAdjustRootMotionSourcePositionRequest);
+	command UnrealRPCCommandResponse characterclientadjustrootmotionposition(UnrealClientAdjustRootMotionPositionRequest);
+	command UnrealRPCCommandResponse characterclientadjustposition(UnrealClientAdjustPositionRequest);
+	command UnrealRPCCommandResponse characterclientackgoodmove(UnrealClientAckGoodMoveRequest);
+}
+component UnrealCharacterServerRPCs {
+	id = 100024;
+	command UnrealRPCCommandResponse characterservermoveold(UnrealServerMoveOldRequest);
+	command UnrealRPCCommandResponse characterservermovenobase(UnrealServerMoveNoBaseRequest);
+	command UnrealRPCCommandResponse characterservermovedualnobase(UnrealServerMoveDualNoBaseRequest);
+	command UnrealRPCCommandResponse characterservermovedualhybridrootmotion(UnrealServerMoveDualHybridRootMotionRequest);
+	command UnrealRPCCommandResponse characterservermovedual(UnrealServerMoveDualRequest);
+	command UnrealRPCCommandResponse characterservermove(UnrealServerMoveRequest);
+}
