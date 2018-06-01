@@ -6,10 +6,16 @@
 #include "SampleGameLogging.h"
 #include "UI/SampleGameUI.h"
 
+#include "SpatialNetDriver.h"
+
+
+ASampleGamePlayerController::ASampleGamePlayerController()
+	: SampleGameUI(nullptr)
+{}
 
 void ASampleGamePlayerController::UpdateHealthUI(int32 NewHealth, int32 MaxHealth)
 {
-	if (SampleGameUI)
+	if (SampleGameUI != nullptr)
 	{
 		SampleGameUI->UpdateHealth(NewHealth, MaxHealth);
 	}
@@ -41,6 +47,14 @@ void ASampleGamePlayerController::SetPawn(APawn* InPawn)
 		{
 			check(UITemplate != nullptr);
 			SampleGameUI = CreateWidget<USampleGameUI>(this, UITemplate);
+			if (SampleGameUI == nullptr)
+			{
+				USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
+				UE_LOG(LogSampleGame, Error, TEXT("Failed to create UI for controller %s on worker %s"),
+					*this->GetName(),
+					SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+				return;
+			}
 		}
 
 		if (!SampleGameUI->IsVisible())

@@ -208,8 +208,9 @@ bool AInstantWeapon::ValidateHit(const FInstantHitInfo& HitInfo)
 
 void AInstantWeapon::DealDamage(const FInstantHitInfo& HitInfo)
 {
-	FDamageEvent DmgEvent;
+	FPointDamageEvent DmgEvent;
 	DmgEvent.DamageTypeClass = DamageTypeClass;
+	DmgEvent.HitInfo.ImpactPoint = HitInfo.Location;
 
 	HitInfo.HitActor->TakeDamage(ShotBaseDamage, DmgEvent, GetOwningCharacter()->GetController(), this);
 }

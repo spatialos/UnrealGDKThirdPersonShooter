@@ -15,6 +15,8 @@ class SAMPLEGAME_API ASampleGamePlayerController : public APlayerController
 	GENERATED_BODY()
 
 public:
+	ASampleGamePlayerController();
+
 	// Updates the health UI with a new value.
 	void UpdateHealthUI(int32 NewHealth, int32 MaxHealth);
 

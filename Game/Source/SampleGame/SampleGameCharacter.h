@@ -5,7 +5,6 @@
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
-#include "TestCube.h"
 #include "SampleGameCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -120,7 +119,7 @@ private:
 
 	// Cube to spawn when the player presses "SpawnCube".
 	UPROPERTY(EditDefaultsOnly, Category = "SampleGameDebugging")
-	TSubclassOf<ATestCube> TestCubeTemplate;
+	TSubclassOf<AActor> TestCubeTemplate;
 
 	// Maximum distance at which the player can interact with objects.
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction", meta = (ClampMin = "0.0"))
