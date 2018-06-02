@@ -14,6 +14,7 @@
 #include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
+#include "SGCharacterMovementComponent.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
 #include "Weapons/Weapon.h"
@@ -22,7 +23,8 @@
 //////////////////////////////////////////////////////////////////////////
 // ASampleGameCharacter
 
-ASampleGameCharacter::ASampleGameCharacter()
+ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USGCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Hack to ensure that the game state is created and set to tick on a client as we don't replicate it
 	UWorld* World = GetWorld();
@@ -126,6 +128,9 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASampleGameCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASampleGameCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASampleGameCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASampleGameCharacter::StopSprinting);
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ASampleGameCharacter::Interact);
 	PlayerInputComponent->BindAction("SpawnCube", IE_Pressed, this, &ASampleGameCharacter::SpawnCube);
@@ -398,6 +403,24 @@ void ASampleGameCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ASampleGameCharacter::StartSprinting()
+{
+	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
+	if (MovementComponent)
+	{
+		MovementComponent->SetSprinting(true);
+	}
+}
+
+void ASampleGameCharacter::StopSprinting()
+{
+	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
+	if (MovementComponent)
+	{
+		MovementComponent->SetSprinting(false);
+	}
 }
 
 void ASampleGameCharacter::MoveForward(float Value)
