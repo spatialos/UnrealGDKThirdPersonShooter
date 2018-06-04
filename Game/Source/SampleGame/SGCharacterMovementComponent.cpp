@@ -7,8 +7,8 @@
 
 USGCharacterMovementComponent::USGCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, SprintSpeedMultiplier(2.0f)
-	, SprintAccelerationMultiplier(2.0f)
+	, SprintSpeedMultiplier(1.5f)
+	, SprintAccelerationMultiplier(1.5f)
 	, SprintDirectionTolerance(0.7f)
 {}
 
@@ -40,6 +40,11 @@ class FNetworkPredictionData_Client* USGCharacterMovementComponent::GetPredictio
 void USGCharacterMovementComponent::SetSprinting(bool bSprinting)
 {
 	bWantsToSprint = bSprinting;
+}
+
+bool USGCharacterMovementComponent::GetSprinting()
+{
+	return static_cast<bool>(bWantsToSprint);
 }
 
 float USGCharacterMovementComponent::GetMaxSpeed() const

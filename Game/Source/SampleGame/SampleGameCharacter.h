@@ -77,6 +77,9 @@ public:
 		return MaxHealth;
 	}
 
+	UFUNCTION(BlueprintPure, Category = "Movement")
+	bool IsSprinting();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

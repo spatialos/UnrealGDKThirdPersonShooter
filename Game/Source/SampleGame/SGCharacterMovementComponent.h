@@ -25,6 +25,9 @@ public:
 
 	void SetSprinting(bool bSprinting);
 
+	UFUNCTION(BlueprintPure, Category = "Sprint")
+	bool GetSprinting();
+
 	virtual float GetMaxSpeed() const override;
 
 	virtual float GetMaxAcceleration() const override;

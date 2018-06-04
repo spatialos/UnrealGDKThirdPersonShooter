@@ -393,6 +393,16 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 	return DamageDealt;
 }
 
+bool ASampleGameCharacter::IsSprinting()
+{
+	USGCharacterMovementComponent* Movement = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
+	if (Movement == nullptr)
+	{
+		return false;
+	}
+	return Movement->GetSprinting();
+}
+
 void ASampleGameCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
