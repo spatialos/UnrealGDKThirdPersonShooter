@@ -10,12 +10,12 @@ set SPATIALGDK_SCHEMAPATH="%1\schema\improbable\unreal\gdk"
 if %SPATIALGDK_PATH% == "" (
 	echo Error: Please specify the SpatialGDK path.
 	pause > nul
-	exit 1
+	exit /b 1
 )
 
 if not exist %SPATIALGDK_PATH%\ (
 	echo Error: SpatialGDK path %SPATIALGDK_PATH% does not exist.
-	exit 1
+	exit /b 1
 )
 
 set PATH_VALID=true
@@ -25,7 +25,7 @@ if not exist %SPATIALGDK_SCHEMAPATH% set PATH_VALID=false
 
 if %PATH_VALID%==false (
 	echo Error: SpatialGDK path %SPATIALGDK_PATH% is invalid. Provide path to cloned SpatialGDK git repository.
-	exit 1
+	exit /b 1
 )
 
 set REPO_PREPARED=true
@@ -34,7 +34,7 @@ if not exist %SPATIALGDK_BINARIESPATH% set REPO_PREPARED=false
 
 if %REPO_PREPARED%==false (
 	echo Error: The specified SpatialGDK directory has not been prepared. Please run ci/build.sh in that directory.
-	exit 1
+	exit /b 1
 )
 
 REM Cleanup old symlinks
@@ -68,3 +68,4 @@ mklink /J "%~dp0\spatial\schema\improbable\unreal\gdk" %SPATIALGDK_SCHEMAPATH%
 
 echo Successfully created symlinks to %SPATIALGDK_PATH%
 
+exit /b 0
