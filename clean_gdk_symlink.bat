@@ -4,7 +4,7 @@ set SPATIALGDK_PLUGINSPATH="%~dp0\Game\Plugins\SpatialGDK"
 set SPATIALGDK_MODULEPATH="%~dp0\Game\Source\SpatialGDK"
 set SPATIALGDK_SCRIPTSPATH="%~dp0\Game\Scripts"
 set SPATIALGDK_BINARIESPATH="%~dp0\Game\Binaries\ThirdParty\Improbable"
-set SPATIALGDK_SCHEMAPATH="%~dp0\schema\improbable\unreal\gdk"
+set SPATIALGDK_SCHEMAPATH="%~dp0\spatial\schema\improbable\unreal\gdk"
 
 ECHO Cleaning old symlinks
 CALL :clean_path %SPATIALGDK_PLUGINSPATH%
