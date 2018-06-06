@@ -400,7 +400,19 @@ bool ASampleGameCharacter::IsSprinting()
 	{
 		return false;
 	}
-	return Movement->GetSprinting();
+
+	if (Role >= ROLE_AutonomousProxy)
+	{
+		// If we're authoritative or the owning client, we know definitively whether we're sprinting.
+		return Movement->GetSprinting();
+	}
+
+	// For all other client types, we need to guess based on speed.
+	FVector Velocity = GetVelocity();
+	// We only care about speed in the X-Y plane.
+	Velocity.Set(Velocity.X, Velocity.Y, 0);
+	// Add a tolerance factor to the max jog speed.
+	return Velocity.Size() > Movement->MaxWalkSpeed + 10.0f;
 }
 
 void ASampleGameCharacter::TurnAtRate(float Rate)
