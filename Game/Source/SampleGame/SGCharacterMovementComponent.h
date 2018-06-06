@@ -6,9 +6,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SGCharacterMovementComponent.generated.h"
 
-/**
- * 
- */
 UCLASS()
 class SAMPLEGAME_API USGCharacterMovementComponent : public UCharacterMovementComponent
 {
@@ -23,23 +20,30 @@ public:
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
+	// Returns true if the character is trying to sprint.
 	void SetWantsToSprint(bool bSprinting);
 
+	// Returns true if the character is actually sprinting.
 	UFUNCTION(BlueprintPure, Category = "Sprint")
 	bool IsSprinting() const;
 
+	// Returns the max speed of the character, modified if sprinting.
 	virtual float GetMaxSpeed() const override;
 
+	// Returns the max acceleration of the character, modified if sprinting.
 	virtual float GetMaxAcceleration() const override;
 
+	// True if movement direction is within SprintDirectionTolerance of the look direction.
 	bool IsMovingForward() const;
 
+private:
 	uint8 bWantsToSprint : 1;
 
-private:
+	// Multiply max speed by this factor when sprinting.
 	UPROPERTY(EditAnywhere, Category = "Sprint")
 	float SprintSpeedMultiplier;
 
+	// Multiply acceleration by this factor when sprinting.
 	UPROPERTY(EditAnywhere, Category = "Sprint")
 	float SprintAccelerationMultiplier;
 
@@ -61,8 +65,6 @@ public:
 	virtual bool CanCombineWith(const FSavedMovePtr& NewMove, ACharacter* InPawn, float MaxDelta) const override;
 
 	virtual void SetMoveFor(ACharacter* Character, float InDeltaTime, FVector const& NewAccel, class FNetworkPredictionData_Client_Character& ClientData) override;
-
-	virtual void PrepMoveFor(class ACharacter* Character) override;
 
 private:
 	uint8 bSavedWantsToSprint : 1;

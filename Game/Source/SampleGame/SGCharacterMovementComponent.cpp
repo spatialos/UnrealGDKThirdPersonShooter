@@ -31,8 +31,8 @@ class FNetworkPredictionData_Client* USGCharacterMovementComponent::GetPredictio
 		USGCharacterMovementComponent* MutableThis = const_cast<USGCharacterMovementComponent*>(this);
 
 		MutableThis->ClientPredictionData = new FNetworkPredictionData_Client_SGMovement(*this);
-		MutableThis->ClientPredictionData->MaxSmoothNetUpdateDist = 92.0f;
-		MutableThis->ClientPredictionData->NoSmoothNetUpdateDist = 140.0f;
+		MutableThis->ClientPredictionData->MaxSmoothNetUpdateDist = NetworkMaxSmoothUpdateDistance;
+		MutableThis->ClientPredictionData->NoSmoothNetUpdateDist = NetworkNoSmoothUpdateDistance;
 	}
 
 	return ClientPredictionData;
@@ -128,17 +128,6 @@ void FSavedMove_SGMovement::SetMoveFor(ACharacter* Character, float InDeltaTime,
 	if (CharacterMovement)
 	{
 		bSavedWantsToSprint = CharacterMovement->bWantsToSprint;
-	}
-}
-
-void FSavedMove_SGMovement::PrepMoveFor(class ACharacter* Character)
-{
-	Super::PrepMoveFor(Character);
-
-	USGCharacterMovementComponent* CharacterMovement = Cast<USGCharacterMovementComponent>(Character->GetCharacterMovement());
-	if (CharacterMovement)
-	{
-
 	}
 }
 
