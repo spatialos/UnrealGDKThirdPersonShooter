@@ -23,10 +23,10 @@ public:
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
-	void SetSprinting(bool bSprinting);
+	void SetWantsToSprint(bool bSprinting);
 
 	UFUNCTION(BlueprintPure, Category = "Sprint")
-	bool GetSprinting();
+	bool IsSprinting() const;
 
 	virtual float GetMaxSpeed() const override;
 

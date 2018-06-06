@@ -2,7 +2,8 @@
 
 #include "SGCharacterMovementComponent.h"
 
-#include "GameFramework//Character.h"
+#include "GameFramework/Character.h"
+#include "SampleGameCharacter.h"
 
 
 USGCharacterMovementComponent::USGCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
@@ -37,20 +38,20 @@ class FNetworkPredictionData_Client* USGCharacterMovementComponent::GetPredictio
 	return ClientPredictionData;
 }
 
-void USGCharacterMovementComponent::SetSprinting(bool bSprinting)
+void USGCharacterMovementComponent::SetWantsToSprint(bool bSprinting)
 {
 	bWantsToSprint = bSprinting;
 }
 
-bool USGCharacterMovementComponent::GetSprinting()
+bool USGCharacterMovementComponent::IsSprinting() const
 {
-	return static_cast<bool>(bWantsToSprint);
+	return static_cast<bool>(bWantsToSprint) && IsMovingForward();
 }
 
 float USGCharacterMovementComponent::GetMaxSpeed() const
 {
 	float MaxSpeed = Super::GetMaxSpeed();
-	if (bWantsToSprint && IsMovingForward())
+	if (IsSprinting())
 	{
 		MaxSpeed *= SprintSpeedMultiplier;
 	}
@@ -60,7 +61,7 @@ float USGCharacterMovementComponent::GetMaxSpeed() const
 float USGCharacterMovementComponent::GetMaxAcceleration() const
 {
 	float MaxAcceleration = Super::GetMaxAcceleration();
-	if (bWantsToSprint && IsMovingForward())
+	if (IsSprinting())
 	{
 		MaxAcceleration *= SprintAccelerationMultiplier;
 	}
@@ -69,19 +70,28 @@ float USGCharacterMovementComponent::GetMaxAcceleration() const
 
 bool USGCharacterMovementComponent::IsMovingForward() const
 {
-	if (!PawnOwner)
+	if (PawnOwner == nullptr)
 	{
 		return false;
 	}
 
-	FVector Forward = PawnOwner->GetActorForwardVector();
 	FVector MoveDirection = Velocity.GetSafeNormal();
+	FVector Forward = PawnOwner->GetActorForwardVector();
+	ASampleGameCharacter* Character = Cast<ASampleGameCharacter>(PawnOwner);
+	if (Character != nullptr)
+	{
+		// Check move direction against control rotation.
+		Forward = Character->GetController()->GetControlRotation().Vector();
+	}
 
 	// Ignore the Z axis for comparison.
 	Forward.Z = 0.0f;
 	MoveDirection.Z = 0.0f;
+	Forward.Normalize();
+	MoveDirection.Normalize();
 
 	float VelocityDot = FVector::DotProduct(Forward, MoveDirection);
+
 	return VelocityDot > SprintDirectionTolerance;
 }
 

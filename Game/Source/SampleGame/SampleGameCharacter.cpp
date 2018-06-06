@@ -404,13 +404,13 @@ bool ASampleGameCharacter::IsSprinting()
 	if (Role >= ROLE_AutonomousProxy)
 	{
 		// If we're authoritative or the owning client, we know definitively whether we're sprinting.
-		return Movement->GetSprinting();
+		return Movement->IsSprinting();
 	}
 
 	// For all other client types, we need to guess based on speed.
 	FVector Velocity = GetVelocity();
 	// We only care about speed in the X-Y plane.
-	Velocity.Set(Velocity.X, Velocity.Y, 0);
+	Velocity.Z = 0.0f;
 	// Add a tolerance factor to the max jog speed.
 	return Velocity.Size() > Movement->MaxWalkSpeed + 10.0f;
 }
@@ -432,7 +432,7 @@ void ASampleGameCharacter::StartSprinting()
 	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
 	if (MovementComponent)
 	{
-		MovementComponent->SetSprinting(true);
+		MovementComponent->SetWantsToSprint(true);
 	}
 }
 
@@ -441,7 +441,7 @@ void ASampleGameCharacter::StopSprinting()
 	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
 	if (MovementComponent)
 	{
-		MovementComponent->SetSprinting(false);
+		MovementComponent->SetWantsToSprint(false);
 	}
 }
 
