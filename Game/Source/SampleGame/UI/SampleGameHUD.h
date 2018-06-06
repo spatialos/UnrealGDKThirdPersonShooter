@@ -19,6 +19,11 @@ public:
 
 	virtual void DrawHUD() override;
 
+	FORCEINLINE void SetDrawCrosshair(bool bDoDraw)
+	{
+		bDrawCrosshair = bDoDraw;
+	}
+
 	UPROPERTY(EditAnywhere)
 	float CrosshairWidth;
 	
@@ -28,5 +33,7 @@ public:
 private:
 	// Draws a crosshair on the center of the screen.
 	void DrawCrosshair();
+
+	bool bDrawCrosshair;
 	
 };

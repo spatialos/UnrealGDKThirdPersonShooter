@@ -69,6 +69,7 @@ ASampleGameCharacter::ASampleGameCharacter()
 	InteractDistance = 500.0f;
 	MaxHealth = 100;
 	CurrentHealth = 0;
+	bIsRagdoll = false;
 }
 
 void ASampleGameCharacter::BeginPlay()
@@ -91,6 +92,20 @@ void ASampleGameCharacter::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
 
 		CurrentHealth = MaxHealth;
+	}
+}
+
+void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
+{
+	Super::EndPlay(Reason);
+
+	if (HasAuthority())
+	{
+		// Destroy weapon actor.
+		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
+		{
+			GetWorld()->DestroyActor(EquippedWeapon);
+		}
 	}
 }
 
@@ -125,6 +140,7 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
+	DOREPLIFETIME(ASampleGameCharacter, bIsRagdoll);
 
 	// Only replicate health to the owning client.
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
@@ -132,6 +148,8 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 void ASampleGameCharacter::Interact()
 {
+	check(GetNetMode() == NM_Client);
+
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("SampleGame_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
 	TraceParams.bTraceAsyncScene = true;
@@ -210,6 +228,80 @@ void ASampleGameCharacter::StopFire()
 	}
 }
 
+void ASampleGameCharacter::Die()
+{
+	if (GetNetMode() == NM_DedicatedServer && HasAuthority())
+	{
+		ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController());
+		if (PC)
+		{
+			PC->KillCharacter();
+		}
+
+		bIsRagdoll = true;
+		OnRep_IsRagdoll();
+	}
+}
+
+void ASampleGameCharacter::StartRagdoll()
+{
+	// Disable capsule collision and disable movement.
+	UCapsuleComponent* CapsuleComponent = GetCapsuleComponent();
+	if (CapsuleComponent == nullptr)
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("Invalid capsule component on character %s"), *this->GetName());
+		return;
+	}
+	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->DisableMovement();
+
+	// Enable mesh collision and physics.
+	USkeletalMeshComponent* MeshComponent = GetMesh();
+	MeshComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
+	MeshComponent->SetCollisionProfileName(FName(TEXT("Ragdoll")));
+	MeshComponent->SetSimulatePhysics(true);
+
+	// Gather list of child components of the capsule.
+	TArray<USceneComponent*> ComponentsToMove;
+	int NumChildren = CapsuleComponent->GetNumChildrenComponents();
+	for (int i = 0; i < NumChildren; ++i)
+	{
+		USceneComponent* Component = CapsuleComponent->GetChildComponent(i);
+		if (Component != nullptr && Component != MeshComponent)
+		{
+			ComponentsToMove.Add(Component);
+		}
+	}
+
+	SetRootComponent(MeshComponent);
+
+	// Move the capsule's former child components over to the mesh.
+	for (USceneComponent* Component : ComponentsToMove)
+	{
+		Component->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	}
+
+	// Fix up the camera to a "death view".
+	if (GetNetMode() == NM_Client)
+	{
+		USpringArmComponent* CameraBoom = GetCameraBoom();
+
+		// Enable lag on the spring arm to smooth movement, counters sporadic movement of the ragdoll.
+		CameraBoom->bEnableCameraLag = true;
+		CameraBoom->bEnableCameraRotationLag = true;
+		// Change the camera boom so it's looking down on the ragdoll from slightly further away.
+		CameraBoom->bUsePawnControlRotation = false;
+		CameraBoom->bInheritPitch = false;
+		CameraBoom->bInheritRoll = false;
+		CameraBoom->bInheritYaw = false;
+		CameraBoom->SocketOffset = FVector::ZeroVector;  // Zero out the over-the-shoulder offset.
+		CameraBoom->TargetOffset = FVector(0, 0, 50);  // Offset slightly up so the camera target doesn't collide with the floor.
+		CameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
+		CameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
+		CameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
+	}
+}
+
 AWeapon* ASampleGameCharacter::GetEquippedWeapon() const
 {
 	return EquippedWeapon;
@@ -260,6 +352,14 @@ void ASampleGameCharacter::OnRep_CurrentHealth()
 	}
 }
 
+void ASampleGameCharacter::OnRep_IsRagdoll()
+{
+	if (bIsRagdoll)
+	{
+		StartRagdoll();
+	}
+}
+
 FVector ASampleGameCharacter::GetLineTraceStart() const
 {
 	return GetFollowCamera()->GetComponentLocation();
@@ -272,8 +372,19 @@ FVector ASampleGameCharacter::GetLineTraceDirection() const
 
 float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	if (!HasAuthority())
+	{
+		return 0;
+	}
+
 	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);
 	CurrentHealth -= DamageDealt;
+
+	if (CurrentHealth <= 0)
+	{
+		Die();
+	}
+
 	return DamageDealt;
 }
 

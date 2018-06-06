@@ -25,6 +25,8 @@ public:
 
 	virtual void BeginPlay() override;
 
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseTurnRate;
@@ -96,6 +98,12 @@ private:
 	// [client] Triggers the equipped weapon to stop firing.
 	void StopFire();
 
+	// [server] Tells this player that it's time to die.
+	void Die();
+
+	// [client + server] Puts the player in ragdoll mode.
+	void StartRagdoll();
+
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
 
@@ -109,6 +117,9 @@ private:
 
 	UFUNCTION()
 	void OnRep_CurrentHealth();
+
+	UFUNCTION()
+	void OnRep_IsRagdoll();
 
 	UPROPERTY(VisibleAnywhere, Replicated)
 	class AWeapon* EquippedWeapon;
@@ -132,6 +143,10 @@ private:
 	// Current health of the character, can be at most MaxHealth.
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
 	int32 CurrentHealth;
+
+	// If true, the character is currently ragdoll-ing.
+	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
+	bool bIsRagdoll;
 
 public:
 	/** Returns CameraBoom subobject **/

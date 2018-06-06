@@ -17,6 +17,8 @@ class SAMPLEGAME_API ASampleGamePlayerController : public APlayerController
 public:
 	ASampleGamePlayerController();
 
+	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
 	// Updates the health UI with a new value.
 	void UpdateHealthUI(int32 NewHealth, int32 MaxHealth);
 
@@ -24,7 +26,19 @@ public:
 	// possesses (or unpossesses) a pawn.
 	virtual void SetPawn(APawn* InPawn) override;
 
+	// [server] Tells the controller that it's time for the player to die.
+	void KillCharacter();
+
+	// [client] Sets whether the player UI should be visible.
+	void SetPlayerUIVisible(bool bIsVisible);
+
 private:
+	// [server] Causes the character to respawn.
+	void RespawnCharacter();
+
+	// [server] Deletes the character.
+	void DeleteCharacter();
+
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
 	TSubclassOf<class USampleGameUI> UITemplate;
@@ -32,5 +46,19 @@ private:
 	// The current game UI.
 	UPROPERTY(Transient)
 	class USampleGameUI* SampleGameUI;
+
+	// Character respawn delay, in seconds.
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float RespawnCharacterDelay;
+
+	// Time for which to keep the character's body around before deleting it.
+	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
+	float DeleteCharacterDelay;
+
+	// Pawn to be deleted when the DeletePawn timer expires.
+	class APawn* PawnToDelete;
+
+	FTimerHandle RespawnTimerHandle;
+	FTimerHandle DeleteCharacterTimerHandle;
 
 };

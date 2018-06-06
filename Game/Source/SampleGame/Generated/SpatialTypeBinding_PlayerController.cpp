@@ -122,25 +122,25 @@ void USpatialTypeBinding_PlayerController::Init(USpatialInterop* InInterop, USpa
 	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("PlayerController"));
 
 	// Populate RepHandleToPropertyMap.
-	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(2, FRepHandleData(Class, {"bReplicateMovement"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(3, FRepHandleData(Class, {"bTearOff"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(4, FRepHandleData(Class, {"bCanBeDamaged"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(5, FRepHandleData(Class, {"RemoteRole"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(6, FRepHandleData(Class, {"ReplicatedMovement"}, COND_SimulatedOrPhysics, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(7, FRepHandleData(Class, {"AttachmentReplication", "AttachParent"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(8, FRepHandleData(Class, {"AttachmentReplication", "LocationOffset"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(9, FRepHandleData(Class, {"AttachmentReplication", "RelativeScale3D"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(10, FRepHandleData(Class, {"AttachmentReplication", "RotationOffset"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(11, FRepHandleData(Class, {"AttachmentReplication", "AttachSocket"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(12, FRepHandleData(Class, {"AttachmentReplication", "AttachComponent"}, COND_Custom, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"PlayerState"}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"Pawn"}, COND_None, REPNOTIFY_Always));
-	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"TargetViewRotation"}, COND_OwnerOnly, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, COND_OwnerOnly, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(2, FRepHandleData(Class, {"bReplicateMovement"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(3, FRepHandleData(Class, {"bTearOff"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(4, FRepHandleData(Class, {"bCanBeDamaged"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(5, FRepHandleData(Class, {"RemoteRole"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(6, FRepHandleData(Class, {"ReplicatedMovement"}, COND_SimulatedOrPhysics, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(7, FRepHandleData(Class, {"AttachmentReplication", "AttachParent"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(8, FRepHandleData(Class, {"AttachmentReplication", "LocationOffset"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(9, FRepHandleData(Class, {"AttachmentReplication", "RelativeScale3D"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(10, FRepHandleData(Class, {"AttachmentReplication", "RotationOffset"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(11, FRepHandleData(Class, {"AttachmentReplication", "AttachSocket"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(12, FRepHandleData(Class, {"AttachmentReplication", "AttachComponent"}, COND_Custom, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"PlayerState"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"Pawn"}, COND_None, REPNOTIFY_Always, 0));
+	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"TargetViewRotation"}, COND_OwnerOnly, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, COND_OwnerOnly, REPNOTIFY_OnChanged, 0));
 
 	// Populate MigratableHandleToPropertyMap.
 	MigratableHandleToPropertyMap.Add(1, FMigratableHandleData(Class, {"AcknowledgedPawn"}));
@@ -1764,7 +1764,7 @@ void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_Send
 		Request.set_field_bnewshouldbeloaded(StructuredParams.bNewShouldBeLoaded);
 		Request.set_field_bnewshouldbevisible(StructuredParams.bNewShouldBeVisible);
 		Request.set_field_bnewshouldblockonload(StructuredParams.bNewShouldBlockOnLoad);
-		Request.set_field_lodindex(StructuredParams.LODIndex);
+		Request.set_field_lodindex(int32_t(StructuredParams.LODIndex));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1835,10 +1835,10 @@ void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendCommand(work
 		Request.set_field_url(TCHAR_TO_UTF8(*StructuredParams.URL));
 		Request.set_field_traveltype(uint32_t(StructuredParams.TravelType));
 		Request.set_field_bseamless(StructuredParams.bSeamless);
-		Request.set_field_mappackageguid_a(StructuredParams.MapPackageGuid.A);
-		Request.set_field_mappackageguid_b(StructuredParams.MapPackageGuid.B);
-		Request.set_field_mappackageguid_c(StructuredParams.MapPackageGuid.C);
-		Request.set_field_mappackageguid_d(StructuredParams.MapPackageGuid.D);
+		Request.set_field_mappackageguid_a(int32_t(StructuredParams.MapPackageGuid.A));
+		Request.set_field_mappackageguid_b(int32_t(StructuredParams.MapPackageGuid.B));
+		Request.set_field_mappackageguid_c(int32_t(StructuredParams.MapPackageGuid.C));
+		Request.set_field_mappackageguid_d(int32_t(StructuredParams.MapPackageGuid.D));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2240,7 +2240,7 @@ void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_S
 			Request.set_field_material(SpatialConstants::NULL_OBJECT_REF);
 		}
 		Request.set_field_forceduration(StructuredParams.ForceDuration);
-		Request.set_field_cinematictexturegroups(StructuredParams.CinematicTextureGroups);
+		Request.set_field_cinematictexturegroups(int32_t(StructuredParams.CinematicTextureGroups));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2636,7 +2636,7 @@ void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendCom
 		// Build request.
 		improbable::unreal::generated::UnrealClientReceiveLocalizedMessageRequest Request;
 		Request.set_field_message(PackageMap->GetHashFromStaticClass(StructuredParams.Message));
-		Request.set_field_switch(StructuredParams.Switch);
+		Request.set_field_switch(int32_t(StructuredParams.Switch));
 		if (StructuredParams.RelatedPlayerState_1 != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.RelatedPlayerState_1);
@@ -2741,7 +2741,7 @@ void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendCommand(w
 		}
 		Request.set_field_forceduration(StructuredParams.ForceDuration);
 		Request.set_field_benablestreaming(StructuredParams.bEnableStreaming);
-		Request.set_field_cinematictexturegroups(StructuredParams.CinematicTextureGroups);
+		Request.set_field_cinematictexturegroups(int32_t(StructuredParams.CinematicTextureGroups));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3425,7 +3425,7 @@ void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendCommand(worker
 
 		// Build request.
 		improbable::unreal::generated::UnrealClientCapBandwidthRequest Request;
-		Request.set_field_cap(StructuredParams.Cap);
+		Request.set_field_cap(int32_t(StructuredParams.Cap));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3769,7 +3769,7 @@ void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendCommand(worker
 		// Build request.
 		improbable::unreal::generated::UnrealServerUpdateCameraRequest Request;
 		Request.set_field_camloc(improbable::Vector3f(StructuredParams.CamLoc.X, StructuredParams.CamLoc.Y, StructuredParams.CamLoc.Z));
-		Request.set_field_campitchandyaw(StructuredParams.CamPitchAndYaw);
+		Request.set_field_campitchandyaw(int32_t(StructuredParams.CamPitchAndYaw));
 
 		// Send command request.
 		Request.set_target_subobject_offset(TargetObjectRef.offset());
