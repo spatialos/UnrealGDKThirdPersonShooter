@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "SampleGameTeams.h"
 #include "SampleGamePlayerController.generated.h"
 
 /**
@@ -31,6 +32,10 @@ public:
 
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
+
+	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
+	UFUNCTION(Server, Reliable, WitHValidation)
+	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 private:
 	// [server] Causes the character to respawn.

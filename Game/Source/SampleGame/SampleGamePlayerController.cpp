@@ -113,6 +113,24 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	check(GetNetMode() == NM_DedicatedServer);
+	
+	/// Set the player-selected values
+	PlayerState->SetPlayerName(NewPlayerName);
+	//((ASampleGamePlayerState*)PlayerState)->SetPlayerTeam(NewPlayerTeam);
+	// TODO jamcrow
+
+	/// Spawn the Pawn
+	RespawnCharacter();
+}
+
+void ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	return true;
+}
+
 void ASampleGamePlayerController::RespawnCharacter()
 {
 	check(GetNetMode() == NM_DedicatedServer);
