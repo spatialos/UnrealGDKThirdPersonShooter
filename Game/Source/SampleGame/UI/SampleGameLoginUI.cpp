@@ -4,10 +4,7 @@
 
 void USampleGameLoginUI::OnJoinGameButtonClicked() const
 {
-	if (PlayerController == nullptr)
-	{
-		return;
-	}
+	check(PlayerController != nullptr)
 
 	/// Update PlayerController, PlayerState, etc
 	PlayerController->ServerTryJoinGame(PlayerName.ToString(), TeamId);
@@ -15,5 +12,5 @@ void USampleGameLoginUI::OnJoinGameButtonClicked() const
 
 void USampleGameLoginUI::JoinGameWasRejected()
 {
-	// TODO - jamcrow : Write validation failure code here.  Indicate which field(s) were the reason for rejection.
+	// TODO jamcrow - Write validation failure code here.  Indicate which field(s) were the reason for rejection.
 }

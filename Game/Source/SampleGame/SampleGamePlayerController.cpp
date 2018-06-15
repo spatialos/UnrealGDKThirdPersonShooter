@@ -42,7 +42,7 @@ void ASampleGamePlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 
-	if (GetNetMode() == NM_Client)
+	if (GetNetMode() == NM_Client && bHasSubmittedLoginOptions)
 	{
 		SetPlayerUIVisible(InPawn != nullptr);
 
@@ -159,6 +159,8 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 	{
 		/// Show the Login UI
 		SampleGameLoginUI->AddToViewport();
+		/// You tell that UI Widget who's boss...
+		SampleGameLoginUI->SetOwnerPlayerController(this);
 		/// Set Mouse Cursor to SHOW, and only interact with the UI
 		bShowMouseCursor = true;
 		SetIgnoreLookInput(true);
@@ -178,17 +180,51 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
 	check(GetNetMode() == NM_DedicatedServer);
-	
-	/// Set the player-selected values
-	PlayerState->SetPlayerName(NewPlayerName);
-	//((ASampleGamePlayerState*)PlayerState)->SetPlayerTeam(NewPlayerTeam);
-	// TODO jamcrow
+	check(!bHasSubmittedLoginOptions);
 
-	/// Spawn the Pawn
-	RespawnCharacter();
+	bool bJoinWasSuccessful = true;
+	// TODO jamcrow - Validate the join request
+
+	/// Inform Client as to whether or not join was accepted
+	ClientJoinResults(bJoinWasSuccessful);
+	
+	if (bJoinWasSuccessful)
+	{
+		bHasSubmittedLoginOptions = true;
+
+		/// Set the player-selected values
+		PlayerState->SetPlayerName(NewPlayerName);
+		//((ASampleGamePlayerState*)PlayerState)->SetPlayerTeam(NewPlayerTeam);
+		// TODO jamcrow - Other team stuff?  Other player choices?
+
+		/// Spawn the Pawn
+		RespawnCharacter();
+	}
+
 }
 
 bool ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	return true;
+}
+
+void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJoinSucceeded)
+{
+	check(GetNetMode() == NM_Client);
+	check(SampleGameLoginUI != nullptr);
+
+	if (bJoinSucceeded)
+	{
+		bHasSubmittedLoginOptions = true;
+		SetLoginUIVisible(false);
+	}
+	else
+	{
+		SampleGameLoginUI->JoinGameWasRejected();
+	}
+}
+
+bool ASampleGamePlayerController::ClientJoinResults_Validate(const bool bJoinSucceeded)
 {
 	return true;
 }
@@ -231,10 +267,14 @@ void ASampleGamePlayerController::Tick(float DeltaSeconds)
 		}
 	}
 
-	if (GetNetMode() == NM_Client && Role == ROLE_AutonomousProxy && !bHasShownLoginHud)
+	/// HACK because sometimes (oftem?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
+	if (LoginUIWidgetTemplate != nullptr)
 	{
-		bHasShownLoginHud = true;
-		/// PLAYER LOGIN UI
-		SetLoginUIVisible(true);
+		if (GetNetMode() == NM_Client && Role == ROLE_AutonomousProxy && !bHasShownLoginHud)
+		{
+			bHasShownLoginHud = true;
+			/// PLAYER LOGIN UI
+			SetLoginUIVisible(true);
+		}
 	}
 }

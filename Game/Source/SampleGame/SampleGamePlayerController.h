@@ -41,6 +41,9 @@ public:
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 private:
+	UFUNCTION(Client, Reliable, WithValidation)
+	void ClientJoinResults(const bool bJoinSucceeded);
+
 	// [server] Performs the actual logic for player character death only ; no respawn logic.
 	void InternalKillCharacter(float DeleteCharacterDelayOverride);
 

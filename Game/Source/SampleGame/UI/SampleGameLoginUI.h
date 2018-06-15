@@ -45,6 +45,6 @@ private:
 	ASampleGamePlayerController* PlayerController = nullptr;
 
 public:
-	void SetMyPlayerController(ASampleGamePlayerController* NewPlayerContoller) { PlayerController = NewPlayerContoller; }
+	void SetOwnerPlayerController(ASampleGamePlayerController* NewPlayerContoller) { PlayerController = NewPlayerContoller; }
 	void JoinGameWasRejected();
 };
