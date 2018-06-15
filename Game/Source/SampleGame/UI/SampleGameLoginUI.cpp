@@ -1,5 +1,6 @@
 
 #include "SampleGameLoginUI.h"
+#include "SampleGamePlayerController.h"
 
 void USampleGameLoginUI::OnJoinGameButtonClicked() const
 {

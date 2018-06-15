@@ -27,17 +27,23 @@ public:
 	// possesses (or unpossesses) a pawn.
 	virtual void SetPawn(APawn* InPawn) override;
 
-	// [server] Tells the controller that it's time for the player to die.
+	// [server] Tells the controller that it's time for the player to die, and sets up conditions for respawn.
 	void KillCharacter();
 
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
+
+	// [client] Sets whether or not the login UI should be visible.
+	void SetLoginUIVisible(bool bIsVisible);
 
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WitHValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 private:
+	// [server] Performs the actual logic for player character death only ; no respawn logic.
+	void InternalKillCharacter(float DeleteCharacterDelayOverride);
+
 	// [server] Causes the character to respawn.
 	void RespawnCharacter();
 
@@ -51,6 +57,14 @@ private:
 	// The current game UI.
 	UPROPERTY(Transient)
 	class USampleGameUI* SampleGameUI;
+
+	// Login UI class template to load at player join.
+	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	TSubclassOf<class USampleGameLoginUI> LoginUIWidgetTemplate;
+
+	// The instance of the Login UI class to allow player choice interaction.
+	UPROPERTY(Transient)
+	class USampleGameLoginUI* SampleGameLoginUI;
 
 	// Character respawn delay, in seconds.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
@@ -66,4 +80,13 @@ private:
 	FTimerHandle RespawnTimerHandle;
 	FTimerHandle DeleteCharacterTimerHandle;
 
+/// HACKs for login state and default spawn character
+///=================================================///
+public:
+	virtual void Tick(float DeltaSeconds) override;
+private:
+	bool bHasKilledDefaultPawn = false;
+	bool bHasShownLoginHud = false;
+	bool bHasSubmittedLoginOptions = false;
+///=================================================///
 };

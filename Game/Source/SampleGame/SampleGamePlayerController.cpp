@@ -5,6 +5,7 @@
 #include "SampleGameCharacter.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
+#include "UI/SampleGameLoginUI.h"
 #include "UI/SampleGameUI.h"
 
 #include "SpatialNetDriver.h"
@@ -65,12 +66,26 @@ void ASampleGamePlayerController::KillCharacter()
 		return;
 	}
 
+	InternalKillCharacter(DeleteCharacterDelay);
+
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASampleGamePlayerController::RespawnCharacter, RespawnCharacterDelay);
+}
+
+void ASampleGamePlayerController::InternalKillCharacter(float DeleteCharacterDelayOverride)
+{
+	/// HACK to circumvent current GDK bug where Destroy() calls are not properly rep'd from server to client (uncomment this line to remove hack)
+	//check(GetNetMode() == NM_DedicatedServer);
+
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	PawnToDelete = GetPawn();
 	UnPossess();
 
 	// TODO: timers won't persist across worker boundary migrations, and neither will PawnToDelete
-	GetWorldTimerManager().SetTimer(DeleteCharacterTimerHandle, this, &ASampleGamePlayerController::DeleteCharacter, DeleteCharacterDelay);
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASampleGamePlayerController::RespawnCharacter, RespawnCharacterDelay);
+	GetWorldTimerManager().SetTimer(DeleteCharacterTimerHandle, this, &ASampleGamePlayerController::DeleteCharacter, DeleteCharacterDelayOverride);
 }
 
 void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
@@ -113,6 +128,53 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
+{
+	/// Lazy instantiate the Login UI
+	if (SampleGameLoginUI == nullptr)
+	{
+		check(LoginUIWidgetTemplate != nullptr);
+		SampleGameLoginUI = CreateWidget<USampleGameLoginUI>(this, LoginUIWidgetTemplate);
+		
+		/// Early out - Error case
+		if (SampleGameLoginUI == nullptr)
+		{
+			// TODO jamcrow - Put some sort of check here or macro to deal with cases where networking has been switched to something other than SpatialOS?
+			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
+			UE_LOG(LogSampleGame, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
+				*this->GetName(),
+				SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+
+			return;
+		}
+	}
+
+	/// Early out - If our visibility state is already set to the requested value, do nothing
+	if (SampleGameLoginUI->IsVisible() == bIsVisible)
+	{
+		return;
+	}
+
+	if (bIsVisible)
+	{
+		/// Show the Login UI
+		SampleGameLoginUI->AddToViewport();
+		/// Set Mouse Cursor to SHOW, and only interact with the UI
+		bShowMouseCursor = true;
+		SetIgnoreLookInput(true);
+		SetIgnoreMoveInput(true);
+	}
+	else
+	{
+		/// Hide the Login UI
+		SampleGameLoginUI->RemoveFromViewport();
+		/// Hide the Mouse Cursor, restore Look and Move control
+		bShowMouseCursor = false;
+		SetIgnoreLookInput(false);
+		SetIgnoreMoveInput(false);
+	}
+}
+
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
 	check(GetNetMode() == NM_DedicatedServer);
@@ -126,7 +188,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 	RespawnCharacter();
 }
 
-void ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+bool ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
 	return true;
 }
@@ -150,5 +212,29 @@ void ASampleGamePlayerController::DeleteCharacter()
 		// TODO: what if the character is on a different worker?
 		GetWorld()->DestroyActor(PawnToDelete);
 		PawnToDelete = nullptr;
+	}
+}
+
+
+void ASampleGamePlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	/// HACK to circumvent current GDK bug where Destroy() calls are not properly rep'd from server to client (uncomment this line to remove hack)
+	//if (GetNetMode() == NM_DedicatedServer)
+	{
+		/// HACK - Since SpatialOS automatically spawns the Character on connection (which is not desired behavior), we kill it right away as a temporary workaround
+		if (GetCharacter() != nullptr && !bHasKilledDefaultPawn)
+		{
+			bHasKilledDefaultPawn = true;
+			InternalKillCharacter(0.0f);
+		}
+	}
+
+	if (GetNetMode() == NM_Client && Role == ROLE_AutonomousProxy && !bHasShownLoginHud)
+	{
+		bHasShownLoginHud = true;
+		/// PLAYER LOGIN UI
+		SetLoginUIVisible(true);
 	}
 }
