@@ -428,3 +428,16 @@ void ASampleGameCharacter::MoveRight(float Value)
 		AddMovementInput(Direction, Value);
 	}
 }
+
+void ASampleGameCharacter::SetMaterialFromPlayerTeam(const ESampleGameTeam& PlayerTeam)
+{
+	check(RedTeamMaterial != nullptr);
+	check(GreenTeamMaterial != nullptr);
+	check(BlueTeamMaterial != nullptr);
+	check(YellowTeamMaterial != nullptr);
+	check(PurpleTeamMaterial != nullptr);
+	check(BlackTeamMaterial != nullptr);
+	check(WhiteTeamMaterial != nullptr);
+
+	// TODO jamcrow
+}

@@ -2,6 +2,7 @@
 
 #include "SampleGamePlayerController.h"
 
+#include "SampleGamePlayerState.h"
 #include "SampleGameCharacter.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
@@ -181,6 +182,8 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 {
 	check(GetNetMode() == NM_DedicatedServer);
 	check(!bHasSubmittedLoginOptions);
+	check(PlayerState != nullptr);
+	check(PlayerState->IsA(ASampleGamePlayerState::StaticClass()));
 
 	bool bJoinWasSuccessful = true;
 	// TODO jamcrow - Validate the join request
@@ -194,7 +197,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 
 		/// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
-		//((ASampleGamePlayerState*)PlayerState)->SetPlayerTeam(NewPlayerTeam);
+		((ASampleGamePlayerState*)PlayerState)->SetSelectedTeam(NewPlayerTeam);
 		// TODO jamcrow - Other team stuff?  Other player choices?
 
 		/// Spawn the Pawn
@@ -267,7 +270,7 @@ void ASampleGamePlayerController::Tick(float DeltaSeconds)
 		}
 	}
 
-	/// HACK because sometimes (oftem?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
+	/// HACK because sometimes (often?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
 	if (LoginUIWidgetTemplate != nullptr)
 	{
 		if (GetNetMode() == NM_Client && Role == ROLE_AutonomousProxy && !bHasShownLoginHud)

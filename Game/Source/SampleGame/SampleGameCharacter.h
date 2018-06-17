@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
+#include "SampleGameTeams.h"
 #include "GameFramework/Character.h"
 #include "SampleGameCharacter.generated.h"
 
@@ -153,5 +154,32 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+	/// Team Color Materials for Pawn
+protected:
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* RedTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* GreenTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* BlueTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* YellowTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* PurpleTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* BlackTeamMaterial;
+	
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* WhiteTeamMaterial;
+
+public:
+	// Change the color of this character to match their chosen team
+ 	void SetMaterialFromPlayerTeam(const ESampleGameTeam& PlayerTeam);
 };
 
