@@ -6,10 +6,10 @@ import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
 component UnrealInstantWeaponSingleClientRepData {
-	id = 100030;
+	id = 100035;
 }
 component UnrealInstantWeaponMultiClientRepData {
-	id = 100031;
+	id = 100036;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
 	bool field_btearoff = 3; // COND_None // ::Actor
@@ -31,15 +31,15 @@ component UnrealInstantWeaponMultiClientRepData {
 	bytes field_hitnotify_timestamp = 19; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 }
 component UnrealInstantWeaponMigratableData {
-	id = 100032;
+	id = 100037;
 }
 import "improbable/unreal/generated/UnrealInstantWeaponTypes.schema";
 
 component UnrealInstantWeaponClientRPCs {
-	id = 100033;
+	id = 100038;
 }
 component UnrealInstantWeaponServerRPCs {
-	id = 100034;
+	id = 100039;
 	command UnrealRPCCommandResponse instantweaponserverdidmiss(UnrealServerDidMissRequest);
 	command UnrealRPCCommandResponse instantweaponserverdidhit(UnrealServerDidHitRequest);
 }

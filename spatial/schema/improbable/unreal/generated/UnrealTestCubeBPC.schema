@@ -6,10 +6,10 @@ import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
 component UnrealTestCubeBPCSingleClientRepData {
-	id = 100025;
+	id = 100030;
 }
 component UnrealTestCubeBPCMultiClientRepData {
-	id = 100026;
+	id = 100031;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
 	bool field_btearoff = 3; // COND_None // ::Actor
@@ -29,14 +29,14 @@ component UnrealTestCubeBPCMultiClientRepData {
 	int32 field_currenthealth = 17; // COND_None // ::TestCube_BP_C
 }
 component UnrealTestCubeBPCMigratableData {
-	id = 100027;
+	id = 100032;
 }
 import "improbable/unreal/generated/UnrealTestCubeBPCTypes.schema";
 
 component UnrealTestCubeBPCClientRPCs {
-	id = 100028;
+	id = 100033;
 }
 component UnrealTestCubeBPCServerRPCs {
-	id = 100029;
+	id = 100034;
 	command UnrealRPCCommandResponse testcubebpcserverinteract(UnrealServerInteractRequest);
 }

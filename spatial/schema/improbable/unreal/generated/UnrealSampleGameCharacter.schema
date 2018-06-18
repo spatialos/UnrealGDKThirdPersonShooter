@@ -6,11 +6,11 @@ import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
 component UnrealSampleGameCharacterSingleClientRepData {
-	id = 100015;
+	id = 100020;
 	int32 field_currenthealth = 1; // COND_AutonomousOnly // ::SampleGameCharacter
 }
 component UnrealSampleGameCharacterMultiClientRepData {
-	id = 100016;
+	id = 100021;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
 	bool field_btearoff = 3; // COND_None // ::Actor
@@ -58,13 +58,13 @@ component UnrealSampleGameCharacterMultiClientRepData {
 	bool field_bisragdoll = 45; // COND_None // ::SampleGameCharacter
 }
 component UnrealSampleGameCharacterMigratableData {
-	id = 100017;
+	id = 100022;
 }
 import "improbable/unreal/generated/UnrealSampleGameCharacterTypes.schema";
 import "improbable/unreal/generated/UnrealCharacterTypes.schema";
 
 component UnrealSampleGameCharacterClientRPCs {
-	id = 100018;
+	id = 100023;
 	command UnrealRPCCommandResponse samplegamecharacterrootmotiondebugclientprintonscreen(UnrealRootMotionDebugClientPrintOnScreenRequest);
 	command UnrealRPCCommandResponse samplegamecharacterclientveryshortadjustposition(UnrealClientVeryShortAdjustPositionRequest);
 	command UnrealRPCCommandResponse samplegamecharacterclientcheatwalk(UnrealClientCheatWalkRequest);
@@ -76,7 +76,7 @@ component UnrealSampleGameCharacterClientRPCs {
 	command UnrealRPCCommandResponse samplegamecharacterclientackgoodmove(UnrealClientAckGoodMoveRequest);
 }
 component UnrealSampleGameCharacterServerRPCs {
-	id = 100019;
+	id = 100024;
 	command UnrealRPCCommandResponse samplegamecharacterserverspawncube(UnrealServerSpawnCubeRequest);
 	command UnrealRPCCommandResponse samplegamecharacterdebugresetcharacter(UnrealDebugResetCharacterRequest);
 	command UnrealRPCCommandResponse samplegamecharacterservermoveold(UnrealServerMoveOldRequest);
