@@ -197,7 +197,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 
 		/// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
-		((ASampleGamePlayerState*)PlayerState)->SetSelectedTeam(NewPlayerTeam);
+		((ASampleGamePlayerState*)PlayerState)->SetSelectedTeamFromEnum(NewPlayerTeam);
 		// TODO jamcrow - Other team stuff?  Other player choices?
 
 		/// Spawn the Pawn
