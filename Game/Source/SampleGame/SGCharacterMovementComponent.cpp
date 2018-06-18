@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "SampleGameCharacter.h"
 
+// Use the first custom movement flag slot in the character for sprinting.
+static const FSavedMove_Character::CompressedFlags FLAG_WantsToSprint = FSavedMove_SGMovement::FLAG_Custom_0;
 
 USGCharacterMovementComponent::USGCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -18,7 +20,7 @@ void USGCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
 	Super::UpdateFromCompressedFlags(Flags);
 
 	// Extract saved state from Flags and apply it to our local variables.
-	bWantsToSprint = (Flags & FSavedMove_SGMovement::FLAG_Custom_0) != 0;
+	bWantsToSprint = (Flags & FLAG_WantsToSprint) != 0;
 }
 
 class FNetworkPredictionData_Client* USGCharacterMovementComponent::GetPredictionData_Client() const
@@ -77,8 +79,7 @@ bool USGCharacterMovementComponent::IsMovingForward() const
 
 	FVector MoveDirection = Velocity.GetSafeNormal();
 	FVector Forward = PawnOwner->GetActorForwardVector();
-	ASampleGameCharacter* Character = Cast<ASampleGameCharacter>(PawnOwner);
-	if (Character != nullptr)
+	if (ASampleGameCharacter* Character = Cast<ASampleGameCharacter>(PawnOwner))
 	{
 		// Check move direction against control rotation.
 		Forward = Character->GetController()->GetControlRotation().Vector();
@@ -106,7 +107,7 @@ uint8 FSavedMove_SGMovement::GetCompressedFlags() const
 	uint8 Result = Super::GetCompressedFlags();
 	if (bSavedWantsToSprint)
 	{
-		Result |= FLAG_Custom_0;
+		Result |= FLAG_WantsToSprint;
 	}
 	return Result;
 }

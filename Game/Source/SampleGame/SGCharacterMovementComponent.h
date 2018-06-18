@@ -20,7 +20,7 @@ public:
 
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
-	// Returns true if the character is trying to sprint.
+	// Sets whether the character is trying to sprint.
 	void SetWantsToSprint(bool bSprinting);
 
 	// Returns true if the character is actually sprinting.
@@ -37,6 +37,8 @@ public:
 	bool IsMovingForward() const;
 
 private:
+	// If true, the player is attempting to sprint. The character will sprint if all conditions are met
+	// (e.g. the player is moving in a direction within SprintDirectionTolerance of the camera direction).
 	uint8 bWantsToSprint : 1;
 
 	// Multiply max speed by this factor when sprinting.

@@ -408,11 +408,12 @@ bool ASampleGameCharacter::IsSprinting()
 	}
 
 	// For all other client types, we need to guess based on speed.
-	FVector Velocity = GetVelocity();
+	// Add a tolerance factor to the max jog speed and use that as a sprint threshold.
+	float SquaredSprintThreshold = Movement->MaxWalkSpeed + 10.0f;
+	SquaredSprintThreshold *= SquaredSprintThreshold;
+
 	// We only care about speed in the X-Y plane.
-	Velocity.Z = 0.0f;
-	// Add a tolerance factor to the max jog speed.
-	return Velocity.Size() > Movement->MaxWalkSpeed + 10.0f;
+	return GetVelocity().SizeSquared2D() > SquaredSprintThreshold;
 }
 
 void ASampleGameCharacter::TurnAtRate(float Rate)
@@ -429,8 +430,7 @@ void ASampleGameCharacter::LookUpAtRate(float Rate)
 
 void ASampleGameCharacter::StartSprinting()
 {
-	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
-	if (MovementComponent)
+	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
 	{
 		MovementComponent->SetWantsToSprint(true);
 	}
@@ -438,8 +438,7 @@ void ASampleGameCharacter::StartSprinting()
 
 void ASampleGameCharacter::StopSprinting()
 {
-	USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
-	if (MovementComponent)
+	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
 	{
 		MovementComponent->SetWantsToSprint(false);
 	}
