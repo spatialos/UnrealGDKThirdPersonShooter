@@ -207,7 +207,9 @@ void ASampleGameCharacter::SpawnStarterWeapon()
 		return;
 	}
 
-	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform());
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform(), SpawnParams);
 	StartWeapon->SetOwningCharacter(this);
 	StartWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
