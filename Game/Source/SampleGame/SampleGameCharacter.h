@@ -12,7 +12,7 @@ UCLASS(config=Game)
 class ASampleGameCharacter : public ACharacter
 {
 	GENERATED_BODY()
-
+		
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
@@ -27,6 +27,9 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
+	/** [client] perform PlayerState related setup */
+	virtual void OnRep_PlayerState() override;
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -158,6 +161,9 @@ public:
 	/// Team Color Materials for Pawn
 protected:
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
+	UMaterial* NoneTeamMaterial;
+
+	UPROPERTY(EditAnywhere, Category = "Team Appearance")
 	UMaterial* RedTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
@@ -179,7 +185,8 @@ protected:
 	UMaterial* WhiteTeamMaterial;
 
 public:
-	// Change the color of this character to match their chosen team
- 	void SetMaterialFromPlayerTeam(const ESampleGameTeam& PlayerTeam);
+	/// Change the color of this character to match their chosen team
+	UFUNCTION()
+	void SetTeamColor();
 };
 

@@ -7,6 +7,7 @@
 UENUM(BlueprintType)
 enum class ESampleGameTeam : uint8
 {
+	Team_None		UMETA(DisplayName = "UNDEFINED"),
 	Team_Red		UMETA(DisplayName = "Red Team"),
 	Team_Green		UMETA(DisplayName = "Green Team"),
 	Team_Blue		UMETA(DisplayName = "Blue Team"),
