@@ -23,7 +23,7 @@ public:
 	UClass* GetBoundClass() const override;
 
 	void Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap) override;
-	void BindToView() override;
+	void BindToView(bool bIsClient) override;
 	void UnbindFromView() override;
 
 	worker::Entity CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const override;
@@ -59,14 +59,15 @@ private:
 	void ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponSingleClientRepData::Update& Update) const;
 	void ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponMultiClientRepData::Update& Update) const;
 	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealInstantWeaponMigratableData::Update& Update) const;
+	void ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::Update& Update);
 
 	// RPC command sender functions.
-	void ServerDidMiss_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
-	void ServerDidHit_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
+	void ServerDidMiss_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
+	void ServerDidHit_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 
 	// RPC command request handler functions.
-	void ServerDidMiss_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op);
-	void ServerDidHit_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op);
+	void ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op);
+	void ServerDidHit_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op);
 
 	// RPC command response handler functions.
 	void ServerDidMiss_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op);

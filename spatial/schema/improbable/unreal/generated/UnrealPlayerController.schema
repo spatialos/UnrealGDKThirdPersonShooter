@@ -2,13 +2,12 @@
 // Note that this file has been generated automatically
 package improbable.unreal.generated;
 
-import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
 component UnrealPlayerControllerSingleClientRepData {
 	id = 100010;
-	UnrealFRotator field_targetviewrotation = 1; // COND_OwnerOnly // ::PlayerController
-	improbable.Vector3f field_spawnlocation = 2; // COND_OwnerOnly // ::PlayerController
+	bytes field_targetviewrotation = 1; // COND_OwnerOnly // ::PlayerController
+	bytes field_spawnlocation = 2; // COND_OwnerOnly // ::PlayerController
 }
 component UnrealPlayerControllerMultiClientRepData {
 	id = 100011;
@@ -19,9 +18,9 @@ component UnrealPlayerControllerMultiClientRepData {
 	uint32 field_remoterole = 5; // COND_None // ::Actor
 	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics // ::Actor
 	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	string field_attachmentreplication_attachsocket = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	UnrealObjectRef field_owner = 13; // COND_None // ::Actor
@@ -115,4 +114,7 @@ component UnrealPlayerControllerServerRPCs {
 	command UnrealRPCCommandResponse playercontrollerserverchangename(UnrealServerChangeNameRequest);
 	command UnrealRPCCommandResponse playercontrollerservercamera(UnrealServerCameraRequest);
 	command UnrealRPCCommandResponse playercontrollerserveracknowledgepossession(UnrealServerAcknowledgePossessionRequest);
+}
+component UnrealPlayerControllerNetMulticastRPCs {
+	id = 100015;
 }

@@ -23,7 +23,7 @@ public:
 	UClass* GetBoundClass() const override;
 
 	void Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap) override;
-	void BindToView() override;
+	void BindToView(bool bIsClient) override;
 	void UnbindFromView() override;
 
 	worker::Entity CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const override;
@@ -59,12 +59,13 @@ private:
 	void ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeBPCSingleClientRepData::Update& Update) const;
 	void ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeBPCMultiClientRepData::Update& Update) const;
 	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealTestCubeBPCMigratableData::Update& Update) const;
+	void ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs::Update& Update);
 
 	// RPC command sender functions.
-	void ServerInteract_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
+	void ServerInteract_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 
 	// RPC command request handler functions.
-	void ServerInteract_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands::Testcubebpcserverinteract>& Op);
+	void ServerInteract_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands::Testcubebpcserverinteract>& Op);
 
 	// RPC command response handler functions.
 	void ServerInteract_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands::Testcubebpcserverinteract>& Op);

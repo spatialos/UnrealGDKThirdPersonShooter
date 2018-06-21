@@ -42,8 +42,8 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 {
 	Super::Init(InInterop, InPackageMap);
 
-	RPCToSenderMap.Emplace("ServerDidMiss", &USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendCommand);
-	RPCToSenderMap.Emplace("ServerDidHit", &USpatialTypeBinding_InstantWeapon::ServerDidHit_SendCommand);
+	RPCToSenderMap.Emplace("ServerDidMiss", &USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC);
+	RPCToSenderMap.Emplace("ServerDidHit", &USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC);
 
 	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("InstantWeapon"));
 
@@ -69,7 +69,7 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"HitNotify", "Timestamp"}, COND_SkipOwner, REPNOTIFY_OnChanged, 0));
 }
 
-void USpatialTypeBinding_InstantWeapon::BindToView()
+void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
 {
 	TSharedPtr<worker::View> View = Interop->GetSpatialOS()->GetView().Pin();
 	ViewCallbacks.Init(View);
@@ -100,23 +100,36 @@ void USpatialTypeBinding_InstantWeapon::BindToView()
 			check(ActorChannel);
 			ReceiveUpdate_MultiClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealInstantWeaponMigratableData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealInstantWeaponMigratableData>& Op)
+		if (!bIsClient)
 		{
-			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealInstantWeaponMigratableData::ComponentId))
+			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealInstantWeaponMigratableData>([this](
+				const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealInstantWeaponMigratableData>& Op)
 			{
-				return;
-			}
-			USpatialActorChannel* ActorChannel = Interop->GetActorChannelByEntityId(Op.EntityId);
-			check(ActorChannel);
-			ReceiveUpdate_Migratable(ActorChannel, Op.Update);
-		}));
+				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
+				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealInstantWeaponMigratableData::ComponentId))
+				{
+					return;
+				}
+				USpatialActorChannel* ActorChannel = Interop->GetActorChannelByEntityId(Op.EntityId);
+				check(ActorChannel);
+				ReceiveUpdate_Migratable(ActorChannel, Op.Update);
+			}));
+		}
 	}
+	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>([this](
+		const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>& Op)
+	{
+		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
+		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::ComponentId))
+		{
+			return;
+		}
+		ReceiveUpdate_NetMulticastRPCs(Op.EntityId, Op.Update);
+	}));
 
 	using ServerRPCCommandTypes = improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest, this, std::placeholders::_1)));
+	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload, this, std::placeholders::_1)));
+	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Instantweaponserverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandResponse, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Instantweaponserverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandResponse, this, std::placeholders::_1)));
 }
@@ -200,6 +213,7 @@ worker::Entity USpatialTypeBinding_InstantWeapon::CreateActorEntity(const FStrin
 		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponMigratableData>(MigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponClientRPCs>(improbable::unreal::generated::UnrealInstantWeaponClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponServerRPCs>(improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>(improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }
 
@@ -394,8 +408,9 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 			{
 				TArray<uint8> ValueData;
 				FMemoryWriter ValueDataWriter(ValueData);
-				bool Success;
-				(const_cast<FRepMovement&>(Value)).NetSerialize(ValueDataWriter, PackageMap, Success);
+				bool bSuccess = true;
+				(const_cast<FRepMovement&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
 				OutUpdate.set_field_replicatedmovement(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
 			break;
@@ -427,21 +442,42 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 		{
 			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
-			OutUpdate.set_field_attachmentreplication_locationoffset(improbable::Vector3f(Value.X, Value.Y, Value.Z));
+			{
+				TArray<uint8> ValueData;
+				FMemoryWriter ValueDataWriter(ValueData);
+				bool bSuccess = true;
+				(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
+				OutUpdate.set_field_attachmentreplication_locationoffset(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			}
 			break;
 		}
 		case 9: // field_attachmentreplication_relativescale3d
 		{
 			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
-			OutUpdate.set_field_attachmentreplication_relativescale3d(improbable::Vector3f(Value.X, Value.Y, Value.Z));
+			{
+				TArray<uint8> ValueData;
+				FMemoryWriter ValueDataWriter(ValueData);
+				bool bSuccess = true;
+				(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
+				OutUpdate.set_field_attachmentreplication_relativescale3d(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			}
 			break;
 		}
 		case 10: // field_attachmentreplication_rotationoffset
 		{
 			const FRotator& Value = *(reinterpret_cast<FRotator const*>(Data));
 
-			OutUpdate.set_field_attachmentreplication_rotationoffset(improbable::unreal::UnrealFRotator(Value.Yaw, Value.Pitch, Value.Roll));
+			{
+				TArray<uint8> ValueData;
+				FMemoryWriter ValueDataWriter(ValueData);
+				bool bSuccess = true;
+				(const_cast<FRotator&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
+				OutUpdate.set_field_attachmentreplication_rotationoffset(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			}
 			break;
 		}
 		case 11: // field_attachmentreplication_attachsocket
@@ -554,7 +590,14 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 		{
 			const FVector& Value = *(reinterpret_cast<FVector const*>(Data));
 
-			OutUpdate.set_field_hitnotify_location(improbable::Vector3f(Value.X, Value.Y, Value.Z));
+			{
+				TArray<uint8> ValueData;
+				FMemoryWriter ValueDataWriter(ValueData);
+				bool bSuccess = true;
+				(const_cast<FVector&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+				OutUpdate.set_field_hitnotify_location(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			}
 			break;
 		}
 		case 18: // field_hitnotify_hitactor
@@ -587,8 +630,9 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 			{
 				TArray<uint8> ValueData;
 				FMemoryWriter ValueDataWriter(ValueData);
-				bool Success;
-				(const_cast<FDateTime&>(Value)).NetSerialize(ValueDataWriter, PackageMap, Success);
+				bool bSuccess = true;
+				(const_cast<FDateTime&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
 				OutUpdate.set_field_hitnotify_timestamp(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 			}
 			break;
@@ -759,8 +803,9 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 				TArray<uint8> ValueData;
 				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess;
+				bool bSuccess = true;
 				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -798,8 +843,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<AActor>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -840,10 +885,13 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			{
-				auto& Vector = (*Update.field_attachmentreplication_locationoffset().data());
-				Value.X = Vector.x();
-				Value.Y = Vector.y();
-				Value.Z = Vector.z();
+				auto& ValueDataStr = (*Update.field_attachmentreplication_locationoffset().data());
+				TArray<uint8> ValueData;
+				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+				FMemoryReader ValueDataReader(ValueData);
+				bool bSuccess = true;
+				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -867,10 +915,13 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			{
-				auto& Vector = (*Update.field_attachmentreplication_relativescale3d().data());
-				Value.X = Vector.x();
-				Value.Y = Vector.y();
-				Value.Z = Vector.z();
+				auto& ValueDataStr = (*Update.field_attachmentreplication_relativescale3d().data());
+				TArray<uint8> ValueData;
+				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+				FMemoryReader ValueDataReader(ValueData);
+				bool bSuccess = true;
+				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -894,10 +945,13 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 			FRotator Value = *(reinterpret_cast<FRotator const*>(PropertyData));
 
 			{
-				auto& Rotator = (*Update.field_attachmentreplication_rotationoffset().data());
-				Value.Yaw = Rotator.yaw();
-				Value.Pitch = Rotator.pitch();
-				Value.Roll = Rotator.roll();
+				auto& ValueDataStr = (*Update.field_attachmentreplication_rotationoffset().data());
+				TArray<uint8> ValueData;
+				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+				FMemoryReader ValueDataReader(ValueData);
+				bool bSuccess = true;
+				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -957,8 +1011,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<USceneComponent>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<USceneComponent>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -1013,8 +1067,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<AActor>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -1098,8 +1152,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<APawn>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<APawn>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -1154,8 +1208,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<ASampleGameCharacter>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<ASampleGameCharacter>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -1196,10 +1250,13 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 			FVector Value = *(reinterpret_cast<FVector const*>(PropertyData));
 
 			{
-				auto& Vector = (*Update.field_hitnotify_location().data());
-				Value.X = Vector.x();
-				Value.Y = Vector.y();
-				Value.Z = Vector.z();
+				auto& ValueDataStr = (*Update.field_hitnotify_location().data());
+				TArray<uint8> ValueData;
+				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+				FMemoryReader ValueDataReader(ValueData);
+				bool bSuccess = true;
+				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -1237,8 +1294,8 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 					{
 						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+						checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 						Value = Cast<AActor>(Object_Raw);
-						checkf(Value, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					}
 					else
 					{
@@ -1283,8 +1340,9 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 				TArray<uint8> ValueData;
 				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
 				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess;
+				bool bSuccess = true;
 				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+				checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
 			}
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
@@ -1304,7 +1362,10 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_Migratable(USpatialActorCh
 {
 }
 
-void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
+void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::Update& Update)
+{
+}
+void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	// This struct is declared in InstantWeapon.generated.h (in a macro that is then put in InstantWeapon.h UCLASS macro)
 	InstantWeapon_eventServerDidMiss_Parms StructuredParams = *static_cast<InstantWeapon_eventServerDidMiss_Parms*>(Parameters);
@@ -1319,9 +1380,16 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendCommand(worker::Connec
 			return {TargetObject};
 		}
 
-		// Build request.
-		improbable::unreal::generated::UnrealServerDidMissRequest Request;
-		Request.set_field_hitinfo_location(improbable::Vector3f(StructuredParams.HitInfo.Location.X, StructuredParams.HitInfo.Location.Y, StructuredParams.HitInfo.Location.Z));
+		// Build RPC Payload.
+		improbable::unreal::generated::UnrealServerDidMissRequest RPCPayload;
+		{
+			TArray<uint8> ValueData;
+			FMemoryWriter ValueDataWriter(ValueData);
+			bool bSuccess = true;
+			(const_cast<FVector&>(StructuredParams.HitInfo.Location)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+			RPCPayload.set_field_hitinfo_location(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+		}
 		if (StructuredParams.HitInfo.HitActor != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.HitInfo.HitActor);
@@ -1333,27 +1401,35 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendCommand(worker::Connec
 			}
 			else
 			{
-				Request.set_field_hitinfo_hitactor(ObjectRef);
+				RPCPayload.set_field_hitinfo_hitactor(ObjectRef);
 			}
 		}
 		else
 		{
-			Request.set_field_hitinfo_hitactor(SpatialConstants::NULL_OBJECT_REF);
+			RPCPayload.set_field_hitinfo_hitactor(SpatialConstants::NULL_OBJECT_REF);
+		}
+		{
+			TArray<uint8> ValueData;
+			FMemoryWriter ValueDataWriter(ValueData);
+			bool bSuccess = true;
+			(const_cast<FDateTime&>(StructuredParams.HitInfo.Timestamp)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
+			RPCPayload.set_field_hitinfo_timestamp(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
-		// Send command request.
-		Request.set_target_subobject_offset(TargetObjectRef.offset());
+		// Send RPC
+		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerDidMiss, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>(TargetObjectRef.entity(), Request, 0);
-		return {RequestId.Id};
-	};
-	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ false);
-}
 
-void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendCommand(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
+			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>(TargetObjectRef.entity(), RPCPayload, 0);
+			return {RequestId.Id};
+	};
+	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
+}
+void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
 	// This struct is declared in InstantWeapon.generated.h (in a macro that is then put in InstantWeapon.h UCLASS macro)
 	InstantWeapon_eventServerDidHit_Parms StructuredParams = *static_cast<InstantWeapon_eventServerDidHit_Parms*>(Parameters);
@@ -1368,9 +1444,16 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendCommand(worker::Connect
 			return {TargetObject};
 		}
 
-		// Build request.
-		improbable::unreal::generated::UnrealServerDidHitRequest Request;
-		Request.set_field_hitinfo_location(improbable::Vector3f(StructuredParams.HitInfo.Location.X, StructuredParams.HitInfo.Location.Y, StructuredParams.HitInfo.Location.Z));
+		// Build RPC Payload.
+		improbable::unreal::generated::UnrealServerDidHitRequest RPCPayload;
+		{
+			TArray<uint8> ValueData;
+			FMemoryWriter ValueDataWriter(ValueData);
+			bool bSuccess = true;
+			(const_cast<FVector&>(StructuredParams.HitInfo.Location)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+			RPCPayload.set_field_hitinfo_location(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+		}
 		if (StructuredParams.HitInfo.HitActor != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.HitInfo.HitActor);
@@ -1382,27 +1465,35 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendCommand(worker::Connect
 			}
 			else
 			{
-				Request.set_field_hitinfo_hitactor(ObjectRef);
+				RPCPayload.set_field_hitinfo_hitactor(ObjectRef);
 			}
 		}
 		else
 		{
-			Request.set_field_hitinfo_hitactor(SpatialConstants::NULL_OBJECT_REF);
+			RPCPayload.set_field_hitinfo_hitactor(SpatialConstants::NULL_OBJECT_REF);
+		}
+		{
+			TArray<uint8> ValueData;
+			FMemoryWriter ValueDataWriter(ValueData);
+			bool bSuccess = true;
+			(const_cast<FDateTime&>(StructuredParams.HitInfo.Timestamp)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
+			RPCPayload.set_field_hitinfo_timestamp(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
-		// Send command request.
-		Request.set_target_subobject_offset(TargetObjectRef.offset());
+		// Send RPC
+		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerDidHit, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
-		auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>(TargetObjectRef.entity(), Request, 0);
-		return {RequestId.Id};
-	};
-	Interop->SendCommandRequest_Internal(Sender, /*bReliable*/ true);
-}
 
-void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op)
+			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>(TargetObjectRef.entity(), RPCPayload, 0);
+			return {RequestId.Id};
+	};
+	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
+}
+void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op)
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -1410,13 +1501,13 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const wor
 		FNetworkGUID TargetNetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(TargetObjectRef);
 		if (!TargetNetGUID.IsValid())
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidMiss_OnCommandRequest: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidMiss_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
 		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		checkf(TargetObject, TEXT("%s: ServerDidMiss_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		checkf(TargetObject, TEXT("%s: ServerDidMiss_OnRPCPayload: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
@@ -1427,10 +1518,13 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const wor
 
 		// Extract from request data.
 		{
-			auto& Vector = Op.Request.field_hitinfo_location();
-			Parameters.HitInfo.Location.X = Vector.x();
-			Parameters.HitInfo.Location.Y = Vector.y();
-			Parameters.HitInfo.Location.Z = Vector.z();
+			auto& ValueDataStr = Op.Request.field_hitinfo_location();
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FMemoryReader ValueDataReader(ValueData);
+			bool bSuccess = true;
+			Parameters.HitInfo.Location.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
 		}
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_hitinfo_hitactor();
@@ -1446,17 +1540,26 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const wor
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					Parameters.HitInfo.HitActor = Cast<AActor>(Object_Raw);
-					checkf(Parameters.HitInfo.HitActor, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidMiss_OnCommandRequest: Parameters.HitInfo.HitActor %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidMiss_OnRPCPayload: Parameters.HitInfo.HitActor %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
+		}
+		{
+			auto& ValueDataStr = Op.Request.field_hitinfo_timestamp();
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FMemoryReader ValueDataReader(ValueData);
+			bool bSuccess = true;
+			Parameters.HitInfo.Timestamp.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
 		}
 
 		// Call implementation.
@@ -1471,7 +1574,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const wor
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerDidMiss_OnCommandRequest: Function not found. Object: %s, Function: ServerDidMiss."),
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerDidMiss_OnRPCPayload: Function not found. Object: %s, Function: ServerDidMiss."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -1481,10 +1584,9 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandRequest(const wor
 		Connection->SendCommandResponse<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>(Op.RequestId, {});
 		return {};
 	};
-	Interop->SendCommandResponse_Internal(Receiver);
+	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-
-void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op)
+void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op)
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -1492,13 +1594,13 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const work
 		FNetworkGUID TargetNetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(TargetObjectRef);
 		if (!TargetNetGUID.IsValid())
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidHit_OnCommandRequest: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidHit_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
 		}
 		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		checkf(TargetObject, TEXT("%s: ServerDidHit_OnCommandRequest: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+		checkf(TargetObject, TEXT("%s: ServerDidHit_OnRPCPayload: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*ObjectRefToString(TargetObjectRef),
 			*TargetNetGUID.ToString());
@@ -1509,10 +1611,13 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const work
 
 		// Extract from request data.
 		{
-			auto& Vector = Op.Request.field_hitinfo_location();
-			Parameters.HitInfo.Location.X = Vector.x();
-			Parameters.HitInfo.Location.Y = Vector.y();
-			Parameters.HitInfo.Location.Z = Vector.z();
+			auto& ValueDataStr = Op.Request.field_hitinfo_location();
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FMemoryReader ValueDataReader(ValueData);
+			bool bSuccess = true;
+			Parameters.HitInfo.Location.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
 		}
 		{
 			improbable::unreal::UnrealObjectRef ObjectRef = Op.Request.field_hitinfo_hitactor();
@@ -1528,17 +1633,26 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const work
 				{
 					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					Parameters.HitInfo.HitActor = Cast<AActor>(Object_Raw);
-					checkf(Parameters.HitInfo.HitActor, TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidHit_OnCommandRequest: Parameters.HitInfo.HitActor %s is not resolved on this worker."),
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerDidHit_OnRPCPayload: Parameters.HitInfo.HitActor %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
 				}
 			}
+		}
+		{
+			auto& ValueDataStr = Op.Request.field_hitinfo_timestamp();
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FMemoryReader ValueDataReader(ValueData);
+			bool bSuccess = true;
+			Parameters.HitInfo.Timestamp.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
 		}
 
 		// Call implementation.
@@ -1553,7 +1667,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const work
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerDidHit_OnCommandRequest: Function not found. Object: %s, Function: ServerDidHit."),
+			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerDidHit_OnRPCPayload: Function not found. Object: %s, Function: ServerDidHit."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -1563,7 +1677,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandRequest(const work
 		Connection->SendCommandResponse<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>(Op.RequestId, {});
 		return {};
 	};
-	Interop->SendCommandResponse_Internal(Receiver);
+	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
 
 void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op)

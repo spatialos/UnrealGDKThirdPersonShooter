@@ -2,16 +2,17 @@
 // Note that this file has been generated automatically
 package improbable.unreal.generated;
 
-import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
 type UnrealServerDidMissRequest {
 	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_hitinfo_location = 2;
+	bytes field_hitinfo_location = 2;
 	UnrealObjectRef field_hitinfo_hitactor = 3;
+	bytes field_hitinfo_timestamp = 4;
 }
 type UnrealServerDidHitRequest {
 	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_hitinfo_location = 2;
+	bytes field_hitinfo_location = 2;
 	UnrealObjectRef field_hitinfo_hitactor = 3;
+	bytes field_hitinfo_timestamp = 4;
 }
