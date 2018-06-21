@@ -12,17 +12,9 @@ UCLASS(config=Game)
 class ASampleGameCharacter : public ACharacter
 {
 	GENERATED_BODY()
-		
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
 
 public:
-	ASampleGameCharacter();
+	ASampleGameCharacter(const FObjectInitializer& ObjectInitializer);
 
 	virtual void BeginPlay() override;
 
@@ -30,6 +22,11 @@ public:
 
 	/** [client] perform PlayerState related setup */
 	virtual void OnRep_PlayerState() override;
+	/** Returns CameraBoom subobject **/
+	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
+
+	/** Returns FollowCamera subobject **/
+	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
@@ -59,6 +56,10 @@ protected:
 	 */
 	void LookUpAtRate(float Rate);
 
+	void StartSprinting();
+
+	void StopSprinting();
+
 public:
 	// Returns a position from which to start a line trace.
 	// Use this so your line trace doesn't collide with the player character.
@@ -78,6 +79,9 @@ public:
 	{
 		return MaxHealth;
 	}
+
+	UFUNCTION(BlueprintPure, Category = "Movement")
+	bool IsSprinting();
 
 protected:
 	// APawn interface
@@ -152,14 +156,6 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
 
-public:
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns FollowCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
-
-	/// Team Color Materials for Pawn
-	// TODO jamcrow - Move all of these pointers over a team object, or other proper container during a future iteration
 protected:
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
 	UMaterialInstance* NoneTeamMaterial;
@@ -189,5 +185,12 @@ public:
 	/// Change the color of this character to match their chosen team
 	UFUNCTION()
 	void SetTeamColor();
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera;
 };
 
