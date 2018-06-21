@@ -14,6 +14,7 @@
 #include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
+#include "SGCharacterMovementComponent.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
 #include "Weapons/Weapon.h"
@@ -22,7 +23,8 @@
 //////////////////////////////////////////////////////////////////////////
 // ASampleGameCharacter
 
-ASampleGameCharacter::ASampleGameCharacter()
+ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<USGCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	// Hack to ensure that the game state is created and set to tick on a client as we don't replicate it
 	UWorld* World = GetWorld();
@@ -126,6 +128,9 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 	PlayerInputComponent->BindAxis("TurnRate", this, &ASampleGameCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ASampleGameCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction("Sprint", IE_Pressed, this, &ASampleGameCharacter::StartSprinting);
+	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ASampleGameCharacter::StopSprinting);
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ASampleGameCharacter::Interact);
 	PlayerInputComponent->BindAction("SpawnCube", IE_Pressed, this, &ASampleGameCharacter::SpawnCube);
@@ -388,6 +393,29 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 	return DamageDealt;
 }
 
+bool ASampleGameCharacter::IsSprinting()
+{
+	USGCharacterMovementComponent* Movement = Cast<USGCharacterMovementComponent>(GetCharacterMovement());
+	if (Movement == nullptr)
+	{
+		return false;
+	}
+
+	if (Role >= ROLE_AutonomousProxy)
+	{
+		// If we're authoritative or the owning client, we know definitively whether we're sprinting.
+		return Movement->IsSprinting();
+	}
+
+	// For all other client types, we need to guess based on speed.
+	// Add a tolerance factor to the max jog speed and use that as a sprint threshold.
+	float SquaredSprintThreshold = Movement->MaxWalkSpeed + 10.0f;
+	SquaredSprintThreshold *= SquaredSprintThreshold;
+
+	// We only care about speed in the X-Y plane.
+	return GetVelocity().SizeSquared2D() > SquaredSprintThreshold;
+}
+
 void ASampleGameCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -398,6 +426,22 @@ void ASampleGameCharacter::LookUpAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
+}
+
+void ASampleGameCharacter::StartSprinting()
+{
+	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
+	{
+		MovementComponent->SetWantsToSprint(true);
+	}
+}
+
+void ASampleGameCharacter::StopSprinting()
+{
+	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
+	{
+		MovementComponent->SetWantsToSprint(false);
+	}
 }
 
 void ASampleGameCharacter::MoveForward(float Value)
