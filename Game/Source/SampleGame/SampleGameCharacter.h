@@ -159,30 +159,31 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	/// Team Color Materials for Pawn
+	// TODO jamcrow - Move all of these pointers over a team object, or other proper container during a future iteration
 protected:
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* NoneTeamMaterial;
+	UMaterialInstance* NoneTeamMaterial;
 
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* RedTeamMaterial;
+	UMaterialInstance* RedTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* GreenTeamMaterial;
+	UMaterialInstance* GreenTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* BlueTeamMaterial;
+	UMaterialInstance* BlueTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* YellowTeamMaterial;
+	UMaterialInstance* YellowTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* PurpleTeamMaterial;
+	UMaterialInstance* PurpleTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* BlackTeamMaterial;
+	UMaterialInstance* BlackTeamMaterial;
 	
 	UPROPERTY(EditAnywhere, Category = "Team Appearance")
-	UMaterial* WhiteTeamMaterial;
+	UMaterialInstance* WhiteTeamMaterial;
 
 public:
 	/// Change the color of this character to match their chosen team

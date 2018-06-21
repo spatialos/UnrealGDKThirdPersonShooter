@@ -74,7 +74,6 @@ void ASampleGamePlayerController::KillCharacter()
 
 void ASampleGamePlayerController::InternalKillCharacter(float DeleteCharacterDelayOverride)
 {
-	/// HACK to circumvent current GDK bug where Destroy() calls are not properly rep'd from server to client (uncomment this line to remove hack)
 	check(GetNetMode() == NM_DedicatedServer);
 
 	if (!HasAuthority())
@@ -186,6 +185,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 	check(PlayerState->IsA(ASampleGamePlayerState::StaticClass()));
 
 	bool bJoinWasSuccessful = true;
+
 	// TODO jamcrow - Validate the join request
 
 	/// Inform Client as to whether or not join was accepted
@@ -198,6 +198,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 		/// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
 		((ASampleGamePlayerState*)PlayerState)->SetSelectedTeamFromEnum(NewPlayerTeam);
+
 		// TODO jamcrow - Other team stuff?  Other player choices?
 
 		/// Spawn the Pawn
@@ -254,21 +255,9 @@ void ASampleGamePlayerController::DeleteCharacter()
 	}
 }
 
-
 void ASampleGamePlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
-
-	/// HACK to circumvent current GDK bug where Destroy() calls are not properly rep'd from server to client (uncomment this line to remove hack)
-	//if (GetNetMode() == NM_DedicatedServer)
-	//{
-	//	/// HACK - Since SpatialOS automatically spawns the Character on connection (which is not desired behavior), we kill it right away as a temporary workaround
-	//	if (GetCharacter() != nullptr && !bHasKilledDefaultPawn)
-	//	{
-	//		bHasKilledDefaultPawn = true;
-	//		InternalKillCharacter(0.0f);
-	//	}
-	//}
 
 	/// HACK because sometimes (often?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
 	if (LoginUIWidgetTemplate != nullptr)

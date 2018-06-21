@@ -88,7 +88,6 @@ private:
 public:
 	virtual void Tick(float DeltaSeconds) override;
 private:
-	bool bHasKilledDefaultPawn = false;
 	bool bHasShownLoginHud = false;
 	bool bHasSubmittedLoginOptions = false;
 ///=================================================///
