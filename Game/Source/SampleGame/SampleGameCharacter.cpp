@@ -11,7 +11,6 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
-#include "Kismet/KismetMathLibrary.h"
 #include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
@@ -75,6 +74,8 @@ ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectIniti
 	bIsRagdoll = false;
 	AimYaw = 0.0f;
 	AimPitch = 0.0f;
+	LocalAimUpdateThreshold = 0.01f;
+	RemoteAimUpdateThreshold = 2.0f;
 }
 
 void ASampleGameCharacter::BeginPlay()
@@ -116,10 +117,13 @@ void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
 
 void ASampleGameCharacter::Tick(float DeltaSeconds)
 {
-	if (Role >= ROLE_AutonomousProxy)
+	if (Role == ROLE_Authority)
 	{
-		// TODO: rate-limit this
-		UpdateAimRotation();
+		UpdateAimRotation(RemoteAimUpdateThreshold);
+	}
+	else if (Role == ROLE_AutonomousProxy)
+	{
+		UpdateAimRotation(LocalAimUpdateThreshold);
 	}
 }
 
@@ -326,11 +330,21 @@ void ASampleGameCharacter::StartRagdoll()
 	}
 }
 
-void ASampleGameCharacter::UpdateAimRotation()
+void ASampleGameCharacter::UpdateAimRotation(float AngleUpdateThreshold)
 {
-	FRotator AimDelta = UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation());
-	AimYaw = UKismetMathLibrary::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
-	AimPitch = UKismetMathLibrary::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+	FRotator AimDelta = GetControlRotation() - GetActorRotation();
+	AimDelta.Normalize();
+	float NewAimYaw = FMath::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
+	float NewAimPitch = FMath::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+
+	if (FMath::Abs(NewAimYaw - AimYaw) > AngleUpdateThreshold)
+	{
+		AimYaw = FMath::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
+	}
+	if (FMath::Abs(NewAimPitch - AimPitch) > AngleUpdateThreshold)
+	{
+		AimPitch = FMath::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+	}
 }
 
 float ASampleGameCharacter::GetAimYaw()

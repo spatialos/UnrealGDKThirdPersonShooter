@@ -117,8 +117,10 @@ private:
 	// [client + server] Puts the player in ragdoll mode.
 	void StartRagdoll();
 
-	// [server] Updates the aim variables to be sync-ed out to clients.
-	void UpdateAimRotation();
+	// [owning client + server] Updates the aim variables to be sync-ed out to clients, or updates the values locally
+	// if we're executing on the owning client.
+	// Will only update the angles if they differ from the current stored value by more than AimUpdateThreshold.
+	void UpdateAimRotation(float AimUpdateThreshold);
 
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
@@ -165,12 +167,22 @@ private:
 	bool bIsRagdoll;
 
 	// Used for telling clients where the player should appear to be looking.
-	UPROPERTY(VisibleAnywhere, Replicated)
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "Aim")
 	float AimYaw;
 
 	// Used for telling clients where the player should appear to be looking.
-	UPROPERTY(VisibleAnywhere, Replicated)
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "Aim")
 	float AimPitch;
+
+	// If the aim offset angles change more than this threshold, update our local aim offset values (only applies on the owning client).
+	// Value is in degrees.
+	UPROPERTY(EditDefaultsOnly, Category = "Aim")
+	float LocalAimUpdateThreshold;
+
+	// If the aim offset angles change more than this threshold, update our replicated aim offset values.
+	// Value is in degrees.
+	UPROPERTY(EditDefaultsOnly, Category = "Aim")
+	float RemoteAimUpdateThreshold;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
