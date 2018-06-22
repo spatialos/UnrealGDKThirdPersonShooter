@@ -11,6 +11,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
@@ -72,6 +73,8 @@ ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectIniti
 	MaxHealth = 100;
 	CurrentHealth = 0;
 	bIsRagdoll = false;
+	AimYaw = 0.0f;
+	AimPitch = 0.0f;
 }
 
 void ASampleGameCharacter::BeginPlay()
@@ -111,6 +114,15 @@ void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
 	}
 }
 
+void ASampleGameCharacter::Tick(float DeltaSeconds)
+{
+	if (Role >= ROLE_AutonomousProxy)
+	{
+		// TODO: rate-limit this
+		UpdateAimRotation();
+	}
+}
+
 void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)
 {
 	// Set up gameplay key bindings
@@ -146,6 +158,10 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
 	DOREPLIFETIME(ASampleGameCharacter, bIsRagdoll);
+
+	// Skip the owner here because we're updating the values locally on the owning client.
+	DOREPLIFETIME_CONDITION(ASampleGameCharacter, AimYaw, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ASampleGameCharacter, AimPitch, COND_SkipOwner);
 
 	// Only replicate health to the owning client.
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
@@ -308,6 +324,23 @@ void ASampleGameCharacter::StartRagdoll()
 		CameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
 		CameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
 	}
+}
+
+void ASampleGameCharacter::UpdateAimRotation()
+{
+	FRotator AimDelta = UKismetMathLibrary::NormalizedDeltaRotator(GetControlRotation(), GetActorRotation());
+	AimYaw = UKismetMathLibrary::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
+	AimPitch = UKismetMathLibrary::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+}
+
+float ASampleGameCharacter::GetAimYaw()
+{
+	return AimYaw;
+}
+
+float ASampleGameCharacter::GetAimPitch()
+{
+	return AimPitch;
 }
 
 AWeapon* ASampleGameCharacter::GetEquippedWeapon() const

@@ -19,6 +19,8 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
+	virtual void Tick(float DeltaSeconds) override;
+
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -80,6 +82,12 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Movement")
 	bool IsSprinting();
 
+	UFUNCTION(BlueprintPure, Category = "Aim")
+	float GetAimYaw();
+
+	UFUNCTION(BlueprintPure, Category = "Aim")
+	float GetAimPitch();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -108,6 +116,9 @@ private:
 
 	// [client + server] Puts the player in ragdoll mode.
 	void StartRagdoll();
+
+	// [server] Updates the aim variables to be sync-ed out to clients.
+	void UpdateAimRotation();
 
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
@@ -152,6 +163,14 @@ private:
 	// If true, the character is currently ragdoll-ing.
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
+
+	// Used for telling clients where the player should appear to be looking.
+	UPROPERTY(VisibleAnywhere, Replicated)
+	float AimYaw;
+
+	// Used for telling clients where the player should appear to be looking.
+	UPROPERTY(VisibleAnywhere, Replicated)
+	float AimPitch;
 
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))

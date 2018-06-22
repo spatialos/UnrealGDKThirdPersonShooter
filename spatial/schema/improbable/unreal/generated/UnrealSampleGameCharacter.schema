@@ -55,6 +55,8 @@ component UnrealSampleGameCharacterMultiClientRepData {
 	bytes field_reprootmotion_linearvelocity = 43; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
 	UnrealObjectRef field_equippedweapon = 44; // COND_None // ::SampleGameCharacter
 	bool field_bisragdoll = 45; // COND_None // ::SampleGameCharacter
+	float field_aimyaw = 46; // COND_SkipOwner // ::SampleGameCharacter
+	float field_aimpitch = 47; // COND_SkipOwner // ::SampleGameCharacter
 }
 component UnrealSampleGameCharacterMigratableData {
 	id = 100024;
