@@ -101,20 +101,6 @@ void ASampleGameCharacter::BeginPlay()
 	}
 }
 
-void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
-{
-	Super::EndPlay(Reason);
-
-	if (HasAuthority())
-	{
-		// Destroy weapon actor.
-		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
-		{
-			GetWorld()->DestroyActor(EquippedWeapon);
-		}
-	}
-}
-
 void ASampleGameCharacter::Tick(float DeltaSeconds)
 {
 	if (Role == ROLE_Authority)
@@ -264,6 +250,12 @@ void ASampleGameCharacter::Die()
 		if (PC)
 		{
 			PC->KillCharacter();
+		}
+
+		// Destroy weapon actor if there is one.
+		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
+		{
+			GetWorld()->DestroyActor(EquippedWeapon);
 		}
 
 		bIsRagdoll = true;
