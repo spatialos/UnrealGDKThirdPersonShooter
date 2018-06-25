@@ -1,26 +1,25 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated;
+package improbable.unreal.generated.playercontroller;
 
-import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
-type UnrealOnServerStartedVisualLoggerRequest {
+type OnServerStartedVisualLoggerRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bislogging = 2;
 }
-type UnrealClientWasKickedRequest {
+type ClientWasKickedRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_kickreason = 2;
 }
-type UnrealClientVoiceHandshakeCompleteRequest {
+type ClientVoiceHandshakeCompleteRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientUpdateMultipleLevelsStreamingStatusRequest {
+type ClientUpdateMultipleLevelsStreamingStatusRequest {
 	uint32 target_subobject_offset = 1;
 	list<bytes> field_levelstatuses = 2;
 }
-type UnrealClientUpdateLevelStreamingStatusRequest {
+type ClientUpdateLevelStreamingStatusRequest {
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bnewshouldbeloaded = 3;
@@ -28,11 +27,11 @@ type UnrealClientUpdateLevelStreamingStatusRequest {
 	bool field_bnewshouldblockonload = 5;
 	int32 field_lodindex = 6;
 }
-type UnrealClientUnmutePlayerRequest {
+type ClientUnmutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealClientTravelInternalRequest {
+type ClientTravelInternalRequest {
 	uint32 target_subobject_offset = 1;
 	string field_url = 2;
 	uint32 field_traveltype = 3;
@@ -42,35 +41,35 @@ type UnrealClientTravelInternalRequest {
 	int32 field_mappackageguid_c = 7;
 	int32 field_mappackageguid_d = 8;
 }
-type UnrealClientTeamMessageRequest {
+type ClientTeamMessageRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_senderplayerstate = 2;
 	string field_s = 3;
 	string field_type = 4;
 	float field_msglifetime = 5;
 }
-type UnrealClientStopForceFeedbackRequest {
+type ClientStopForceFeedbackRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcefeedbackeffect = 2;
 	string field_tag = 3;
 }
-type UnrealClientStopCameraShakeRequest {
+type ClientStopCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_shake = 2;
 	bool field_bimmediately = 3;
 }
-type UnrealClientStopCameraAnimRequest {
+type ClientStopCameraAnimRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_animtostop = 2;
 }
-type UnrealClientStartOnlineSessionRequest {
+type ClientStartOnlineSessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientSpawnCameraLensEffectRequest {
+type ClientSpawnCameraLensEffectRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_lenseffectemitterclass = 2;
 }
-type UnrealClientSetViewTargetRequest {
+type ClientSetViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_a = 2;
 	float field_transitionparams_blendtime = 3;
@@ -78,70 +77,69 @@ type UnrealClientSetViewTargetRequest {
 	float field_transitionparams_blendexp = 5;
 	bool field_transitionparams_blockoutgoing = 6;
 }
-type UnrealClientSetSpectatorWaitingRequest {
+type ClientSetSpectatorWaitingRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bwaiting = 2;
 }
-type UnrealClientSetHUDRequest {
+type ClientSetHUDRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_newhudclass = 2;
 }
-type UnrealClientSetForceMipLevelsToBeResidentRequest {
+type ClientSetForceMipLevelsToBeResidentRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_material = 2;
 	float field_forceduration = 3;
 	int32 field_cinematictexturegroups = 4;
 }
-type UnrealClientSetCinematicModeRequest {
+type ClientSetCinematicModeRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bincinematicmode = 2;
 	bool field_baffectsmovement = 3;
 	bool field_baffectsturning = 4;
 	bool field_baffectshud = 5;
 }
-type UnrealClientSetCameraModeRequest {
+type ClientSetCameraModeRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newcammode = 2;
 }
-type UnrealClientSetCameraFadeRequest {
+type ClientSetCameraFadeRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_benablefading = 2;
 	uint32 field_fadecolor_b = 3;
 	uint32 field_fadecolor_g = 4;
 	uint32 field_fadecolor_r = 5;
 	uint32 field_fadecolor_a = 6;
-	float field_fadealpha_x = 7;
-	float field_fadealpha_y = 8;
-	float field_fadetime = 9;
-	bool field_bfadeaudio = 10;
+	bytes field_fadealpha = 7;
+	float field_fadetime = 8;
+	bool field_bfadeaudio = 9;
 }
-type UnrealClientSetBlockOnAsyncLoadingRequest {
+type ClientSetBlockOnAsyncLoadingRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientReturnToMainMenuWithTextReasonRequest {
+type ClientReturnToMainMenuWithTextReasonRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_returnreason = 2;
 }
-type UnrealClientReturnToMainMenuRequest {
+type ClientReturnToMainMenuRequest {
 	uint32 target_subobject_offset = 1;
 	string field_returnreason = 2;
 }
-type UnrealClientRetryClientRestartRequest {
+type ClientRetryClientRestartRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_newpawn = 2;
 }
-type UnrealClientRestartRequest {
+type ClientRestartRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_newpawn = 2;
 }
-type UnrealClientResetRequest {
+type ClientResetRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientRepObjRefRequest {
+type ClientRepObjRefRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_object = 2;
 }
-type UnrealClientReceiveLocalizedMessageRequest {
+type ClientReceiveLocalizedMessageRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_message = 2;
 	int32 field_switch = 3;
@@ -149,47 +147,47 @@ type UnrealClientReceiveLocalizedMessageRequest {
 	UnrealObjectRef field_relatedplayerstate2 = 5;
 	UnrealObjectRef field_optionalobject = 6;
 }
-type UnrealClientPrestreamTexturesRequest {
+type ClientPrestreamTexturesRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcedactor = 2;
 	float field_forceduration = 3;
 	bool field_benablestreaming = 4;
 	int32 field_cinematictexturegroups = 5;
 }
-type UnrealClientPrepareMapChangeRequest {
+type ClientPrepareMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 	string field_levelname = 2;
 	bool field_bfirst = 3;
 	bool field_blast = 4;
 }
-type UnrealClientPlaySoundAtLocationRequest {
+type ClientPlaySoundAtLocationRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_sound = 2;
-	improbable.Vector3f field_location = 3;
+	bytes field_location = 3;
 	float field_volumemultiplier = 4;
 	float field_pitchmultiplier = 5;
 }
-type UnrealClientPlaySoundRequest {
+type ClientPlaySoundRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_sound = 2;
 	float field_volumemultiplier = 3;
 	float field_pitchmultiplier = 4;
 }
-type UnrealClientPlayForceFeedbackRequest {
+type ClientPlayForceFeedbackRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_forcefeedbackeffect = 2;
 	bool field_blooping = 3;
 	bool field_bignoretimedilation = 4;
 	string field_tag = 5;
 }
-type UnrealClientPlayCameraShakeRequest {
+type ClientPlayCameraShakeRequest {
 	uint32 target_subobject_offset = 1;
 	uint32 field_shake = 2;
 	float field_scale = 3;
 	uint32 field_playspace = 4;
-	UnrealFRotator field_userplayspacerot = 5;
+	bytes field_userplayspacerot = 5;
 }
-type UnrealClientPlayCameraAnimRequest {
+type ClientPlayCameraAnimRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_animtoplay = 2;
 	float field_scale = 3;
@@ -199,145 +197,145 @@ type UnrealClientPlayCameraAnimRequest {
 	bool field_bloop = 7;
 	bool field_brandomstarttime = 8;
 	uint32 field_space = 9;
-	UnrealFRotator field_customplayspace = 10;
+	bytes field_customplayspace = 10;
 }
-type UnrealClientMutePlayerRequest {
+type ClientMutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealClientMessageRequest {
+type ClientMessageRequest {
 	uint32 target_subobject_offset = 1;
 	string field_s = 2;
 	string field_type = 3;
 	float field_msglifetime = 4;
 }
-type UnrealClientIgnoreMoveInputRequest {
+type ClientIgnoreMoveInputRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bignore = 2;
 }
-type UnrealClientIgnoreLookInputRequest {
+type ClientIgnoreLookInputRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bignore = 2;
 }
-type UnrealClientGotoStateRequest {
+type ClientGotoStateRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newstate = 2;
 }
-type UnrealClientGameEndedRequest {
+type ClientGameEndedRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_endgamefocus = 2;
 	bool field_biswinner = 3;
 }
-type UnrealClientForceGarbageCollectionRequest {
+type ClientForceGarbageCollectionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientFlushLevelStreamingRequest {
+type ClientFlushLevelStreamingRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientEndOnlineSessionRequest {
+type ClientEndOnlineSessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientEnableNetworkVoiceRequest {
+type ClientEnableNetworkVoiceRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_benable = 2;
 }
-type UnrealClientCommitMapChangeRequest {
+type ClientCommitMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientClearCameraLensEffectsRequest {
+type ClientClearCameraLensEffectsRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientCapBandwidthRequest {
+type ClientCapBandwidthRequest {
 	uint32 target_subobject_offset = 1;
 	int32 field_cap = 2;
 }
-type UnrealClientCancelPendingMapChangeRequest {
+type ClientCancelPendingMapChangeRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealClientAddTextureStreamingLocRequest {
+type ClientAddTextureStreamingLocRequest {
 	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_inloc = 2;
+	bytes field_inloc = 2;
 	float field_duration = 3;
 	bool field_boverridelocation = 4;
 }
-type UnrealServerViewSelfRequest {
+type ServerViewSelfRequest {
 	uint32 target_subobject_offset = 1;
 	float field_transitionparams_blendtime = 2;
 	uint32 field_transitionparams_blendfunction = 3;
 	float field_transitionparams_blendexp = 4;
 	bool field_transitionparams_blockoutgoing = 5;
 }
-type UnrealServerViewPrevPlayerRequest {
+type ServerViewPrevPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerViewNextPlayerRequest {
+type ServerViewNextPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerVerifyViewTargetRequest {
+type ServerVerifyViewTargetRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerUpdateMultipleLevelsVisibilityRequest {
+type ServerUpdateMultipleLevelsVisibilityRequest {
 	uint32 target_subobject_offset = 1;
 	list<bytes> field_levelvisibilities = 2;
 }
-type UnrealServerUpdateLevelVisibilityRequest {
+type ServerUpdateLevelVisibilityRequest {
 	uint32 target_subobject_offset = 1;
 	string field_packagename = 2;
 	bool field_bisvisible = 3;
 }
-type UnrealServerUpdateCameraRequest {
+type ServerUpdateCameraRequest {
 	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_camloc = 2;
+	bytes field_camloc = 2;
 	int32 field_campitchandyaw = 3;
 }
-type UnrealServerUnmutePlayerRequest {
+type ServerUnmutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealServerToggleAILoggingRequest {
+type ServerToggleAILoggingRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerShortTimeoutRequest {
+type ServerShortTimeoutRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerSetSpectatorWaitingRequest {
+type ServerSetSpectatorWaitingRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bwaiting = 2;
 }
-type UnrealServerSetSpectatorLocationRequest {
+type ServerSetSpectatorLocationRequest {
 	uint32 target_subobject_offset = 1;
-	improbable.Vector3f field_newloc = 2;
-	UnrealFRotator field_newrot = 3;
+	bytes field_newloc = 2;
+	bytes field_newrot = 3;
 }
-type UnrealServerRestartPlayerRequest {
-	uint32 target_subobject_offset = 1;
-}
-type UnrealServerPauseRequest {
+type ServerRestartPlayerRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerNotifyLoadedWorldRequest {
+type ServerPauseRequest {
+	uint32 target_subobject_offset = 1;
+}
+type ServerNotifyLoadedWorldRequest {
 	uint32 target_subobject_offset = 1;
 	string field_worldpackagename = 2;
 }
-type UnrealServerMutePlayerRequest {
+type ServerMutePlayerRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_playerid = 2;
 }
-type UnrealServerCheckClientPossessionReliableRequest {
+type ServerCheckClientPossessionReliableRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerCheckClientPossessionRequest {
+type ServerCheckClientPossessionRequest {
 	uint32 target_subobject_offset = 1;
 }
-type UnrealServerChangeNameRequest {
+type ServerChangeNameRequest {
 	uint32 target_subobject_offset = 1;
 	string field_s = 2;
 }
-type UnrealServerCameraRequest {
+type ServerCameraRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newmode = 2;
 }
-type UnrealServerAcknowledgePossessionRequest {
+type ServerAcknowledgePossessionRequest {
 	uint32 target_subobject_offset = 1;
 	UnrealObjectRef field_p = 2;
 }
