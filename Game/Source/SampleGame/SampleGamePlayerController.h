@@ -33,25 +33,22 @@ public:
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
 
-	// [client] Sets whether or not the login UI should be visible.
-	void SetLoginUIVisible(bool bIsVisible);
-
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
-	UFUNCTION(Server, Reliable, WitHValidation)
+	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 private:
-	UFUNCTION(Client, Reliable, WithValidation)
+	UFUNCTION(Client, Reliable)
 	void ClientJoinResults(const bool bJoinSucceeded);
-
-	// [server] Performs the actual logic for player character death only ; no respawn logic.
-	void InternalKillCharacter(float DeleteCharacterDelayOverride);
 
 	// [server] Causes the character to respawn.
 	void RespawnCharacter();
 
 	// [server] Deletes the character.
 	void DeleteCharacter();
+
+	// [client] Sets whether or not the login UI should be visible.
+	void SetLoginUIVisible(bool bIsVisible);
 
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
@@ -62,7 +59,7 @@ private:
 	class USampleGameUI* SampleGameUI;
 
 	// Login UI class template to load at player join.
-	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	UPROPERTY(EditDefaultsOnly, Category = "SampleGameUI")
 	TSubclassOf<class USampleGameLoginUI> LoginUIWidgetTemplate;
 
 	// The instance of the Login UI class to allow player choice interaction.
@@ -83,12 +80,12 @@ private:
 	FTimerHandle RespawnTimerHandle;
 	FTimerHandle DeleteCharacterTimerHandle;
 
-/// HACKs for login state and default spawn character
-///=================================================///
+// HACK for login state (Unreal issue, not GDK issue)
+//=================================================//
 public:
 	virtual void Tick(float DeltaSeconds) override;
 private:
 	bool bHasShownLoginHud = false;
 	bool bHasSubmittedLoginOptions = false;
-///=================================================///
+//=================================================//
 };

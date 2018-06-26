@@ -67,25 +67,12 @@ void ASampleGamePlayerController::KillCharacter()
 		return;
 	}
 
-	InternalKillCharacter(DeleteCharacterDelay);
-
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASampleGamePlayerController::RespawnCharacter, RespawnCharacterDelay);
-}
-
-void ASampleGamePlayerController::InternalKillCharacter(float DeleteCharacterDelayOverride)
-{
-	check(GetNetMode() == NM_DedicatedServer);
-
-	if (!HasAuthority())
-	{
-		return;
-	}
-
 	PawnToDelete = GetPawn();
 	UnPossess();
 
 	// TODO: timers won't persist across worker boundary migrations, and neither will PawnToDelete
-	GetWorldTimerManager().SetTimer(DeleteCharacterTimerHandle, this, &ASampleGamePlayerController::DeleteCharacter, DeleteCharacterDelayOverride);
+	GetWorldTimerManager().SetTimer(DeleteCharacterTimerHandle, this, &ASampleGamePlayerController::DeleteCharacter, DeleteCharacterDelay);
+	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ASampleGamePlayerController::RespawnCharacter, RespawnCharacterDelay);
 }
 
 void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
@@ -130,16 +117,15 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 
 void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 {
-	/// Lazy instantiate the Login UI
+	// Lazy instantiate the Login UI
 	if (SampleGameLoginUI == nullptr)
 	{
 		check(LoginUIWidgetTemplate != nullptr);
 		SampleGameLoginUI = CreateWidget<USampleGameLoginUI>(this, LoginUIWidgetTemplate);
 		
-		/// Early out - Error case
+		// Early out - Error case
 		if (SampleGameLoginUI == nullptr)
 		{
-			// TODO jamcrow - Put some sort of check here or macro to deal with cases where networking has been switched to something other than SpatialOS?
 			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
 			UE_LOG(LogSampleGame, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
 				*this->GetName(),
@@ -149,7 +135,7 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 		}
 	}
 
-	/// Early out - If our visibility state is already set to the requested value, do nothing
+	// Early out - If our visibility state is already set to the requested value, do nothing
 	if (SampleGameLoginUI->IsVisible() == bIsVisible)
 	{
 		return;
@@ -157,20 +143,20 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 
 	if (bIsVisible)
 	{
-		/// Show the Login UI
+		// Show the Login UI
 		SampleGameLoginUI->AddToViewport();
-		/// You tell that UI Widget who's boss...
+		// You tell that UI Widget who's boss... (the UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections)
 		SampleGameLoginUI->SetOwnerPlayerController(this);
-		/// Set Mouse Cursor to SHOW, and only interact with the UI
+		// Set Mouse Cursor to SHOW, and only interact with the UI
 		bShowMouseCursor = true;
 		SetIgnoreLookInput(true);
 		SetIgnoreMoveInput(true);
 	}
 	else
 	{
-		/// Hide the Login UI
+		// Hide the Login UI
 		SampleGameLoginUI->RemoveFromViewport();
-		/// Hide the Mouse Cursor, restore Look and Move control
+		// Hide the Mouse Cursor, restore Look and Move control
 		bShowMouseCursor = false;
 		SetIgnoreLookInput(false);
 		SetIgnoreMoveInput(false);
@@ -179,29 +165,30 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
-	check(GetNetMode() == NM_DedicatedServer);
-	check(!bHasSubmittedLoginOptions);
-	check(PlayerState != nullptr);
-	check(PlayerState->IsA(ASampleGamePlayerState::StaticClass()));
-
 	bool bJoinWasSuccessful = true;
 
-	// TODO jamcrow - Validate the join request
+	// Validate the join request
+	if (bHasSubmittedLoginOptions
+		|| PlayerState == nullptr
+		|| !PlayerState->IsA(ASampleGamePlayerState::StaticClass()))
+	{
+		bJoinWasSuccessful = false;
 
-	/// Inform Client as to whether or not join was accepted
+		// TODO: jamescrowder - Log an error reporting the reason our join was not successful
+	}	
+
+	// Inform Client as to whether or not join was accepted
 	ClientJoinResults(bJoinWasSuccessful);
 	
 	if (bJoinWasSuccessful)
 	{
 		bHasSubmittedLoginOptions = true;
 
-		/// Set the player-selected values
+		// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
-		((ASampleGamePlayerState*)PlayerState)->SetSelectedTeamFromEnum(NewPlayerTeam);
+		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeamFromEnum(NewPlayerTeam);
 
-		// TODO jamcrow - Other team stuff?  Other player choices?
-
-		/// Spawn the Pawn
+		// Spawn the Pawn
 		RespawnCharacter();
 	}
 
@@ -214,7 +201,6 @@ bool ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewP
 
 void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJoinSucceeded)
 {
-	check(GetNetMode() == NM_Client);
 	check(SampleGameLoginUI != nullptr);
 
 	if (bJoinSucceeded)
@@ -226,11 +212,6 @@ void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJ
 	{
 		SampleGameLoginUI->JoinGameWasRejected();
 	}
-}
-
-bool ASampleGamePlayerController::ClientJoinResults_Validate(const bool bJoinSucceeded)
-{
-	return true;
 }
 
 void ASampleGamePlayerController::RespawnCharacter()
@@ -259,14 +240,14 @@ void ASampleGamePlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	/// HACK because sometimes (often?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
-	if (LoginUIWidgetTemplate != nullptr)
+	// HACK because sometimes (often?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
+	// This appears to be an Unreal issue, not a GDK issue, as I ran into this in Vanilla Shooter as well.
+	if (LoginUIWidgetTemplate != nullptr
+		&& GetNetMode() == NM_Client
+		&& Role == ROLE_AutonomousProxy
+		&& !bHasShownLoginHud)
 	{
-		if (GetNetMode() == NM_Client && Role == ROLE_AutonomousProxy && !bHasShownLoginHud)
-		{
-			bHasShownLoginHud = true;
-			/// PLAYER LOGIN UI
-			SetLoginUIVisible(true);
-		}
+		bHasShownLoginHud = true;
+		SetLoginUIVisible(true);
 	}
 }

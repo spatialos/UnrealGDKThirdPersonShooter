@@ -2,15 +2,21 @@
 #include "SampleGameLoginUI.h"
 #include "SampleGamePlayerController.h"
 
+
+USampleGameLoginUI::USampleGameLoginUI(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer), PlayerController(nullptr)
+{
+}
+
 void USampleGameLoginUI::OnJoinGameButtonClicked() const
 {
 	check(PlayerController != nullptr)
 
-	/// Update PlayerController, PlayerState, etc
+	// Inform PlayerController, update PlayerState, etc
 	PlayerController->ServerTryJoinGame(PlayerName.ToString(), TeamId);
 }
 
 void USampleGameLoginUI::JoinGameWasRejected()
 {
-	// TODO jamcrow - Write validation failure code here.  Indicate which field(s) were the reason for rejection.
+	// TODO: jamescrowder - Write validation failure code here.  Indicate which field(s) were the reason for rejection.
 }

@@ -17,6 +17,7 @@
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 #include "SampleGamePlayerState.h"
+#include "SampleGameTeams.h"
 
 #include "UnrealSampleGamePlayerStateSingleClientRepDataAddComponentOp.h"
 #include "UnrealSampleGamePlayerStateMultiClientRepDataAddComponentOp.h"
@@ -611,9 +612,9 @@ void USpatialTypeBinding_SampleGamePlayerState::ServerSendUpdate_MultiClient(con
 		}
 		case 27: // field_selectedteam
 		{
-			uint8 Value = *(reinterpret_cast<uint8 const*>(Data));
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(Data));
 
-			OutUpdate.set_field_selectedteam(uint32_t(Value));
+			OutUpdate.set_field_selectedteam(uint32(Value));
 			break;
 		}
 	default:
@@ -1409,9 +1410,9 @@ void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_MultiClient(USpati
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
-			uint8 Value = *(reinterpret_cast<uint8 const*>(PropertyData));
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(PropertyData));
 
-			Value = uint8(uint8((*Update.field_selectedteam().data())));
+			Value = ESampleGameTeam((*Update.field_selectedteam().data()));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 

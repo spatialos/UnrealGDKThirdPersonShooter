@@ -102,6 +102,13 @@ void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
 {
 	Super::EndPlay(Reason);
 
+	// Unregister from updates to our selected team appearance in PlayerState
+	ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+	if (SampleGamePlayerState != nullptr)
+	{
+		SampleGamePlayerState->UnregisterCharacterListenerForSelectedTeam();
+	}
+
 	if (HasAuthority())
 	{
 		// Destroy weapon actor.
@@ -116,25 +123,23 @@ void ASampleGameCharacter::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
 	
-	/// Update colors only on Clients
+	// Update colors only on Clients
 	if (GetNetMode() == NM_Client)
 	{
-		if (PlayerState != nullptr && PlayerState->IsA(ASampleGamePlayerState::StaticClass()))
+		ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+		if (SampleGamePlayerState != nullptr)
 		{
-			ASampleGamePlayerState* SampleGamePlayerState = (ASampleGamePlayerState*)PlayerState;
-
-			/// Register for updates to our selected team appearance from our PlayerState (switch teams mid-match? Powerup that fools everyone into thinking you're on their team?  Etc?)
+			// Register for updates to our selected team appearance from our PlayerState
 			SampleGamePlayerState->RegisterCharacterListenerForSelectedTeam(this);
 
-			/// Attempt to set the team using whatever value is current in PlayerState (will check for ESampleGameTeam::Team_None and ignore)
-			SetTeamColor();
+			// Attempt to set the team using whatever value is current in PlayerState (will check for ESampleGameTeam::Team_None and ignore)
+			UpdateTeamColor();
 		}
 	}
 }
 
-void ASampleGameCharacter::SetTeamColor()
+void ASampleGameCharacter::UpdateTeamColor()
 {
-	/// Hack - Remove the following 'check' lines once materials are switched to dynamic instances
 	check(NoneTeamMaterial != nullptr);
 	check(RedTeamMaterial != nullptr);
 	check(GreenTeamMaterial != nullptr);
@@ -144,12 +149,11 @@ void ASampleGameCharacter::SetTeamColor()
 	check(BlackTeamMaterial != nullptr);
 	check(WhiteTeamMaterial != nullptr);
 
-	// TODO jamcrow - Switch static material sets to dynamic instances instead
-	if (PlayerState != nullptr && PlayerState->IsA(ASampleGamePlayerState::StaticClass()))
+	ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+	if (SampleGamePlayerState != nullptr)
 	{
 		USkeletalMeshComponent* CharacterMesh = GetMesh();
-
-		ASampleGamePlayerState* SampleGamePlayerState = (ASampleGamePlayerState*)PlayerState;				
+		
 		switch (SampleGamePlayerState->GetSelectedTeamAsEnum())
 		{
 		case ESampleGameTeam::Team_Red:
@@ -174,7 +178,7 @@ void ASampleGameCharacter::SetTeamColor()
 			CharacterMesh->SetMaterial(0, WhiteTeamMaterial);
 			break;			
 		case ESampleGameTeam::Team_None:
-			/// If team value has not yet replicated, use the temporary colors
+			// If team value has not yet replicated, use the temporary colors
 			CharacterMesh->SetMaterial(0, NoneTeamMaterial);
 			break;
 		default:

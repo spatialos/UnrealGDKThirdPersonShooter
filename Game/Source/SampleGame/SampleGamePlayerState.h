@@ -8,12 +8,9 @@
 #include "SampleGamePlayerState.generated.h"
 
 
-/// Delegate to allow Character class to register a listener to the OnRep_SelectedTeam event
+// Delegate to allow Character class to register a listener to the OnRep_SelectedTeam event
 DECLARE_DELEGATE(CharacterListenerDelegate);
 
-/**
- * 
- */
 UCLASS()
 class SAMPLEGAME_API ASampleGamePlayerState : public APlayerState
 {
@@ -21,24 +18,20 @@ class SAMPLEGAME_API ASampleGamePlayerState : public APlayerState
 
 protected:
 	UPROPERTY(Transient, ReplicatedUsing = OnRep_SelectedTeam)
-	uint8 SelectedTeam;
+	ESampleGameTeam SelectedTeam;
 
-	/// Delegate to allow Character class to register a listener to the OnRep_SelectedTeam event
+	// Delegate to allow Character class to register a listener to the OnRep_SelectedTeam event
 	CharacterListenerDelegate CharacterListenerSelectedTeam;
-
-	// TODO jamcrow - Add more team or player details here (ref to instantiated "team" object common across all team members?)
-
+	
 public:
-	void SetSelectedTeamFromEnum(const ESampleGameTeam& NewSelectedTeam) { SelectedTeam = (uint8)NewSelectedTeam; }
-	void SetSelectedTeamFromByte(const uint8& NewSelectedTeam) { SelectedTeam = NewSelectedTeam; }
-	const ESampleGameTeam GetSelectedTeamAsEnum() const { return (ESampleGameTeam)SelectedTeam; }
-	const uint8 GetSelectedTeamAsByte() const { return SelectedTeam; }
+	void SetSelectedTeamFromEnum(const ESampleGameTeam& NewSelectedTeam) { SelectedTeam = NewSelectedTeam; }
+	void SetSelectedTeamFromByte(const uint8& NewSelectedTeam) { SelectedTeam = (ESampleGameTeam)NewSelectedTeam; }
+	const ESampleGameTeam GetSelectedTeamAsEnum() const { return SelectedTeam; }
+	const uint8 GetSelectedTeamAsByte() const { return (uint8)SelectedTeam; }
 
 	UFUNCTION()
 	void OnRep_SelectedTeam();
 
 	void RegisterCharacterListenerForSelectedTeam(class ASampleGameCharacter* CharacterInstance);
 	void UnregisterCharacterListenerForSelectedTeam();
-
-	// TODO jamcrow - Add more team or player details here (ref to instantiated "team" object common across all team members?)
 };
