@@ -21,11 +21,12 @@ public:
 	virtual class FNetworkPredictionData_Client* GetPredictionData_Client() const override;
 
 	// Override this so we can determine whether we've overrotated and whether we should pull the character back towards the control rotation.
-	// Note that ideally we'd do this in ComputeOrientToMovementRotation, but that method is const so we can't set bShouldInterpToControlRotation.
+	// Note that ideally we'd do this in ComputeOrientToMovementRotation, but that method is const so we can't set member variables.
+	// The superclass's implementation of this method will call ComputeOrientToMovementRotation.
 	virtual void PhysicsRotation(float DeltaTime) override;
 
 	// Override this so we can prevent the desired rotation from ever being more than 90 degrees from the control rotation. This makes
-	// our aim offsets work properly.
+	// our aim offsets look good.
 	virtual FRotator ComputeOrientToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const override;
 
 	// Sets whether the character is trying to sprint.
@@ -50,7 +51,7 @@ private:
 	uint8 bWantsToSprint : 1;
 
 	// If true, the player will attempt to interpolate all the way to the control rotation. Used to correct for
-	// over-rotation while standing still (e.g. trying have an aim offset of < 90 degrees).
+	// over-rotation while standing still (e.g. trying have an aim offset of > 90 degrees).
 	uint8 bShouldInterpToControlRotation : 1;
 
 	// Multiply max speed by this factor when sprinting.

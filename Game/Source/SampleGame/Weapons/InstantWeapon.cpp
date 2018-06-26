@@ -236,7 +236,7 @@ void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 {
 	if (!GetOwningCharacter()->CanFire())
 	{
-		UE_LOG(LogSampleGame, Warning, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
+		UE_LOG(LogSampleGame, Verbose, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
 		return;
 	}
 

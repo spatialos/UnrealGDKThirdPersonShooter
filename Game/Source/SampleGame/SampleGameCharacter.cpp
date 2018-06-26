@@ -20,6 +20,8 @@
 #include "Weapons/Weapon.h"
 
 
+static const FName kRightGunSocketName("GunSocket_r");
+
 //////////////////////////////////////////////////////////////////////////
 // ASampleGameCharacter
 
@@ -217,7 +219,6 @@ void ASampleGameCharacter::SpawnStarterWeapon()
 	SpawnParams.Owner = this;
 	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform(), SpawnParams);
 	StartWeapon->SetOwningCharacter(this);
-	const FName kRightGunSocketName("GunSocket_r");
 	StartWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, kRightGunSocketName);
 
 	UE_LOG(LogSampleGame, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());

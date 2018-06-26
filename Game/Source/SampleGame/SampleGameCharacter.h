@@ -121,8 +121,8 @@ private:
 
 	// [owning client + server] Updates the aim variables to be sync-ed out to clients, or updates the values locally
 	// if we're executing on the owning client.
-	// Will only update the angles if they differ from the current stored value by more than AimUpdateThreshold.
-	void UpdateAimRotation(float AimUpdateThreshold);
+	// Will only update the angles if they differ from the current stored value by more than AngleUpdateThreshold.
+	void UpdateAimRotation(float AngleUpdateThreshold);
 
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
