@@ -77,6 +77,7 @@ public:
 		return MaxHealth;
 	}
 
+	// [server + client] Returns true if the character is currently sprinting.
 	UFUNCTION(BlueprintPure, Category = "Movement")
 	bool IsSprinting();
 
@@ -85,6 +86,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = "Aim")
 	float GetAimPitch();
+
+	// [server + client] Returns true if the character is able to shoot at the given moment.
+	bool CanFire();
 
 protected:
 	// APawn interface

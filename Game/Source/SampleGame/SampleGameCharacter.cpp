@@ -229,6 +229,9 @@ void ASampleGameCharacter::StartFire()
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
+		// Don't allow sprinting and shooting at the same time.
+		StopSprinting();
+
 		Weapon->StartFire();
 	}
 }
@@ -347,6 +350,11 @@ float ASampleGameCharacter::GetAimYaw()
 float ASampleGameCharacter::GetAimPitch()
 {
 	return AimPitch;
+}
+
+bool ASampleGameCharacter::CanFire()
+{
+	return EquippedWeapon && !IsSprinting();
 }
 
 AWeapon* ASampleGameCharacter::GetEquippedWeapon() const
