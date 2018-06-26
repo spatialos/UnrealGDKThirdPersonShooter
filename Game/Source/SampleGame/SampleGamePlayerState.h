@@ -32,6 +32,9 @@ public:
 	UFUNCTION()
 	void OnRep_SelectedTeam();
 
+	// TODO: UNR-356 - jamescrowder - Replace the below functionality with something better, or remove if no longer relevant, once additional login features are implemented
+	//-----------------------------------//
 	void RegisterCharacterListenerForSelectedTeam(class ASampleGameCharacter* CharacterInstance);
 	void UnregisterCharacterListenerForSelectedTeam();
+	//-----------------------------------//
 };
