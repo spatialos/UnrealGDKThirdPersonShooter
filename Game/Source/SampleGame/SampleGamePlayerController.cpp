@@ -145,7 +145,7 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 	{
 		// Show the Login UI
 		SampleGameLoginUI->AddToViewport();
-		// You tell that UI Widget who's boss... (the UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections)
+		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
 		SampleGameLoginUI->SetOwnerPlayerController(this);
 		// Set Mouse Cursor to SHOW, and only interact with the UI
 		bShowMouseCursor = true;
@@ -167,15 +167,22 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 {
 	bool bJoinWasSuccessful = true;
 
-	// Validate the join request
-	if (bHasSubmittedLoginOptions
-		|| PlayerState == nullptr
+	// Validate PlayerState
+	if (PlayerState == nullptr
 		|| !PlayerState->IsA(ASampleGamePlayerState::StaticClass()))
 	{
 		bJoinWasSuccessful = false;
 
-		// TODO: jamescrowder - Log an error reporting the reason our join was not successful
-	}	
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Invalid PlayerState pointer (%s)"), *this->GetName(), PlayerState == nullptr ? TEXT("nullptr") : *PlayerState->GetName());
+	}
+
+	// Validate the join request
+	if (bHasSubmittedLoginOptions)
+	{
+		bJoinWasSuccessful = false;
+
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Already submitted Join request.  Client attempting to join session multiple times."), *this->GetName());
+	}
 
 	// Inform Client as to whether or not join was accepted
 	ClientJoinResults(bJoinWasSuccessful);
@@ -186,7 +193,7 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 
 		// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
-		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeamFromEnum(NewPlayerTeam);
+		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeam(NewPlayerTeam);
 
 		// Spawn the Pawn
 		RespawnCharacter();

@@ -38,6 +38,7 @@ public:
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 private:
+	// [client] Informs the invoking client whether the join request suceeded or failed
 	UFUNCTION(Client, Reliable)
 	void ClientJoinResults(const bool bJoinSucceeded);
 

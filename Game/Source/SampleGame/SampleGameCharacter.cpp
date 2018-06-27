@@ -103,7 +103,7 @@ void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
 	Super::EndPlay(Reason);
 
 	// Unregister from updates to our selected team appearance in PlayerState
-	ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+	ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
 	if (SampleGamePlayerState != nullptr)
 	{
 		SampleGamePlayerState->UnregisterCharacterListenerForSelectedTeam();
@@ -126,13 +126,13 @@ void ASampleGameCharacter::OnRep_PlayerState()
 	// Update colors only on Clients
 	if (GetNetMode() == NM_Client)
 	{
-		ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+		ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
 		if (SampleGamePlayerState != nullptr)
 		{
 			// Register for updates to our selected team appearance from our PlayerState
 			SampleGamePlayerState->RegisterCharacterListenerForSelectedTeam(this);
 
-			// Attempt to set the team using whatever value is current in PlayerState (will check for ESampleGameTeam::Team_None and ignore)
+			// Attempt to set the team using whatever value is current in PlayerState
 			UpdateTeamColor();
 		}
 	}
@@ -149,12 +149,12 @@ void ASampleGameCharacter::UpdateTeamColor()
 	check(BlackTeamMaterial != nullptr);
 	check(WhiteTeamMaterial != nullptr);
 
-	ASampleGamePlayerState* SampleGamePlayerState = (PlayerState != nullptr) ? Cast<ASampleGamePlayerState>(PlayerState) : nullptr;
+	ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
 	if (SampleGamePlayerState != nullptr)
 	{
 		USkeletalMeshComponent* CharacterMesh = GetMesh();
 		
-		switch (SampleGamePlayerState->GetSelectedTeamAsEnum())
+		switch (SampleGamePlayerState->GetSelectedTeam())
 		{
 		case ESampleGameTeam::Team_Red:
 			CharacterMesh->SetMaterial(0, RedTeamMaterial);
@@ -178,10 +178,9 @@ void ASampleGameCharacter::UpdateTeamColor()
 			CharacterMesh->SetMaterial(0, WhiteTeamMaterial);
 			break;			
 		case ESampleGameTeam::Team_None:
+		default:
 			// If team value has not yet replicated, use the temporary colors
 			CharacterMesh->SetMaterial(0, NoneTeamMaterial);
-			break;
-		default:
 			break;
 		}
 	}

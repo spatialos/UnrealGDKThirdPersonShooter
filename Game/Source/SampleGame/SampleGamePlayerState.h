@@ -24,10 +24,8 @@ protected:
 	CharacterListenerDelegate CharacterListenerSelectedTeam;
 	
 public:
-	void SetSelectedTeamFromEnum(const ESampleGameTeam& NewSelectedTeam) { SelectedTeam = NewSelectedTeam; }
-	void SetSelectedTeamFromByte(const uint8& NewSelectedTeam) { SelectedTeam = (ESampleGameTeam)NewSelectedTeam; }
-	const ESampleGameTeam GetSelectedTeamAsEnum() const { return SelectedTeam; }
-	const uint8 GetSelectedTeamAsByte() const { return (uint8)SelectedTeam; }
+	void SetSelectedTeam(const ESampleGameTeam& NewSelectedTeam) { SelectedTeam = NewSelectedTeam; }
+	const ESampleGameTeam GetSelectedTeam() const { return SelectedTeam; }
 
 	UFUNCTION()
 	void OnRep_SelectedTeam();

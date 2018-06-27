@@ -18,7 +18,7 @@ public:
 
 	// Team Selection
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player_Team)
-	ESampleGameTeam TeamId;	// NOTE - uint8 can support up to 255 total teams.  For games with more teams, use int32 instead (uint32 isn't supported by UE4 Blueprints)
+	ESampleGameTeam TeamId;
 
 	// Name Input
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Player_Name)
@@ -36,7 +36,9 @@ private:
 	ASampleGamePlayerController* PlayerController;
 
 public:
+	// Informs the UI Widget which PlayerController instance is controlling it.  Must be called and given a valid PlayerController before 'OnJoinGameButtonClicked' can be invoked.
 	void SetOwnerPlayerController(ASampleGamePlayerController* NewPlayerContoller) { PlayerController = NewPlayerContoller; }
 
+	// This method will be called from PlayerController if the join reqeust sent by 'OnJoinGameButtonClicked' to 'PlayerController' fails server-side.
 	void JoinGameWasRejected();
 };
