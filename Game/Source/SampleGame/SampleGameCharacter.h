@@ -20,9 +20,6 @@ public:
 
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
 
-	/** [client] perform PlayerState related setup - Also registers for updates to our selected team appearance from our PlayerState - Attempts to set the team using whatever value is current in PlayerState */
-	virtual void OnRep_PlayerState() override;
-
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 
@@ -130,6 +127,9 @@ private:
 	UFUNCTION()
 	void OnRep_IsRagdoll();
 
+	UFUNCTION()
+	void OnRep_Team();
+
 	UPROPERTY(VisibleAnywhere, Replicated)
 	class AWeapon* EquippedWeapon;
 
@@ -153,9 +153,13 @@ private:
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
 	int32 CurrentHealth;
 
-	// If true, the character is currently ragdoll-ing.
+	// If true, the character is currently dead and ragdoll-ing.
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
+
+	// If true, the character is currently dead and ragdoll-ing.
+	UPROPERTY(ReplicatedUsing = OnRep_Team)
+	ESampleGameTeam Team;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
@@ -194,5 +198,11 @@ public:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	// [server] Sets the Character's Team value.
+	void SetTeam(ESampleGameTeam NewTeam);
+
+	// Returns the current value of Team.
+	ESampleGameTeam GetTeam() const;
 };
 
