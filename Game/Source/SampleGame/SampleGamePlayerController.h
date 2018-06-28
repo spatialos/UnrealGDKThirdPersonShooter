@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "SampleGameTeams.h"
 #include "SampleGamePlayerController.generated.h"
 
 /**
@@ -26,18 +27,29 @@ public:
 	// possesses (or unpossesses) a pawn.
 	virtual void SetPawn(APawn* InPawn) override;
 
-	// [server] Tells the controller that it's time for the player to die.
+	// [server] Tells the controller that it's time for the player to die, and sets up conditions for respawn.
 	void KillCharacter();
 
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
 
+	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
+
 private:
+	// [client] Informs the invoking client whether the join request suceeded or failed
+	UFUNCTION(Client, Reliable)
+	void ClientJoinResults(const bool bJoinSucceeded);
+
 	// [server] Causes the character to respawn.
 	void RespawnCharacter();
 
 	// [server] Deletes the character.
 	void DeleteCharacter();
+
+	// [client] Sets whether or not the login UI should be visible.
+	void SetLoginUIVisible(bool bIsVisible);
 
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
@@ -46,6 +58,14 @@ private:
 	// The current game UI.
 	UPROPERTY(Transient)
 	class USampleGameUI* SampleGameUI;
+
+	// Login UI class template to load at player join.
+	UPROPERTY(EditDefaultsOnly, Category = "SampleGameUI")
+	TSubclassOf<class USampleGameLoginUI> LoginUIWidgetTemplate;
+
+	// The instance of the Login UI class to allow player choice interaction.
+	UPROPERTY(Transient)
+	class USampleGameLoginUI* SampleGameLoginUI;
 
 	// Character respawn delay, in seconds.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
@@ -61,4 +81,12 @@ private:
 	FTimerHandle RespawnTimerHandle;
 	FTimerHandle DeleteCharacterTimerHandle;
 
+// HACK for login state (Unreal issue, not GDK issue)
+//=================================================//
+public:
+	virtual void Tick(float DeltaSeconds) override;
+private:
+	bool bHasShownLoginHud = false;
+	bool bHasSubmittedLoginOptions = false;
+//=================================================//
 };

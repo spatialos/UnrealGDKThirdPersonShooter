@@ -1,7 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
 
-#include "SpatialTypeBinding_PlayerState.h"
+#include "SpatialTypeBinding_SampleGamePlayerState.h"
 
 #include "GameFramework/PlayerState.h"
 #include "NetworkGuid.h"
@@ -16,32 +16,34 @@
 #include "SpatialPackageMapClient.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
+#include "SampleGamePlayerState.h"
+#include "SampleGameTeams.h"
 
-#include "UnrealPlayerStateSingleClientRepDataAddComponentOp.h"
-#include "UnrealPlayerStateMultiClientRepDataAddComponentOp.h"
-#include "UnrealPlayerStateMigratableDataAddComponentOp.h"
+#include "UnrealSampleGamePlayerStateSingleClientRepDataAddComponentOp.h"
+#include "UnrealSampleGamePlayerStateMultiClientRepDataAddComponentOp.h"
+#include "UnrealSampleGamePlayerStateMigratableDataAddComponentOp.h"
 
-const FRepHandlePropertyMap& USpatialTypeBinding_PlayerState::GetRepHandlePropertyMap() const
+const FRepHandlePropertyMap& USpatialTypeBinding_SampleGamePlayerState::GetRepHandlePropertyMap() const
 {
 	return RepHandleToPropertyMap;
 }
 
-const FMigratableHandlePropertyMap& USpatialTypeBinding_PlayerState::GetMigratableHandlePropertyMap() const
+const FMigratableHandlePropertyMap& USpatialTypeBinding_SampleGamePlayerState::GetMigratableHandlePropertyMap() const
 {
 	return MigratableHandleToPropertyMap;
 }
 
-UClass* USpatialTypeBinding_PlayerState::GetBoundClass() const
+UClass* USpatialTypeBinding_SampleGamePlayerState::GetBoundClass() const
 {
-	return APlayerState::StaticClass();
+	return ASampleGamePlayerState::StaticClass();
 }
 
-void USpatialTypeBinding_PlayerState::Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap)
+void USpatialTypeBinding_SampleGamePlayerState::Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap)
 {
 	Super::Init(InInterop, InPackageMap);
 
 
-	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("PlayerState"));
+	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("SampleGamePlayerState"));
 
 	// Populate RepHandleToPropertyMap.
 	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged, 0));
@@ -70,20 +72,21 @@ void USpatialTypeBinding_PlayerState::Init(USpatialInterop* InInterop, USpatialP
 	RepHandleToPropertyMap.Add(24, FRepHandleData(Class, {"StartTime"}, COND_None, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(25, FRepHandleData(Class, {"UniqueId"}, COND_InitialOnly, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(26, FRepHandleData(Class, {"PlayerNamePrivate"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(27, FRepHandleData(Class, {"SelectedTeam"}, COND_None, REPNOTIFY_OnChanged, 0));
 }
 
-void USpatialTypeBinding_PlayerState::BindToView()
+void USpatialTypeBinding_SampleGamePlayerState::BindToView()
 {
 	TSharedPtr<worker::View> View = Interop->GetSpatialOS()->GetView().Pin();
 	ViewCallbacks.Init(View);
 
 	if (Interop->GetNetDriver()->GetNetMode() == NM_Client)
 	{
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerStateSingleClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerStateSingleClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -91,11 +94,11 @@ void USpatialTypeBinding_PlayerState::BindToView()
 			check(ActorChannel);
 			ReceiveUpdate_SingleClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerStateMultiClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerStateMultiClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -103,11 +106,11 @@ void USpatialTypeBinding_PlayerState::BindToView()
 			check(ActorChannel);
 			ReceiveUpdate_MultiClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerStateMigratableData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerStateMigratableData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerStateMigratableData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::ComponentId))
 			{
 				return;
 			}
@@ -118,12 +121,12 @@ void USpatialTypeBinding_PlayerState::BindToView()
 	}
 }
 
-void USpatialTypeBinding_PlayerState::UnbindFromView()
+void USpatialTypeBinding_SampleGamePlayerState::UnbindFromView()
 {
 	ViewCallbacks.Reset();
 }
 
-worker::Entity USpatialTypeBinding_PlayerState::CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const
+worker::Entity USpatialTypeBinding_SampleGamePlayerState::CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const
 {
 	// Validate replication list.
 	const uint16 RepHandlePropertyMapCount = GetRepHandlePropertyMap().Num();
@@ -133,14 +136,14 @@ worker::Entity USpatialTypeBinding_PlayerState::CreateActorEntity(const FString&
 	}
 
 	// Setup initial data.
-	improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Data SingleClientData;
-	improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update SingleClientUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Data SingleClientData;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update SingleClientUpdate;
 	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Data MultiClientData;
-	improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update MultiClientUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Data MultiClientData;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::UnrealPlayerStateMigratableData::Data MigratableData;
-	improbable::unreal::generated::UnrealPlayerStateMigratableData::Update MigratableDataUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Data MigratableData;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update MigratableDataUpdate;
 	bool bMigratableDataUpdateChanged = false;
 	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
 	SingleClientUpdate.ApplyTo(SingleClientData);
@@ -192,22 +195,22 @@ worker::Entity USpatialTypeBinding_PlayerState::CreateActorEntity(const FString&
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateClientRPCs>(improbable::unreal::generated::UnrealPlayerStateClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateServerRPCs>(improbable::unreal::generated::UnrealPlayerStateServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData>(SingleClientData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData>(MultiClientData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData>(MigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::UnrealSampleGamePlayerStateClientRPCs>(improbable::unreal::generated::UnrealSampleGamePlayerStateClientRPCs::Data{}, OwningClientOnly)
+		.AddComponent<improbable::unreal::generated::UnrealSampleGamePlayerStateServerRPCs>(improbable::unreal::generated::UnrealSampleGamePlayerStateServerRPCs::Data{}, WorkersOnly)
 		.Build();
 }
 
-void USpatialTypeBinding_PlayerState::SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const
+void USpatialTypeBinding_SampleGamePlayerState::SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const
 {
 	// Build SpatialOS updates.
-	improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update SingleClientUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update SingleClientUpdate;
 	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update MultiClientUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::UnrealPlayerStateMigratableData::Update MigratableDataUpdate;
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update MigratableDataUpdate;
 	bool bMigratableDataUpdateChanged = false;
 	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
 
@@ -215,19 +218,19 @@ void USpatialTypeBinding_PlayerState::SendComponentUpdates(const FPropertyChange
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	if (bSingleClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealPlayerStateSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
 	}
 	if (bMultiClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealPlayerStateMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
 	}
 	if (bMigratableDataUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealPlayerStateMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
 	}
 }
 
-void USpatialTypeBinding_PlayerState::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
+void USpatialTypeBinding_SampleGamePlayerState::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
@@ -240,50 +243,50 @@ void USpatialTypeBinding_PlayerState::SendRPCCommand(UObject* TargetObject, cons
 	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
-void USpatialTypeBinding_PlayerState::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
+void USpatialTypeBinding_SampleGamePlayerState::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
 {
-	auto* SingleClientAddOp = Cast<UUnrealPlayerStateSingleClientRepDataAddComponentOp>(AddComponentOp);
+	auto* SingleClientAddOp = Cast<UUnrealSampleGamePlayerStateSingleClientRepDataAddComponentOp>(AddComponentOp);
 	if (SingleClientAddOp)
 	{
-		auto Update = improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
 		ReceiveUpdate_SingleClient(Channel, Update);
 	}
-	auto* MultiClientAddOp = Cast<UUnrealPlayerStateMultiClientRepDataAddComponentOp>(AddComponentOp);
+	auto* MultiClientAddOp = Cast<UUnrealSampleGamePlayerStateMultiClientRepDataAddComponentOp>(AddComponentOp);
 	if (MultiClientAddOp)
 	{
-		auto Update = improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
 		ReceiveUpdate_MultiClient(Channel, Update);
 	}
-	auto* MigratableDataAddOp = Cast<UUnrealPlayerStateMigratableDataAddComponentOp>(AddComponentOp);
+	auto* MigratableDataAddOp = Cast<UUnrealSampleGamePlayerStateMigratableDataAddComponentOp>(AddComponentOp);
 	if (MigratableDataAddOp)
 	{
-		auto Update = improbable::unreal::generated::UnrealPlayerStateMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
+		auto Update = improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
 		ReceiveUpdate_Migratable(Channel, Update);
 	}
 }
 
-worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_PlayerState::GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const
+worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_SampleGamePlayerState::GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const
 {
 	worker::Map<worker::ComponentId, worker::InterestOverride> Interest;
 	if (bIsClient)
 	{
 		if (!bAutonomousProxy)
 		{
-			Interest.emplace(improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::ComponentId, worker::InterestOverride{false});
+			Interest.emplace(improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::ComponentId, worker::InterestOverride{false});
 		}
-		Interest.emplace(improbable::unreal::generated::UnrealPlayerStateMigratableData::ComponentId, worker::InterestOverride{false});
+		Interest.emplace(improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::ComponentId, worker::InterestOverride{false});
 	}
 	return Interest;
 }
 
-void USpatialTypeBinding_PlayerState::BuildSpatialComponentUpdate(
+void USpatialTypeBinding_SampleGamePlayerState::BuildSpatialComponentUpdate(
 	const FPropertyChangeState& Changes,
 	USpatialActorChannel* Channel,
-	improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update& SingleClientUpdate,
+	improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update& SingleClientUpdate,
 	bool& bSingleClientUpdateChanged,
-	improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update& MultiClientUpdate,
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update& MultiClientUpdate,
 	bool& bMultiClientUpdateChanged,
-	improbable::unreal::generated::UnrealPlayerStateMigratableData::Update& MigratableDataUpdate,
+	improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update& MigratableDataUpdate,
 	bool& bMigratableDataUpdateChanged) const
 {
 	const FRepHandlePropertyMap& RepPropertyMap = GetRepHandlePropertyMap();
@@ -341,11 +344,11 @@ void USpatialTypeBinding_PlayerState::BuildSpatialComponentUpdate(
 	}
 }
 
-void USpatialTypeBinding_PlayerState::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_SampleGamePlayerState::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_SampleGamePlayerState::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update& OutUpdate) const
 {
 	switch (Handle)
 	{
@@ -607,30 +610,37 @@ void USpatialTypeBinding_PlayerState::ServerSendUpdate_MultiClient(const uint8* 
 			OutUpdate.set_field_playernameprivate(TCHAR_TO_UTF8(*Value));
 			break;
 		}
+		case 27: // field_selectedteam
+		{
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(Data));
+
+			OutUpdate.set_field_selectedteam(uint32(Value));
+			break;
+		}
 	default:
 		checkf(false, TEXT("Unknown replication handle %d encountered when creating a SpatialOS update."));
 		break;
 	}
 }
 
-void USpatialTypeBinding_PlayerState::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealPlayerStateMigratableData::Update& OutUpdate) const
+void USpatialTypeBinding_SampleGamePlayerState::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_PlayerState::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealPlayerStateSingleClientRepData::Update& Update) const
+void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealSampleGamePlayerStateSingleClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
 	TArray<UProperty*> RepNotifies;
 	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies);
 }
 
-void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealPlayerStateMultiClientRepData::Update& Update) const
+void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealSampleGamePlayerStateMultiClientRepData::Update& Update) const
 {
 	Interop->PreReceiveSpatialUpdate(ActorChannel);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
-	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::generated::UnrealPlayerStateClientRPCs::ComponentId);
+	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::generated::UnrealSampleGamePlayerStateClientRPCs::ComponentId);
 	const FRepHandlePropertyMap& HandleToPropertyMap = GetRepHandlePropertyMap();
 	FSpatialConditionMapFilter ConditionMap(ActorChannel, bAutonomousProxy);
 
@@ -1392,9 +1402,31 @@ void USpatialTypeBinding_PlayerState::ReceiveUpdate_MultiClient(USpatialActorCha
 				Handle);
 		}
 	}
+	if (!Update.field_selectedteam().empty())
+	{
+		// field_selectedteam
+		uint16 Handle = 27;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(PropertyData));
+
+			Value = ESampleGameTeam((*Update.field_selectedteam().data()));
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
 	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
 }
 
-void USpatialTypeBinding_PlayerState::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealPlayerStateMigratableData::Update& Update) const
+void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::UnrealSampleGamePlayerStateMigratableData::Update& Update) const
 {
 }
