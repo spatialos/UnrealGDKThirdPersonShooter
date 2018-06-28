@@ -2,9 +2,11 @@
 
 #include "SampleGamePlayerController.h"
 
+#include "SampleGamePlayerState.h"
 #include "SampleGameCharacter.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
+#include "UI/SampleGameLoginUI.h"
 #include "UI/SampleGameUI.h"
 
 #include "SpatialNetDriver.h"
@@ -41,7 +43,7 @@ void ASampleGamePlayerController::SetPawn(APawn* InPawn)
 {
 	Super::SetPawn(InPawn);
 
-	if (GetNetMode() == NM_Client)
+	if (GetNetMode() == NM_Client && bHasSubmittedLoginOptions)
 	{
 		SetPlayerUIVisible(InPawn != nullptr);
 
@@ -113,6 +115,112 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
+{
+	// Lazy instantiate the Login UI
+	if (SampleGameLoginUI == nullptr)
+	{
+		check(LoginUIWidgetTemplate != nullptr);
+		SampleGameLoginUI = CreateWidget<USampleGameLoginUI>(this, LoginUIWidgetTemplate);
+		
+		// Early out - Error case
+		if (SampleGameLoginUI == nullptr)
+		{
+			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
+			UE_LOG(LogSampleGame, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
+				*this->GetName(),
+				SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+
+			return;
+		}
+	}
+
+	// Early out - If our visibility state is already set to the requested value, do nothing
+	if (SampleGameLoginUI->IsVisible() == bIsVisible)
+	{
+		return;
+	}
+
+	if (bIsVisible)
+	{
+		// Show the Login UI
+		SampleGameLoginUI->AddToViewport();
+		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
+		SampleGameLoginUI->SetOwnerPlayerController(this);
+		// Set Mouse Cursor to SHOW, and only interact with the UI
+		bShowMouseCursor = true;
+		SetIgnoreLookInput(true);
+		SetIgnoreMoveInput(true);
+	}
+	else
+	{
+		// Hide the Login UI
+		SampleGameLoginUI->RemoveFromViewport();
+		// Hide the Mouse Cursor, restore Look and Move control
+		bShowMouseCursor = false;
+		SetIgnoreLookInput(false);
+		SetIgnoreMoveInput(false);
+	}
+}
+
+void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	bool bJoinWasSuccessful = true;
+
+	// Validate PlayerState
+	if (PlayerState == nullptr
+		|| !PlayerState->IsA(ASampleGamePlayerState::StaticClass()))
+	{
+		bJoinWasSuccessful = false;
+
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Invalid PlayerState pointer (%s)"), *this->GetName(), PlayerState == nullptr ? TEXT("nullptr") : *PlayerState->GetName());
+	}
+
+	// Validate the join request
+	if (bHasSubmittedLoginOptions)
+	{
+		bJoinWasSuccessful = false;
+
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Already submitted Join request.  Client attempting to join session multiple times."), *this->GetName());
+	}
+
+	// Inform Client as to whether or not join was accepted
+	ClientJoinResults(bJoinWasSuccessful);
+	
+	if (bJoinWasSuccessful)
+	{
+		bHasSubmittedLoginOptions = true;
+
+		// Set the player-selected values
+		PlayerState->SetPlayerName(NewPlayerName);
+		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeam(NewPlayerTeam);
+
+		// Spawn the Pawn
+		RespawnCharacter();
+	}
+
+}
+
+bool ASampleGamePlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	return true;
+}
+
+void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJoinSucceeded)
+{
+	check(SampleGameLoginUI != nullptr);
+
+	if (bJoinSucceeded)
+	{
+		bHasSubmittedLoginOptions = true;
+		SetLoginUIVisible(false);
+	}
+	else
+	{
+		SampleGameLoginUI->JoinGameWasRejected();
+	}
+}
+
 void ASampleGamePlayerController::RespawnCharacter()
 {
 	check(GetNetMode() == NM_DedicatedServer);
@@ -132,5 +240,21 @@ void ASampleGamePlayerController::DeleteCharacter()
 		// TODO: what if the character is on a different worker?
 		GetWorld()->DestroyActor(PawnToDelete);
 		PawnToDelete = nullptr;
+	}
+}
+
+void ASampleGamePlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	// HACK because sometimes (often?) Tick() runs (WAY) before BeginPlay(), or even before all the assigned-in-Blueprint variables have populated...
+	// This appears to be an Unreal issue, not a GDK issue, as I ran into this in Vanilla Shooter as well.
+	if (LoginUIWidgetTemplate != nullptr
+		&& GetNetMode() == NM_Client
+		&& Role == ROLE_AutonomousProxy
+		&& !bHasShownLoginHud)
+	{
+		bHasShownLoginHud = true;
+		SetLoginUIVisible(true);
 	}
 }

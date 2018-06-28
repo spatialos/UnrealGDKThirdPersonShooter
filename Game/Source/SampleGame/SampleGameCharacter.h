@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
+#include "SampleGameTeams.h"
 #include "SampleGameCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -18,6 +19,9 @@ public:
 	virtual void BeginPlay() override;
 
 	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+
+	/** [client] perform PlayerState related setup - Also registers for updates to our selected team appearance from our PlayerState - Attempts to set the team using whatever value is current in PlayerState */
+	virtual void OnRep_PlayerState() override;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -153,6 +157,36 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
 
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* NoneTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* RedTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* GreenTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlueTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* YellowTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* PurpleTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlackTeamMaterial;
+	
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* WhiteTeamMaterial;
+
+public:
+	// Change the color of this character to match their chosen team
+	UFUNCTION()
+	void UpdateTeamColor();
+	
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class USpringArmComponent* CameraBoom;
