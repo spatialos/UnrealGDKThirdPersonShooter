@@ -1,15 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated;
+package improbable.unreal.generated.samplegameplayercontroller;
 
-import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
-type UnrealClientJoinResultsRequest {
+type ClientJoinResultsRequest {
 	uint32 target_subobject_offset = 1;
 	bool field_bjoinsucceeded = 2;
 }
-type UnrealServerTryJoinGameRequest {
+type ServerTryJoinGameRequest {
 	uint32 target_subobject_offset = 1;
 	string field_newplayername = 2;
 	uint32 field_newplayerteam = 3;
