@@ -165,20 +165,7 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 			}
 		}
 
-		// Ignore pre-selected PlayerStarts per Character/PlayerController.  We spawn by Team now.	
-///		// Check if we have a previously selected PlayerStart.
-///		if (ShouldSpawnAtStartSpot(Player))
-///		{
-///			// Check that its team value (if any) matches current SelectedTeam
-///			ASampleGameTeamPlayerStart* Start = Cast<ASampleGameTeamPlayerStart>(Player->StartSpot);
-///			if (Start != nullptr
-///				&& Start->TeamToSpawn == SelectedTeam)
-///			{
-///				// If so, just use that one and return
-///				return Start;
-///			}
-///		}
-	
+		// Ignore pre-selected PlayerStarts per Character/PlayerController.  Instead, spawn by Team.
 		// Pick a PlayerStart based on SelectedTeam, or default behavior if not able to select by team
 		AActor* BestStart = ChoosePlayerStart(Player);
 		if (BestStart != nullptr)

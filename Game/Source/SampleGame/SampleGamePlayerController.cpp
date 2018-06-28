@@ -196,19 +196,15 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeam(NewPlayerTeam);
 
 		// Recalculate our PlayerStart using the new SelectedTeam information
-		/// TODO - jamcrow
-		/*
-		// Find a starting spot
-		AActor* const StartSpot = FindPlayerStart(NewPlayerController, Portal);
-		if (StartSpot != nullptr)
+		AActor* const NewStartSpot = GetWorld()->GetAuthGameMode()->ChoosePlayerStart(this);
+		if (NewStartSpot != nullptr)
 		{
-		// Set the player controller / camera in this new location
-		FRotator InitialControllerRot = StartSpot->GetActorRotation();
-		InitialControllerRot.Roll = 0.f;
-		NewPlayerController->SetInitialLocationAndRotation(StartSpot->GetActorLocation(), InitialControllerRot);
-		NewPlayerController->StartSpot = StartSpot;
+			// Set the player controller / camera in this new location
+			FRotator InitialControllerRot = NewStartSpot->GetActorRotation();
+			InitialControllerRot.Roll = 0.f;
+			SetInitialLocationAndRotation(NewStartSpot->GetActorLocation(), InitialControllerRot);
+			StartSpot = NewStartSpot;
 		}
-		*/
 
 		// Spawn the Pawn
 		RespawnCharacter();
