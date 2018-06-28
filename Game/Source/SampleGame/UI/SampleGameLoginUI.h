@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "SampleGameTeams.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGameLoginUI.generated.h"
 
 class ASampleGamePlayerController;

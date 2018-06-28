@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
-#include "SampleGameTeams.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGameCharacter.generated.h"
 
 UCLASS(config=Game)

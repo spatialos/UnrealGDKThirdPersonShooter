@@ -13,4 +13,7 @@ class ASampleGameGameMode : public AGameModeBase
 
 public:
 	ASampleGameGameMode();
+
+	virtual AActor* ChoosePlayerStart_Implementation(AController* Player) override;
+	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
 };
