@@ -1,15 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated;
+package improbable.unreal.generated.samplegameplayerstate;
 
-import "improbable/vector3.schema";
 import "improbable/unreal/gdk/core_types.schema";
 
-component UnrealSampleGamePlayerStateSingleClientRepData {
-	id = 100015;
-}
-component UnrealSampleGamePlayerStateMultiClientRepData {
+component SampleGamePlayerStateSingleClientRepData {
 	id = 100016;
+}
+component SampleGamePlayerStateMultiClientRepData {
+	id = 100017;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
 	bool field_btearoff = 3; // COND_None // ::Actor
@@ -17,9 +16,9 @@ component UnrealSampleGamePlayerStateMultiClientRepData {
 	uint32 field_remoterole = 5; // COND_None // ::Actor
 	bytes field_replicatedmovement = 6; // COND_SimulatedOrPhysics // ::Actor
 	UnrealObjectRef field_attachmentreplication_attachparent = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	improbable.Vector3f field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	improbable.Vector3f field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
-	UnrealFRotator field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_locationoffset = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_relativescale3d = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication_rotationoffset = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	string field_attachmentreplication_attachsocket = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	UnrealObjectRef field_attachmentreplication_attachcomponent = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
 	UnrealObjectRef field_owner = 13; // COND_None // ::Actor
@@ -38,13 +37,16 @@ component UnrealSampleGamePlayerStateMultiClientRepData {
 	string field_playernameprivate = 26; // COND_None // ::PlayerState
 	uint32 field_selectedteam = 27; // COND_None // ::SampleGamePlayerState
 }
-component UnrealSampleGamePlayerStateMigratableData {
-	id = 100017;
-}
-
-component UnrealSampleGamePlayerStateClientRPCs {
+component SampleGamePlayerStateMigratableData {
 	id = 100018;
 }
-component UnrealSampleGamePlayerStateServerRPCs {
+
+component SampleGamePlayerStateClientRPCs {
 	id = 100019;
+}
+component SampleGamePlayerStateServerRPCs {
+	id = 100020;
+}
+component SampleGamePlayerStateNetMulticastRPCs {
+	id = 100021;
 }
