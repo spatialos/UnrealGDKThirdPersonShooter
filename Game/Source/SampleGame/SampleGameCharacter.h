@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
+#include "SampleGameTeams.h"
 #include "SampleGameCharacter.generated.h"
 
 UCLASS(config=Game)
@@ -141,6 +142,9 @@ private:
 	UFUNCTION()
 	void OnRep_IsRagdoll();
 
+	UFUNCTION()
+	void OnRep_Team();
+
 	UPROPERTY(VisibleAnywhere, Replicated)
 	class AWeapon* EquippedWeapon;
 
@@ -193,5 +197,45 @@ private:
 	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* FollowCamera;
+
+	// Indicates which team this Character is associated with
+	UPROPERTY(ReplicatedUsing = OnRep_Team)
+	ESampleGameTeam Team;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* NoneTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* RedTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* GreenTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlueTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* YellowTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* PurpleTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlackTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* WhiteTeamMaterial;
+
+public:
+	// Change the color of this character to match their chosen team
+	UFUNCTION()
+	void UpdateTeamColor();
+
+	// [server] Sets the Character's Team value.
+	void SetTeam(ESampleGameTeam NewTeam);
+
+	// Returns the current value of Team.
+	ESampleGameTeam GetTeam() const;
 };
 

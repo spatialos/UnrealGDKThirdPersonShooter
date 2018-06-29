@@ -3,6 +3,7 @@
 #include "SampleGameGameMode.h"
 
 #include "SampleGameLogging.h"
+#include "SampleGamePlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UI/SampleGameHUD.h"
 
@@ -32,4 +33,10 @@ ASampleGameGameMode::ASampleGameGameMode()
 	{
 		UE_LOG(LogSampleGame, Error, TEXT("[SampleGameGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
 	}
+
+	// Use our custom PlayerState child for additional game-specific player data
+	PlayerStateClass = ASampleGamePlayerState::StaticClass();
+
+	// Start in Spectator Mode - The PlayerController will spawn the Characters after login, instead of on connect
+	bStartPlayersAsSpectators = true;
 }

@@ -1,16 +1,15 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated.controller;
+package improbable.unreal.generated.samplegameplayercontroller;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-type ClientSetRotationRequest {
+type ClientJoinResultsRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_newrotation = 2;
-	bool field_bresetcamera = 3;
+	bool field_bjoinsucceeded = 2;
 }
-type ClientSetLocationRequest {
+type ServerTryJoinGameRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_newlocation = 2;
-	bytes field_newrotation = 3;
+	string field_newplayername = 2;
+	uint32 field_newplayerteam = 3;
 }

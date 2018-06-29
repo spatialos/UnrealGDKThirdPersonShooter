@@ -1,13 +1,20 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated;
+package improbable.unreal.generated.testcubebpc;
 
 import "improbable/unreal/gdk/core_types.schema";
 
+<<<<<<< HEAD
 component UnrealTestCubeBPCSingleClientRepData {
 	id = 100034;
 }
 component UnrealTestCubeBPCMultiClientRepData {
+=======
+component TestCubeBPCSingleClientRepData {
+	id = 100034;
+}
+component TestCubeBPCMultiClientRepData {
+>>>>>>> master
 	id = 100035;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
@@ -27,17 +34,33 @@ component UnrealTestCubeBPCMultiClientRepData {
 	bool field_iscolor1 = 16; // COND_None // ::TestCube_BP_C
 	int32 field_currenthealth = 17; // COND_None // ::TestCube_BP_C
 }
+<<<<<<< HEAD
 component UnrealTestCubeBPCMigratableData {
+=======
+component TestCubeBPCMigratableData {
+>>>>>>> master
 	id = 100036;
 }
 import "improbable/unreal/generated/UnrealTestCubeBPCTypes.schema";
 
+<<<<<<< HEAD
 component UnrealTestCubeBPCClientRPCs {
 	id = 100037;
 }
 component UnrealTestCubeBPCServerRPCs {
 	id = 100038;
 	command UnrealRPCCommandResponse testcubebpcserverinteract(UnrealServerInteractRequest);
+=======
+component TestCubeBPCClientRPCs {
+	id = 100037;
+}
+component TestCubeBPCServerRPCs {
+	id = 100038;
+	command UnrealRPCCommandResponse serverinteract(testcubebpc.ServerInteractRequest);
+}
+component TestCubeBPCNetMulticastRPCs {
+	id = 100039;
+>>>>>>> master
 }
 component UnrealTestCubeBPCNetMulticastRPCs {
 	id = 100039;
