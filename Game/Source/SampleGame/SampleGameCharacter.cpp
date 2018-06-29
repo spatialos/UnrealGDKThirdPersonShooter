@@ -413,7 +413,7 @@ void ASampleGameCharacter::OnRep_IsRagdoll()
 
 void ASampleGameCharacter::OnRep_Team()
 {
-	if (GetNetMode() != NM_Client)
+	if (GetNetMode() == NM_DedicatedServer)
 	{
 		return;
 	}
