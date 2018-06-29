@@ -56,6 +56,7 @@ component UnrealSampleGameCharacterMultiClientRepData {
 	improbable.Vector3f field_reprootmotion_linearvelocity = 43; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
 	UnrealObjectRef field_equippedweapon = 44; // COND_None // ::SampleGameCharacter
 	bool field_bisragdoll = 45; // COND_None // ::SampleGameCharacter
+	uint32 field_team = 46; // COND_None // ::SampleGameCharacter
 }
 component UnrealSampleGameCharacterMigratableData {
 	id = 100022;

@@ -17,6 +17,7 @@
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 #include "SampleGameCharacter.h"
+#include "SampleGameTeams.h"
 #include "Weapons/Weapon.h"
 
 #include "UnrealSampleGameCharacterSingleClientRepDataAddComponentOp.h"
@@ -109,6 +110,7 @@ void USpatialTypeBinding_SampleGameCharacter::Init(USpatialInterop* InInterop, U
 	RepHandleToPropertyMap.Add(44, FRepHandleData(Class, {"EquippedWeapon"}, COND_None, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(45, FRepHandleData(Class, {"CurrentHealth"}, COND_AutonomousOnly, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(46, FRepHandleData(Class, {"bIsRagdoll"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(47, FRepHandleData(Class, {"Team"}, COND_None, REPNOTIFY_OnChanged, 0));
 }
 
 void USpatialTypeBinding_SampleGameCharacter::BindToView()
@@ -924,6 +926,13 @@ void USpatialTypeBinding_SampleGameCharacter::ServerSendUpdate_MultiClient(const
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
 			OutUpdate.set_field_bisragdoll(Value);
+			break;
+		}
+		case 47: // field_team
+		{
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(Data));
+
+			OutUpdate.set_field_team(uint32(Value));
 			break;
 		}
 	default:
@@ -2380,6 +2389,28 @@ void USpatialTypeBinding_SampleGameCharacter::ReceiveUpdate_MultiClient(USpatial
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_bisragdoll().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
+	if (!Update.field_team().empty())
+	{
+		// field_team
+		uint16 Handle = 47;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(PropertyData));
+
+			Value = ESampleGameTeam((*Update.field_team().data()));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 

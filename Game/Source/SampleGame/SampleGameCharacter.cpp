@@ -102,38 +102,12 @@ void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
 {
 	Super::EndPlay(Reason);
 
-	// Unregister from updates to our selected team appearance in PlayerState
-	ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
-	if (SampleGamePlayerState != nullptr)
-	{
-		SampleGamePlayerState->UnregisterCharacterListenerForSelectedTeam();
-	}
-
 	if (HasAuthority())
 	{
 		// Destroy weapon actor.
 		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
 		{
 			GetWorld()->DestroyActor(EquippedWeapon);
-		}
-	}
-}
-
-void ASampleGameCharacter::OnRep_PlayerState()
-{
-	Super::OnRep_PlayerState();
-	
-	// Update colors only on Clients
-	if (GetNetMode() == NM_Client)
-	{
-		ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
-		if (SampleGamePlayerState != nullptr)
-		{
-			// Register for updates to our selected team appearance from our PlayerState
-			SampleGamePlayerState->RegisterCharacterListenerForSelectedTeam(this);
-
-			// Attempt to set the team using whatever value is current in PlayerState
-			UpdateTeamColor();
 		}
 	}
 }
@@ -149,40 +123,36 @@ void ASampleGameCharacter::UpdateTeamColor()
 	check(BlackTeamMaterial != nullptr);
 	check(WhiteTeamMaterial != nullptr);
 
-	ASampleGamePlayerState* SampleGamePlayerState = Cast<ASampleGamePlayerState>(PlayerState);
-	if (SampleGamePlayerState != nullptr)
+	USkeletalMeshComponent* CharacterMesh = GetMesh();
+
+	switch (Team)
 	{
-		USkeletalMeshComponent* CharacterMesh = GetMesh();
-		
-		switch (SampleGamePlayerState->GetSelectedTeam())
-		{
-		case ESampleGameTeam::Team_Red:
-			CharacterMesh->SetMaterial(0, RedTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_Green:
-			CharacterMesh->SetMaterial(0, GreenTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_Blue:
-			CharacterMesh->SetMaterial(0, BlueTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_Purple:
-			CharacterMesh->SetMaterial(0, PurpleTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_Yellow:
-			CharacterMesh->SetMaterial(0, YellowTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_Black:
-			CharacterMesh->SetMaterial(0, BlackTeamMaterial);
-			break;
-		case ESampleGameTeam::Team_White:
-			CharacterMesh->SetMaterial(0, WhiteTeamMaterial);
-			break;			
-		case ESampleGameTeam::Team_None:
-		default:
-			// If team value has not yet replicated, use the temporary colors
-			CharacterMesh->SetMaterial(0, NoneTeamMaterial);
-			break;
-		}
+	case ESampleGameTeam::Team_Red:
+		CharacterMesh->SetMaterial(0, RedTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_Green:
+		CharacterMesh->SetMaterial(0, GreenTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_Blue:
+		CharacterMesh->SetMaterial(0, BlueTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_Purple:
+		CharacterMesh->SetMaterial(0, PurpleTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_Yellow:
+		CharacterMesh->SetMaterial(0, YellowTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_Black:
+		CharacterMesh->SetMaterial(0, BlackTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_White:
+		CharacterMesh->SetMaterial(0, WhiteTeamMaterial);
+		break;
+	case ESampleGameTeam::Team_None:
+	default:
+		// If team value has not yet replicated, use the temporary colors
+		CharacterMesh->SetMaterial(0, NoneTeamMaterial);
+		break;
 	}
 }
 
@@ -221,6 +191,7 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
 	DOREPLIFETIME(ASampleGameCharacter, bIsRagdoll);
+	DOREPLIFETIME(ASampleGameCharacter, Team);
 
 	// Only replicate health to the owning client.
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
@@ -440,6 +411,16 @@ void ASampleGameCharacter::OnRep_IsRagdoll()
 	}
 }
 
+void ASampleGameCharacter::OnRep_Team()
+{
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
+	UpdateTeamColor();
+}
+
 FVector ASampleGameCharacter::GetLineTraceStart() const
 {
 	return GetFollowCamera()->GetComponentLocation();
@@ -546,4 +527,20 @@ void ASampleGameCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
+}
+
+void ASampleGameCharacter::SetTeam(ESampleGameTeam NewTeam)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	Team = NewTeam;
+	OnRep_Team();
+}
+
+ESampleGameTeam ASampleGameCharacter::GetTeam() const
+{
+	return Team;
 }
