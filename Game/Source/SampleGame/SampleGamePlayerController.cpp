@@ -229,6 +229,13 @@ void ASampleGamePlayerController::RespawnCharacter()
 	{
 		APawn* NewPawn = GameMode->SpawnDefaultPawnFor(this, StartSpot.Get());
 		Possess(NewPawn);
+
+		ASampleGameCharacter* NewCharacter = Cast<ASampleGameCharacter>(NewPawn);
+		if (NewCharacter != nullptr)
+		{
+			ASampleGamePlayerState* SGPlayerState = Cast<ASampleGamePlayerState>(PlayerState);
+			NewCharacter->SetTeam(SGPlayerState != nullptr ? SGPlayerState->GetSelectedTeam() : ESampleGameTeam::Team_None);
+		}
 	}
 }
 

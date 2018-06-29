@@ -13,30 +13,3 @@ void ASampleGamePlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty
 
 	DOREPLIFETIME(ASampleGamePlayerState, SelectedTeam);
 }
-
-void ASampleGamePlayerState::OnRep_SelectedTeam()
-{
-	if (CharacterListenerSelectedTeam.IsBound())
-	{
-		// Notify the Character via Delegate, if bound, that SelectedTeam has been updated.
-		CharacterListenerSelectedTeam.Execute();
-	}
-}
-
-// TODO: UNR-356 - jamescrowder
-//-----------------------------------//
-void ASampleGamePlayerState::RegisterCharacterListenerForSelectedTeam(ASampleGameCharacter* CharacterInstance)
-{
-	check(!CharacterListenerSelectedTeam.IsBound());
-
-	CharacterListenerSelectedTeam.BindUFunction(CharacterInstance, "UpdateTeamColor");
-}
-
-void ASampleGamePlayerState::UnregisterCharacterListenerForSelectedTeam()
-{
-	if (CharacterListenerSelectedTeam.IsBound())
-	{
-		CharacterListenerSelectedTeam.Unbind();
-	}
-}
-//-----------------------------------//
