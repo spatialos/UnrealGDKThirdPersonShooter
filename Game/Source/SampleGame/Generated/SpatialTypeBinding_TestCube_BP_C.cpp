@@ -97,19 +97,11 @@ void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-<<<<<<< HEAD
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealTestCubeBPCMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealTestCubeBPCMigratableData>& Op)
-			{
-				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealTestCubeBPCMigratableData::ComponentId))
-=======
 			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCMigratableData>([this](
 				const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCMigratableData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCMigratableData::ComponentId))
->>>>>>> master
 				{
 					return;
 				}
@@ -119,34 +111,20 @@ void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
 			}));
 		}
 	}
-<<<<<<< HEAD
-	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs>([this](
-		const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs>& Op)
-	{
-		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs::ComponentId))
-=======
 	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>([this](
 		const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>& Op)
 	{
 		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::ComponentId))
->>>>>>> master
 		{
 			return;
 		}
 		ReceiveUpdate_NetMulticastRPCs(Op.EntityId, Op.Update);
 	}));
 
-<<<<<<< HEAD
-	using ServerRPCCommandTypes = improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Testcubebpcserverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Testcubebpcserverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnCommandResponse, this, std::placeholders::_1)));
-=======
 	using ServerRPCCommandTypes = improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands;
 	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnCommandResponse, this, std::placeholders::_1)));
->>>>>>> master
 }
 
 void USpatialTypeBinding_TestCube_BP_C::UnbindFromView()
@@ -223,21 +201,12 @@ worker::Entity USpatialTypeBinding_TestCube_BP_C::CreateActorEntity(const FStrin
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-<<<<<<< HEAD
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCClientRPCs>(improbable::unreal::generated::UnrealTestCubeBPCClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs>(improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs>(improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs::Data{}, WorkersOnly)
-=======
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData>(SingleClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData>(MultiClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCMigratableData>(MigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCClientRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::Data{}, WorkersOnly)
->>>>>>> master
 		.Build();
 }
 
@@ -1242,11 +1211,7 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_Migratable(USpatialActorCh
 {
 }
 
-<<<<<<< HEAD
-void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealTestCubeBPCNetMulticastRPCs::Update& Update)
-=======
 void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::Update& Update)
->>>>>>> master
 {
 }
 void USpatialTypeBinding_TestCube_BP_C::ServerInteract_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
@@ -1262,11 +1227,7 @@ void USpatialTypeBinding_TestCube_BP_C::ServerInteract_SendRPC(worker::Connectio
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD
-		improbable::unreal::generated::UnrealServerInteractRequest RPCPayload;
-=======
 		improbable::unreal::generated::testcubebpc::ServerInteractRequest RPCPayload;
->>>>>>> master
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1275,20 +1236,12 @@ void USpatialTypeBinding_TestCube_BP_C::ServerInteract_SendRPC(worker::Connectio
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands::Testcubebpcserverinteract>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD
-void USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealTestCubeBPCServerRPCs::Commands::Testcubebpcserverinteract>& Op)
-=======
 void USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>& Op)
->>>>>>> master
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{

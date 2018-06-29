@@ -75,11 +75,7 @@ void USpatialTypeBinding_SampleGamePlayerState::Init(USpatialInterop* InInterop,
 	RepHandleToPropertyMap.Add(27, FRepHandleData(Class, {"SelectedTeam"}, COND_None, REPNOTIFY_OnChanged, 0));
 }
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerState.cpp
-void USpatialTypeBinding_PlayerState::BindToView(bool bIsClient)
-=======
 void USpatialTypeBinding_SampleGamePlayerState::BindToView(bool bIsClient)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerState.cpp
 {
 	TSharedPtr<worker::View> View = Interop->GetSpatialOS()->GetView().Pin();
 	ViewCallbacks.Init(View);
@@ -112,19 +108,11 @@ void USpatialTypeBinding_SampleGamePlayerState::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerState.cpp
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerStateMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerStateMigratableData>& Op)
-			{
-				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerStateMigratableData::ComponentId))
-=======
 			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateMigratableData>([this](
 				const worker::ComponentUpdateOp<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateMigratableData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateMigratableData::ComponentId))
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerState.cpp
 				{
 					return;
 				}
@@ -134,19 +122,11 @@ void USpatialTypeBinding_SampleGamePlayerState::BindToView(bool bIsClient)
 			}));
 		}
 	}
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerState.cpp
-	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs>([this](
-		const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs>& Op)
-	{
-		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs::ComponentId))
-=======
 	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs>([this](
 		const worker::ComponentUpdateOp<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs>& Op)
 	{
 		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs::ComponentId))
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerState.cpp
 		{
 			return;
 		}
@@ -228,21 +208,12 @@ worker::Entity USpatialTypeBinding_SampleGamePlayerState::CreateActorEntity(cons
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerState.cpp
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateClientRPCs>(improbable::unreal::generated::UnrealPlayerStateClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateServerRPCs>(improbable::unreal::generated::UnrealPlayerStateServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs>(improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs::Data{}, WorkersOnly)
-=======
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateSingleClientRepData>(SingleClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateMultiClientRepData>(MultiClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateMigratableData>(MigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateClientRPCs>(improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateServerRPCs>(improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs>(improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs::Data{}, WorkersOnly)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerState.cpp
 		.Build();
 }
 
@@ -1553,9 +1524,5 @@ void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_Migratable(USpatia
 }
 
 void USpatialTypeBinding_SampleGamePlayerState::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::samplegameplayerstate::SampleGamePlayerStateNetMulticastRPCs::Update& Update)
-{
-}
-
-void USpatialTypeBinding_PlayerState::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealPlayerStateNetMulticastRPCs::Update& Update)
 {
 }

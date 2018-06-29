@@ -4,17 +4,10 @@ package improbable.unreal.generated.instantweapon;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-<<<<<<< HEAD
-component UnrealInstantWeaponSingleClientRepData {
-	id = 100040;
-}
-component UnrealInstantWeaponMultiClientRepData {
-=======
 component InstantWeaponSingleClientRepData {
 	id = 100040;
 }
 component InstantWeaponMultiClientRepData {
->>>>>>> master
 	id = 100041;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
@@ -36,24 +29,11 @@ component InstantWeaponMultiClientRepData {
 	UnrealObjectRef field_hitnotify_hitactor = 18; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 	bytes field_hitnotify_timestamp = 19; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 }
-<<<<<<< HEAD
-component UnrealInstantWeaponMigratableData {
-=======
 component InstantWeaponMigratableData {
->>>>>>> master
 	id = 100042;
 }
 import "improbable/unreal/generated/UnrealInstantWeaponTypes.schema";
 
-<<<<<<< HEAD
-component UnrealInstantWeaponClientRPCs {
-	id = 100043;
-}
-component UnrealInstantWeaponServerRPCs {
-	id = 100044;
-	command UnrealRPCCommandResponse instantweaponserverdidmiss(UnrealServerDidMissRequest);
-	command UnrealRPCCommandResponse instantweaponserverdidhit(UnrealServerDidHitRequest);
-=======
 component InstantWeaponClientRPCs {
 	id = 100043;
 }
@@ -63,9 +43,5 @@ component InstantWeaponServerRPCs {
 	command UnrealRPCCommandResponse serverdidhit(instantweapon.ServerDidHitRequest);
 }
 component InstantWeaponNetMulticastRPCs {
-	id = 100045;
->>>>>>> master
-}
-component UnrealInstantWeaponNetMulticastRPCs {
 	id = 100045;
 }

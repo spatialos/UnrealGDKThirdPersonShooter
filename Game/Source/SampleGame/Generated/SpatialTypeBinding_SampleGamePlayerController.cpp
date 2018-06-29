@@ -46,83 +46,6 @@ void USpatialTypeBinding_SampleGamePlayerController::Init(USpatialInterop* InInt
 {
 	Super::Init(InInterop, InPackageMap);
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-	RPCToSenderMap.Emplace("OnServerStartedVisualLogger", &USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendRPC);
-	RPCToSenderMap.Emplace("ClientWasKicked", &USpatialTypeBinding_PlayerController::ClientWasKicked_SendRPC);
-	RPCToSenderMap.Emplace("ClientVoiceHandshakeComplete", &USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_SendRPC);
-	RPCToSenderMap.Emplace("ClientUpdateMultipleLevelsStreamingStatus", &USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_SendRPC);
-	RPCToSenderMap.Emplace("ClientUpdateLevelStreamingStatus", &USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_SendRPC);
-	RPCToSenderMap.Emplace("ClientUnmutePlayer", &USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendRPC);
-	RPCToSenderMap.Emplace("ClientTravelInternal", &USpatialTypeBinding_PlayerController::ClientTravelInternal_SendRPC);
-	RPCToSenderMap.Emplace("ClientTeamMessage", &USpatialTypeBinding_PlayerController::ClientTeamMessage_SendRPC);
-	RPCToSenderMap.Emplace("ClientStopForceFeedback", &USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendRPC);
-	RPCToSenderMap.Emplace("ClientStopCameraShake", &USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendRPC);
-	RPCToSenderMap.Emplace("ClientStopCameraAnim", &USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendRPC);
-	RPCToSenderMap.Emplace("ClientStartOnlineSession", &USpatialTypeBinding_PlayerController::ClientStartOnlineSession_SendRPC);
-	RPCToSenderMap.Emplace("ClientSpawnCameraLensEffect", &USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetViewTarget", &USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetSpectatorWaiting", &USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetHUD", &USpatialTypeBinding_PlayerController::ClientSetHUD_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetForceMipLevelsToBeResident", &USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetCinematicMode", &USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetCameraMode", &USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetCameraFade", &USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetBlockOnAsyncLoading", &USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_SendRPC);
-	RPCToSenderMap.Emplace("ClientReturnToMainMenuWithTextReason", &USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_SendRPC);
-	RPCToSenderMap.Emplace("ClientReturnToMainMenu", &USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendRPC);
-	RPCToSenderMap.Emplace("ClientRetryClientRestart", &USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendRPC);
-	RPCToSenderMap.Emplace("ClientRestart", &USpatialTypeBinding_PlayerController::ClientRestart_SendRPC);
-	RPCToSenderMap.Emplace("ClientReset", &USpatialTypeBinding_PlayerController::ClientReset_SendRPC);
-	RPCToSenderMap.Emplace("ClientRepObjRef", &USpatialTypeBinding_PlayerController::ClientRepObjRef_SendRPC);
-	RPCToSenderMap.Emplace("ClientReceiveLocalizedMessage", &USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendRPC);
-	RPCToSenderMap.Emplace("ClientPrestreamTextures", &USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendRPC);
-	RPCToSenderMap.Emplace("ClientPrepareMapChange", &USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendRPC);
-	RPCToSenderMap.Emplace("ClientPlaySoundAtLocation", &USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendRPC);
-	RPCToSenderMap.Emplace("ClientPlaySound", &USpatialTypeBinding_PlayerController::ClientPlaySound_SendRPC);
-	RPCToSenderMap.Emplace("ClientPlayForceFeedback", &USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendRPC);
-	RPCToSenderMap.Emplace("ClientPlayCameraShake", &USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendRPC);
-	RPCToSenderMap.Emplace("ClientPlayCameraAnim", &USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendRPC);
-	RPCToSenderMap.Emplace("ClientMutePlayer", &USpatialTypeBinding_PlayerController::ClientMutePlayer_SendRPC);
-	RPCToSenderMap.Emplace("ClientMessage", &USpatialTypeBinding_PlayerController::ClientMessage_SendRPC);
-	RPCToSenderMap.Emplace("ClientIgnoreMoveInput", &USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendRPC);
-	RPCToSenderMap.Emplace("ClientIgnoreLookInput", &USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendRPC);
-	RPCToSenderMap.Emplace("ClientGotoState", &USpatialTypeBinding_PlayerController::ClientGotoState_SendRPC);
-	RPCToSenderMap.Emplace("ClientGameEnded", &USpatialTypeBinding_PlayerController::ClientGameEnded_SendRPC);
-	RPCToSenderMap.Emplace("ClientForceGarbageCollection", &USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_SendRPC);
-	RPCToSenderMap.Emplace("ClientFlushLevelStreaming", &USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_SendRPC);
-	RPCToSenderMap.Emplace("ClientEndOnlineSession", &USpatialTypeBinding_PlayerController::ClientEndOnlineSession_SendRPC);
-	RPCToSenderMap.Emplace("ClientEnableNetworkVoice", &USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendRPC);
-	RPCToSenderMap.Emplace("ClientCommitMapChange", &USpatialTypeBinding_PlayerController::ClientCommitMapChange_SendRPC);
-	RPCToSenderMap.Emplace("ClientClearCameraLensEffects", &USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_SendRPC);
-	RPCToSenderMap.Emplace("ClientCapBandwidth", &USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendRPC);
-	RPCToSenderMap.Emplace("ClientCancelPendingMapChange", &USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_SendRPC);
-	RPCToSenderMap.Emplace("ClientAddTextureStreamingLoc", &USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetRotation", &USpatialTypeBinding_PlayerController::ClientSetRotation_SendRPC);
-	RPCToSenderMap.Emplace("ClientSetLocation", &USpatialTypeBinding_PlayerController::ClientSetLocation_SendRPC);
-	RPCToSenderMap.Emplace("ServerViewSelf", &USpatialTypeBinding_PlayerController::ServerViewSelf_SendRPC);
-	RPCToSenderMap.Emplace("ServerViewPrevPlayer", &USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_SendRPC);
-	RPCToSenderMap.Emplace("ServerViewNextPlayer", &USpatialTypeBinding_PlayerController::ServerViewNextPlayer_SendRPC);
-	RPCToSenderMap.Emplace("ServerVerifyViewTarget", &USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_SendRPC);
-	RPCToSenderMap.Emplace("ServerUpdateMultipleLevelsVisibility", &USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_SendRPC);
-	RPCToSenderMap.Emplace("ServerUpdateLevelVisibility", &USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendRPC);
-	RPCToSenderMap.Emplace("ServerUpdateCamera", &USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendRPC);
-	RPCToSenderMap.Emplace("ServerUnmutePlayer", &USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendRPC);
-	RPCToSenderMap.Emplace("ServerToggleAILogging", &USpatialTypeBinding_PlayerController::ServerToggleAILogging_SendRPC);
-	RPCToSenderMap.Emplace("ServerShortTimeout", &USpatialTypeBinding_PlayerController::ServerShortTimeout_SendRPC);
-	RPCToSenderMap.Emplace("ServerSetSpectatorWaiting", &USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendRPC);
-	RPCToSenderMap.Emplace("ServerSetSpectatorLocation", &USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendRPC);
-	RPCToSenderMap.Emplace("ServerRestartPlayer", &USpatialTypeBinding_PlayerController::ServerRestartPlayer_SendRPC);
-	RPCToSenderMap.Emplace("ServerPause", &USpatialTypeBinding_PlayerController::ServerPause_SendRPC);
-	RPCToSenderMap.Emplace("ServerNotifyLoadedWorld", &USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendRPC);
-	RPCToSenderMap.Emplace("ServerMutePlayer", &USpatialTypeBinding_PlayerController::ServerMutePlayer_SendRPC);
-	RPCToSenderMap.Emplace("ServerCheckClientPossessionReliable", &USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_SendRPC);
-	RPCToSenderMap.Emplace("ServerCheckClientPossession", &USpatialTypeBinding_PlayerController::ServerCheckClientPossession_SendRPC);
-	RPCToSenderMap.Emplace("ServerChangeName", &USpatialTypeBinding_PlayerController::ServerChangeName_SendRPC);
-	RPCToSenderMap.Emplace("ServerCamera", &USpatialTypeBinding_PlayerController::ServerCamera_SendRPC);
-	RPCToSenderMap.Emplace("ServerAcknowledgePossession", &USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_SendRPC);
-
-	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("PlayerController"));
-=======
 	RPCToSenderMap.Emplace("ClientJoinResults", &USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_SendRPC);
 	RPCToSenderMap.Emplace("OnServerStartedVisualLogger", &USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger_SendRPC);
 	RPCToSenderMap.Emplace("ClientWasKicked", &USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC);
@@ -200,7 +123,6 @@ void USpatialTypeBinding_SampleGamePlayerController::Init(USpatialInterop* InInt
 	RPCToSenderMap.Emplace("ServerAcknowledgePossession", &USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession_SendRPC);
 
 	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("SampleGamePlayerController"));
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 	// Populate RepHandleToPropertyMap.
 	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged, 0));
@@ -224,11 +146,7 @@ void USpatialTypeBinding_SampleGamePlayerController::Init(USpatialInterop* InInt
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, COND_OwnerOnly, REPNOTIFY_OnChanged, 0));
 }
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::BindToView(bool bIsClient)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::BindToView(bool bIsClient)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	TSharedPtr<worker::View> View = Interop->GetSpatialOS()->GetView().Pin();
 	ViewCallbacks.Init(View);
@@ -261,19 +179,11 @@ void USpatialTypeBinding_SampleGamePlayerController::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerControllerMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerControllerMigratableData>& Op)
-			{
-				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerControllerMigratableData::ComponentId))
-=======
 			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData>([this](
 				const worker::ComponentUpdateOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::ComponentId))
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 				{
 					return;
 				}
@@ -283,179 +193,17 @@ void USpatialTypeBinding_SampleGamePlayerController::BindToView(bool bIsClient)
 			}));
 		}
 	}
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs>([this](
-		const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs>& Op)
-	{
-		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs::ComponentId))
-=======
 	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs>([this](
 		const worker::ComponentUpdateOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs>& Op)
 	{
 		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs::ComponentId))
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			return;
 		}
 		ReceiveUpdate_NetMulticastRPCs(Op.EntityId, Op.Update);
 	}));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-	using ClientRPCCommandTypes = improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrolleronserverstartedvisuallogger>(std::bind(&USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientwaskicked>(std::bind(&USpatialTypeBinding_PlayerController::ClientWasKicked_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientvoicehandshakecomplete>(std::bind(&USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientupdatemultiplelevelsstreamingstatus>(std::bind(&USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientupdatelevelstreamingstatus>(std::bind(&USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientunmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclienttravelinternal>(std::bind(&USpatialTypeBinding_PlayerController::ClientTravelInternal_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientteammessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientTeamMessage_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientstopforcefeedback>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientstopcamerashake>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopCameraShake_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientstopcameraanim>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientstartonlinesession>(std::bind(&USpatialTypeBinding_PlayerController::ClientStartOnlineSession_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientspawncameralenseffect>(std::bind(&USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetviewtarget>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetspectatorwaiting>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsethud>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetHUD_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetforcemiplevelstoberesident>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetcinematicmode>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCinematicMode_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetcameramode>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCameraMode_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetcamerafade>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCameraFade_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetblockonasyncloading>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientreturntomainmenuwithtextreason>(std::bind(&USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientreturntomainmenu>(std::bind(&USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientretryclientrestart>(std::bind(&USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientrestart>(std::bind(&USpatialTypeBinding_PlayerController::ClientRestart_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientreset>(std::bind(&USpatialTypeBinding_PlayerController::ClientReset_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientrepobjref>(std::bind(&USpatialTypeBinding_PlayerController::ClientRepObjRef_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientreceivelocalizedmessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientprestreamtextures>(std::bind(&USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientpreparemapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientPrepareMapChange_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientplaysoundatlocation>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientplaysound>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlaySound_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientplayforcefeedback>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientplaycamerashake>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientplaycameraanim>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ClientMutePlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientmessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientMessage_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientignoremoveinput>(std::bind(&USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientignorelookinput>(std::bind(&USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientgotostate>(std::bind(&USpatialTypeBinding_PlayerController::ClientGotoState_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientgameended>(std::bind(&USpatialTypeBinding_PlayerController::ClientGameEnded_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientforcegarbagecollection>(std::bind(&USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientflushlevelstreaming>(std::bind(&USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientendonlinesession>(std::bind(&USpatialTypeBinding_PlayerController::ClientEndOnlineSession_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientenablenetworkvoice>(std::bind(&USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientcommitmapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientCommitMapChange_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientclearcameralenseffects>(std::bind(&USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientcapbandwidth>(std::bind(&USpatialTypeBinding_PlayerController::ClientCapBandwidth_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientcancelpendingmapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientaddtexturestreamingloc>(std::bind(&USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetrotation>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetRotation_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Playercontrollerclientsetlocation>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetLocation_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrolleronserverstartedvisuallogger>(std::bind(&USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientwaskicked>(std::bind(&USpatialTypeBinding_PlayerController::ClientWasKicked_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientvoicehandshakecomplete>(std::bind(&USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientupdatemultiplelevelsstreamingstatus>(std::bind(&USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientupdatelevelstreamingstatus>(std::bind(&USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientunmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclienttravelinternal>(std::bind(&USpatialTypeBinding_PlayerController::ClientTravelInternal_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientteammessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientTeamMessage_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientstopforcefeedback>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientstopcamerashake>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopCameraShake_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientstopcameraanim>(std::bind(&USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientstartonlinesession>(std::bind(&USpatialTypeBinding_PlayerController::ClientStartOnlineSession_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientspawncameralenseffect>(std::bind(&USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetviewtarget>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetspectatorwaiting>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsethud>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetHUD_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetforcemiplevelstoberesident>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetcinematicmode>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCinematicMode_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetcameramode>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCameraMode_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetcamerafade>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetCameraFade_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetblockonasyncloading>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientreturntomainmenuwithtextreason>(std::bind(&USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientreturntomainmenu>(std::bind(&USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientretryclientrestart>(std::bind(&USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientrestart>(std::bind(&USpatialTypeBinding_PlayerController::ClientRestart_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientreset>(std::bind(&USpatialTypeBinding_PlayerController::ClientReset_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientrepobjref>(std::bind(&USpatialTypeBinding_PlayerController::ClientRepObjRef_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientreceivelocalizedmessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientprestreamtextures>(std::bind(&USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientpreparemapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientPrepareMapChange_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientplaysoundatlocation>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientplaysound>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlaySound_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientplayforcefeedback>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientplaycamerashake>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientplaycameraanim>(std::bind(&USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ClientMutePlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientmessage>(std::bind(&USpatialTypeBinding_PlayerController::ClientMessage_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientignoremoveinput>(std::bind(&USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientignorelookinput>(std::bind(&USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientgotostate>(std::bind(&USpatialTypeBinding_PlayerController::ClientGotoState_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientgameended>(std::bind(&USpatialTypeBinding_PlayerController::ClientGameEnded_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientforcegarbagecollection>(std::bind(&USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientflushlevelstreaming>(std::bind(&USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientendonlinesession>(std::bind(&USpatialTypeBinding_PlayerController::ClientEndOnlineSession_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientenablenetworkvoice>(std::bind(&USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientcommitmapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientCommitMapChange_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientclearcameralenseffects>(std::bind(&USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientcapbandwidth>(std::bind(&USpatialTypeBinding_PlayerController::ClientCapBandwidth_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientcancelpendingmapchange>(std::bind(&USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientaddtexturestreamingloc>(std::bind(&USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetrotation>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetRotation_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ClientRPCCommandTypes::Playercontrollerclientsetlocation>(std::bind(&USpatialTypeBinding_PlayerController::ClientSetLocation_OnCommandResponse, this, std::placeholders::_1)));
-
-	using ServerRPCCommandTypes = improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverviewself>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewSelf_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverviewprevplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverviewnextplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewNextPlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserververifyviewtarget>(std::bind(&USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverupdatemultiplelevelsvisibility>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverupdatelevelvisibility>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverupdatecamera>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateCamera_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverunmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservertoggleailogging>(std::bind(&USpatialTypeBinding_PlayerController::ServerToggleAILogging_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservershorttimeout>(std::bind(&USpatialTypeBinding_PlayerController::ServerShortTimeout_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserversetspectatorwaiting>(std::bind(&USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserversetspectatorlocation>(std::bind(&USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverrestartplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerRestartPlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverpause>(std::bind(&USpatialTypeBinding_PlayerController::ServerPause_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservernotifyloadedworld>(std::bind(&USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservermuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerMutePlayer_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservercheckclientpossessionreliable>(std::bind(&USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservercheckclientpossession>(std::bind(&USpatialTypeBinding_PlayerController::ServerCheckClientPossession_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserverchangename>(std::bind(&USpatialTypeBinding_PlayerController::ServerChangeName_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerservercamera>(std::bind(&USpatialTypeBinding_PlayerController::ServerCamera_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Playercontrollerserveracknowledgepossession>(std::bind(&USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverviewself>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewSelf_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverviewprevplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverviewnextplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerViewNextPlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserververifyviewtarget>(std::bind(&USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverupdatemultiplelevelsvisibility>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverupdatelevelvisibility>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverupdatecamera>(std::bind(&USpatialTypeBinding_PlayerController::ServerUpdateCamera_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverunmuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservertoggleailogging>(std::bind(&USpatialTypeBinding_PlayerController::ServerToggleAILogging_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservershorttimeout>(std::bind(&USpatialTypeBinding_PlayerController::ServerShortTimeout_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserversetspectatorwaiting>(std::bind(&USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserversetspectatorlocation>(std::bind(&USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverrestartplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerRestartPlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverpause>(std::bind(&USpatialTypeBinding_PlayerController::ServerPause_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservernotifyloadedworld>(std::bind(&USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservermuteplayer>(std::bind(&USpatialTypeBinding_PlayerController::ServerMutePlayer_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservercheckclientpossessionreliable>(std::bind(&USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservercheckclientpossession>(std::bind(&USpatialTypeBinding_PlayerController::ServerCheckClientPossession_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserverchangename>(std::bind(&USpatialTypeBinding_PlayerController::ServerChangeName_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerservercamera>(std::bind(&USpatialTypeBinding_PlayerController::ServerCamera_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Playercontrollerserveracknowledgepossession>(std::bind(&USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnCommandResponse, this, std::placeholders::_1)));
-}
-
-void USpatialTypeBinding_PlayerController::UnbindFromView()
-=======
 	using ClientRPCCommandTypes = improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands;
 	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Clientjoinresults>(std::bind(&USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayload, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandRequest<ClientRPCCommandTypes::Onserverstartedvisuallogger>(std::bind(&USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger_OnRPCPayload, this, std::placeholders::_1)));
@@ -612,7 +360,6 @@ void USpatialTypeBinding_PlayerController::UnbindFromView()
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::UnbindFromView()
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	ViewCallbacks.Reset();
 }
@@ -686,21 +433,12 @@ worker::Entity USpatialTypeBinding_SampleGamePlayerController::CreateActorEntity
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrOwningClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerClientRPCs>(improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerServerRPCs>(improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs>(improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs::Data{}, WorkersOnly)
-=======
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData>(SingleClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData>(MultiClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData>(MigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs::Data{}, WorkersOnly)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		.Build();
 }
 
@@ -1192,45 +930,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSendUpdate_MultiClien
 
 void USpatialTypeBinding_SampleGamePlayerController::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update& OutUpdate) const
 {
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-	switch (Handle)
-	{
-		case 1: // field_acknowledgedpawn
-		{
-			APawn* Value = *(reinterpret_cast<APawn* const*>(Data));
-
-			if (Value != nullptr)
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
-				if (!NetGUID.IsValid())
-				{
-					if (Value->IsFullNameStableForNetworking())
-					{
-						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
-					}
-				}
-				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
-				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
-				{
-					Interop->QueueOutgoingObjectMigUpdate_Internal(Value, Channel, 1);
-				}
-				else
-				{
-					OutUpdate.set_field_acknowledgedpawn(ObjectRef);
-				}
-			}
-			else
-			{
-				OutUpdate.set_field_acknowledgedpawn(SpatialConstants::NULL_OBJECT_REF);
-			}
-			break;
-		}
-	default:
-		checkf(false, TEXT("Unknown migration property handle %d encountered when creating a SpatialOS update."));
-		break;
-	}
-=======
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update& Update) const
@@ -1980,40 +1679,8 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_acknowledgedpawn().data());
-			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
-			{
-				Value = nullptr;
-			}
-			else
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-				if (NetGUID.IsValid())
-				{
-					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					checkf(Cast<APawn>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-					Value = Cast<APawn>(Object_Raw);
-				}
-				else
-				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-						*Interop->GetSpatialOS()->GetWorkerId(),
-						*ObjectRefToString(ObjectRef),
-						*ActorChannel->Actor->GetName(),
-						ActorChannel->GetEntityId().ToSpatialEntityId(),
-						*MigratableData->Property->GetName(),
-						Handle);
-					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectMigUpdate_Internal(ObjectRef, ActorChannel, MigratableData);
-				}
-			}
-=======
 			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientJoinResults queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		}
 
 		// Build RPC Payload.
@@ -2027,19 +1694,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_SendRPC(w
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealPlayerControllerNetMulticastRPCs::Update& Update)
-{
-}
-void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientjoinresults>(TargetObjectRef.entity(), RPCPayload, 0);
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
 void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventOnServerStartedVisualLogger_Parms StructuredParams = *static_cast<PlayerController_eventOnServerStartedVisualLogger_Parms*>(Parameters);
@@ -2055,11 +1715,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealOnServerStartedVisualLoggerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::OnServerStartedVisualLoggerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bislogging(StructuredParams.bIsLogging);
 
 		// Send RPC
@@ -2069,20 +1725,12 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrolleronserverstartedvisuallogger>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Onserverstartedvisuallogger>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientWasKicked_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientWasKicked_Parms StructuredParams = *static_cast<PlayerController_eventClientWasKicked_Parms*>(Parameters);
@@ -2098,11 +1746,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC(wor
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientWasKickedRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientWasKickedRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		// UNSUPPORTED UTextProperty (unhandled) RPCPayload.set_field_kickreason(StructuredParams.KickReason)
 
 		// Send RPC
@@ -2112,20 +1756,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC(wor
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientwaskicked>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientwaskicked>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplete_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2138,11 +1774,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientVoiceHandshakeCompleteRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientVoiceHandshakeCompleteRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2151,20 +1783,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientvoicehandshakecomplete>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientvoicehandshakecomplete>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsStreamingStatus_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientUpdateMultipleLevelsStreamingStatus_Parms StructuredParams = *static_cast<PlayerController_eventClientUpdateMultipleLevelsStreamingStatus_Parms*>(Parameters);
@@ -2180,11 +1804,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientUpdateMultipleLevelsStreamingStatusRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientUpdateMultipleLevelsStreamingStatusRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		::worker::List<std::string> List;
 		for(int i = 0; i < StructuredParams.LevelStatuses.Num(); i++)
 		{
@@ -2202,20 +1822,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientupdatemultiplelevelsstreamingstatus>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientupdatemultiplelevelsstreamingstatus>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingStatus_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientUpdateLevelStreamingStatus_Parms StructuredParams = *static_cast<PlayerController_eventClientUpdateLevelStreamingStatus_Parms*>(Parameters);
@@ -2231,11 +1843,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientUpdateLevelStreamingStatusRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientUpdateLevelStreamingStatusRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_packagename(TCHAR_TO_UTF8(*StructuredParams.PackageName.ToString()));
 		RPCPayload.set_field_bnewshouldbeloaded(StructuredParams.bNewShouldBeLoaded);
 		RPCPayload.set_field_bnewshouldbevisible(StructuredParams.bNewShouldBeVisible);
@@ -2249,20 +1857,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientupdatelevelstreamingstatus>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientupdatelevelstreamingstatus>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientUnmutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventClientUnmutePlayer_Parms*>(Parameters);
@@ -2278,11 +1878,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_SendRPC(
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientUnmutePlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientUnmutePlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -2299,20 +1895,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_SendRPC(
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientunmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientunmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientTravelInternal_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientTravelInternal_Parms StructuredParams = *static_cast<PlayerController_eventClientTravelInternal_Parms*>(Parameters);
@@ -2328,11 +1916,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_SendRP
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientTravelInternalRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientTravelInternalRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_url(TCHAR_TO_UTF8(*StructuredParams.URL));
 		RPCPayload.set_field_traveltype(uint32_t(StructuredParams.TravelType));
 		RPCPayload.set_field_bseamless(StructuredParams.bSeamless);
@@ -2348,20 +1932,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_SendRP
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclienttravelinternal>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clienttravelinternal>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientTeamMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientTeamMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientTeamMessage_Parms*>(Parameters);
@@ -2377,11 +1953,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(w
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientTeamMessageRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientTeamMessageRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.SenderPlayerState != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.SenderPlayerState);
@@ -2418,20 +1990,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(w
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientteammessage>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientteammessage>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientStopForceFeedback_Parms StructuredParams = *static_cast<PlayerController_eventClientStopForceFeedback_Parms*>(Parameters);
@@ -2447,11 +2011,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_Sen
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientStopForceFeedbackRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientStopForceFeedbackRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.ForceFeedbackEffect != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForceFeedbackEffect);
@@ -2486,20 +2046,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_Sen
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopforcefeedback>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopforcefeedback>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopCameraShake_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientStopCameraShake_Parms StructuredParams = *static_cast<PlayerController_eventClientStopCameraShake_Parms*>(Parameters);
@@ -2515,11 +2067,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientStopCameraShakeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientStopCameraShakeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_shake(PackageMap->GetHashFromStaticClass(StructuredParams.Shake));
 		RPCPayload.set_field_bimmediately(StructuredParams.bImmediately);
 
@@ -2530,20 +2078,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopcamerashake>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopcamerashake>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientStopCameraAnim_Parms StructuredParams = *static_cast<PlayerController_eventClientStopCameraAnim_Parms*>(Parameters);
@@ -2559,11 +2099,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRP
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientStopCameraAnimRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientStopCameraAnimRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.AnimToStop != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.AnimToStop);
@@ -2597,20 +2133,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRP
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopcameraanim>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopcameraanim>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -2623,11 +2151,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_Se
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientStartOnlineSessionRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientStartOnlineSessionRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -2636,20 +2160,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_Se
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstartonlinesession>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstartonlinesession>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSpawnCameraLensEffect_Parms StructuredParams = *static_cast<PlayerController_eventClientSpawnCameraLensEffect_Parms*>(Parameters);
@@ -2665,11 +2181,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSpawnCameraLensEffectRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSpawnCameraLensEffectRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_lenseffectemitterclass(PackageMap->GetHashFromStaticClass(StructuredParams.LensEffectEmitterClass));
 
 		// Send RPC
@@ -2679,20 +2191,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientspawncameralenseffect>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientspawncameralenseffect>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetViewTarget_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetViewTarget_Parms StructuredParams = *static_cast<PlayerController_eventClientSetViewTarget_Parms*>(Parameters);
@@ -2708,11 +2212,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetViewTargetRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetViewTargetRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.A != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.A);
@@ -2750,20 +2250,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetviewtarget>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetviewtarget>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetSpectatorWaiting_Parms StructuredParams = *static_cast<PlayerController_eventClientSetSpectatorWaiting_Parms*>(Parameters);
@@ -2779,11 +2271,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_S
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetSpectatorWaitingRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetSpectatorWaitingRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bwaiting(StructuredParams.bWaiting);
 
 		// Send RPC
@@ -2793,20 +2281,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_S
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetspectatorwaiting>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetspectatorwaiting>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetHUD_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetHUD_Parms StructuredParams = *static_cast<PlayerController_eventClientSetHUD_Parms*>(Parameters);
@@ -2822,11 +2302,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetHUDRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetHUDRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_newhudclass(PackageMap->GetHashFromStaticClass(StructuredParams.NewHUDClass));
 
 		// Send RPC
@@ -2836,20 +2312,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsethud>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsethud>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBeResident_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetForceMipLevelsToBeResident_Parms StructuredParams = *static_cast<PlayerController_eventClientSetForceMipLevelsToBeResident_Parms*>(Parameters);
@@ -2865,11 +2333,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetForceMipLevelsToBeResidentRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetForceMipLevelsToBeResidentRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.Material != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Material);
@@ -2905,20 +2369,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetforcemiplevelstoberesident>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetforcemiplevelstoberesident>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetCinematicMode_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCinematicMode_Parms*>(Parameters);
@@ -2934,11 +2390,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_Send
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetCinematicModeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetCinematicModeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bincinematicmode(StructuredParams.bInCinematicMode);
 		RPCPayload.set_field_baffectsmovement(StructuredParams.bAffectsMovement);
 		RPCPayload.set_field_baffectsturning(StructuredParams.bAffectsTurning);
@@ -2951,20 +2403,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_Send
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcinematicmode>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcinematicmode>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCameraMode_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetCameraMode_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCameraMode_Parms*>(Parameters);
@@ -2980,11 +2424,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_SendRPC
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetCameraModeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetCameraModeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_newcammode(TCHAR_TO_UTF8(*StructuredParams.NewCamMode.ToString()));
 
 		// Send RPC
@@ -2994,20 +2434,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_SendRPC
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcameramode>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcameramode>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCameraFade_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientSetCameraFade_Parms StructuredParams = *static_cast<PlayerController_eventClientSetCameraFade_Parms*>(Parameters);
@@ -3023,11 +2455,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_SendRPC
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetCameraFadeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetCameraFadeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_benablefading(StructuredParams.bEnableFading);
 		RPCPayload.set_field_fadecolor_b(uint32_t(StructuredParams.FadeColor.B));
 		RPCPayload.set_field_fadecolor_g(uint32_t(StructuredParams.FadeColor.G));
@@ -3051,20 +2479,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_SendRPC
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcamerafade>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcamerafade>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoading_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3077,11 +2497,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetBlockOnAsyncLoadingRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientSetBlockOnAsyncLoadingRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3090,20 +2506,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetblockonasyncloading>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetblockonasyncloading>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithTextReason_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientReturnToMainMenuWithTextReason_Parms StructuredParams = *static_cast<PlayerController_eventClientReturnToMainMenuWithTextReason_Parms*>(Parameters);
@@ -3119,11 +2527,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientReturnToMainMenuWithTextReasonRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientReturnToMainMenuWithTextReasonRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		// UNSUPPORTED UTextProperty (unhandled) RPCPayload.set_field_returnreason(StructuredParams.ReturnReason)
 
 		// Send RPC
@@ -3133,20 +2537,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreturntomainmenuwithtextreason>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreturntomainmenuwithtextreason>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientReturnToMainMenu_Parms StructuredParams = *static_cast<PlayerController_eventClientReturnToMainMenu_Parms*>(Parameters);
@@ -3162,11 +2558,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_Send
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientReturnToMainMenuRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientReturnToMainMenuRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_returnreason(TCHAR_TO_UTF8(*StructuredParams.ReturnReason));
 
 		// Send RPC
@@ -3176,20 +2568,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_Send
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreturntomainmenu>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreturntomainmenu>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientRetryClientRestart_Parms StructuredParams = *static_cast<PlayerController_eventClientRetryClientRestart_Parms*>(Parameters);
@@ -3205,11 +2589,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_Se
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientRetryClientRestartRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientRetryClientRestartRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.NewPawn != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewPawn);
@@ -3243,20 +2623,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_Se
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientretryclientrestart>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientretryclientrestart>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRestart_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientRestart_Parms StructuredParams = *static_cast<PlayerController_eventClientRestart_Parms*>(Parameters);
@@ -3272,11 +2644,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worke
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientRestartRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientRestartRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.NewPawn != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.NewPawn);
@@ -3310,20 +2678,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worke
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientrestart>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientrestart>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReset_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReset_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -3336,11 +2696,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_SendRPC(worker:
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientResetRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientResetRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -3349,20 +2705,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_SendRPC(worker:
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreset>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreset>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRepObjRef_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientRepObjRef_Parms StructuredParams = *static_cast<PlayerController_eventClientRepObjRef_Parms*>(Parameters);
@@ -3378,11 +2726,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(wor
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientRepObjRefRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientRepObjRefRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.Object != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Object);
@@ -3416,20 +2760,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(wor
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientrepobjref>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientrepobjref>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientReceiveLocalizedMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientReceiveLocalizedMessage_Parms*>(Parameters);
@@ -3445,11 +2781,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientReceiveLocalizedMessageRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientReceiveLocalizedMessageRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_message(PackageMap->GetHashFromStaticClass(StructuredParams.Message));
 		RPCPayload.set_field_switch(int32_t(StructuredParams.Switch));
 		if (StructuredParams.RelatedPlayerState_1 != nullptr)
@@ -3535,20 +2867,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreceivelocalizedmessage>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreceivelocalizedmessage>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPrestreamTextures_Parms StructuredParams = *static_cast<PlayerController_eventClientPrestreamTextures_Parms*>(Parameters);
@@ -3564,11 +2888,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_Sen
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPrestreamTexturesRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPrestreamTexturesRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.ForcedActor != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForcedActor);
@@ -3605,20 +2925,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_Sen
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientprestreamtextures>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientprestreamtextures>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPrepareMapChange_Parms StructuredParams = *static_cast<PlayerController_eventClientPrepareMapChange_Parms*>(Parameters);
@@ -3634,11 +2946,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_Send
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPrepareMapChangeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPrepareMapChangeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_levelname(TCHAR_TO_UTF8(*StructuredParams.LevelName.ToString()));
 		RPCPayload.set_field_bfirst(StructuredParams.bFirst);
 		RPCPayload.set_field_blast(StructuredParams.bLast);
@@ -3650,20 +2958,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_Send
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientpreparemapchange>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientpreparemapchange>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPlaySoundAtLocation_Parms StructuredParams = *static_cast<PlayerController_eventClientPlaySoundAtLocation_Parms*>(Parameters);
@@ -3679,11 +2979,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_S
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPlaySoundAtLocationRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPlaySoundAtLocationRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.Sound != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Sound);
@@ -3727,20 +3023,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_S
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaysoundatlocation>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaysoundatlocation>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlaySound_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPlaySound_Parms StructuredParams = *static_cast<PlayerController_eventClientPlaySound_Parms*>(Parameters);
@@ -3756,11 +3044,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(wor
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPlaySoundRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPlaySoundRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.Sound != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.Sound);
@@ -3796,20 +3080,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(wor
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaysound>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaysound>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPlayForceFeedback_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayForceFeedback_Parms*>(Parameters);
@@ -3825,11 +3101,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_Sen
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPlayForceFeedbackRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPlayForceFeedbackRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.ForceFeedbackEffect != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.ForceFeedbackEffect);
@@ -3866,20 +3138,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_Sen
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplayforcefeedback>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplayforcefeedback>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPlayCameraShake_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayCameraShake_Parms*>(Parameters);
@@ -3895,11 +3159,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPlayCameraShakeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPlayCameraShakeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_shake(PackageMap->GetHashFromStaticClass(StructuredParams.Shake));
 		RPCPayload.set_field_scale(StructuredParams.Scale);
 		RPCPayload.set_field_playspace(uint32_t(StructuredParams.PlaySpace));
@@ -3919,20 +3179,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaycamerashake>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaycamerashake>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientPlayCameraAnim_Parms StructuredParams = *static_cast<PlayerController_eventClientPlayCameraAnim_Parms*>(Parameters);
@@ -3948,11 +3200,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRP
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientPlayCameraAnimRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientPlayCameraAnimRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.AnimToPlay != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.AnimToPlay);
@@ -4001,20 +3249,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRP
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaycameraanim>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaycameraanim>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientMutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientMutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventClientMutePlayer_Parms*>(Parameters);
@@ -4030,11 +3270,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_SendRPC(wo
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientMutePlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientMutePlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -4051,20 +3287,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_SendRPC(wo
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientMessage_Parms StructuredParams = *static_cast<PlayerController_eventClientMessage_Parms*>(Parameters);
@@ -4080,11 +3308,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_SendRPC(worke
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientMessageRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientMessageRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_s(TCHAR_TO_UTF8(*StructuredParams.S));
 		RPCPayload.set_field_type(TCHAR_TO_UTF8(*StructuredParams.Type.ToString()));
 		RPCPayload.set_field_msglifetime(StructuredParams.MsgLifeTime);
@@ -4096,20 +3320,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_SendRPC(worke
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientmessage>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientmessage>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientIgnoreMoveInput_Parms StructuredParams = *static_cast<PlayerController_eventClientIgnoreMoveInput_Parms*>(Parameters);
@@ -4125,11 +3341,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientIgnoreMoveInputRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientIgnoreMoveInputRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bignore(StructuredParams.bIgnore);
 
 		// Send RPC
@@ -4139,20 +3351,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientignoremoveinput>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientignoremoveinput>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientIgnoreLookInput_Parms StructuredParams = *static_cast<PlayerController_eventClientIgnoreLookInput_Parms*>(Parameters);
@@ -4168,11 +3372,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientIgnoreLookInputRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientIgnoreLookInputRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bignore(StructuredParams.bIgnore);
 
 		// Send RPC
@@ -4182,20 +3382,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientignorelookinput>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientignorelookinput>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientGotoState_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientGotoState_Parms StructuredParams = *static_cast<PlayerController_eventClientGotoState_Parms*>(Parameters);
@@ -4211,11 +3403,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_SendRPC(wor
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientGotoStateRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientGotoStateRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_newstate(TCHAR_TO_UTF8(*StructuredParams.NewState.ToString()));
 
 		// Send RPC
@@ -4225,20 +3413,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_SendRPC(wor
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientgotostate>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientgotostate>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientGameEnded_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientGameEnded_Parms StructuredParams = *static_cast<PlayerController_eventClientGameEnded_Parms*>(Parameters);
@@ -4254,11 +3434,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(wor
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientGameEndedRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientGameEndedRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.EndGameFocus != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.EndGameFocus);
@@ -4293,20 +3469,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(wor
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientgameended>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientgameended>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollection_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4319,11 +3487,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientForceGarbageCollectionRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientForceGarbageCollectionRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4332,20 +3496,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientforcegarbagecollection>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientforcegarbagecollection>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4358,11 +3514,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_S
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientFlushLevelStreamingRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientFlushLevelStreamingRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4371,20 +3523,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_S
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientflushlevelstreaming>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientflushlevelstreaming>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4397,11 +3541,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_Send
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientEndOnlineSessionRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientEndOnlineSessionRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4410,20 +3550,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_Send
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientendonlinesession>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientendonlinesession>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientEnableNetworkVoice_Parms StructuredParams = *static_cast<PlayerController_eventClientEnableNetworkVoice_Parms*>(Parameters);
@@ -4439,11 +3571,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_Se
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientEnableNetworkVoiceRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientEnableNetworkVoiceRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_benable(StructuredParams.bEnable);
 
 		// Send RPC
@@ -4453,20 +3581,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_Se
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientenablenetworkvoice>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientenablenetworkvoice>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCommitMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4479,11 +3599,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientCommitMapChangeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientCommitMapChangeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4492,20 +3608,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcommitmapchange>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcommitmapchange>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffects_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4518,11 +3626,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientClearCameraLensEffectsRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientClearCameraLensEffectsRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4531,20 +3635,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientclearcameralenseffects>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientclearcameralenseffects>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCapBandwidth_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientCapBandwidth_Parms StructuredParams = *static_cast<PlayerController_eventClientCapBandwidth_Parms*>(Parameters);
@@ -4560,11 +3656,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_SendRPC(
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientCapBandwidthRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientCapBandwidthRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_cap(int32_t(StructuredParams.Cap));
 
 		// Send RPC
@@ -4574,20 +3666,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_SendRPC(
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcapbandwidth>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcapbandwidth>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChange_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4600,11 +3684,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientCancelPendingMapChangeRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientCancelPendingMapChangeRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4613,20 +3693,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcancelpendingmapchange>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcancelpendingmapchange>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLoc_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventClientAddTextureStreamingLoc_Parms StructuredParams = *static_cast<PlayerController_eventClientAddTextureStreamingLoc_Parms*>(Parameters);
@@ -4642,11 +3714,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientAddTextureStreamingLocRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ClientAddTextureStreamingLocRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -4665,20 +3733,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientaddtexturestreamingloc>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientaddtexturestreamingloc>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetRotation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in Controller.generated.h (in a macro that is then put in Controller.h UCLASS macro)
 	Controller_eventClientSetRotation_Parms StructuredParams = *static_cast<Controller_eventClientSetRotation_Parms*>(Parameters);
@@ -4694,11 +3754,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_SendRPC(w
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetRotationRequest RPCPayload;
-=======
 		improbable::unreal::generated::controller::ClientSetRotationRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -4716,9 +3772,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_SendRPC(w
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetrotation>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetrotation>(TargetObjectRef.entity(), RPCPayload, 0);
 			return {RequestId.Id};
 	};
@@ -4766,16 +3819,11 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_SendRPC(w
 			*ObjectRefToString(TargetObjectRef));
 
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetlocation>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetLocation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in SampleGamePlayerController.generated.h (in a macro that is then put in SampleGamePlayerController.h UCLASS macro)
 	SampleGamePlayerController_eventServerTryJoinGame_Parms StructuredParams = *static_cast<SampleGamePlayerController_eventServerTryJoinGame_Parms*>(Parameters);
@@ -4791,29 +3839,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_SendRPC(w
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealClientSetLocationRequest RPCPayload;
-		{
-			TArray<uint8> ValueData;
-			FMemoryWriter ValueDataWriter(ValueData);
-			bool bSuccess = true;
-			(const_cast<FVector&>(StructuredParams.NewLocation)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
-			RPCPayload.set_field_newlocation(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
-		}
-		{
-			TArray<uint8> ValueData;
-			FMemoryWriter ValueDataWriter(ValueData);
-			bool bSuccess = true;
-			(const_cast<FRotator&>(StructuredParams.NewRotation)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
-			RPCPayload.set_field_newrotation(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
-		}
-
-		// Send RPC
-		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetLocation, target: %s %s"),
-=======
 		improbable::unreal::generated::samplegameplayercontroller::ServerTryJoinGameRequest RPCPayload;
 		RPCPayload.set_field_newplayername(TCHAR_TO_UTF8(*StructuredParams.NewPlayerName));
 		RPCPayload.set_field_newplayerteam(uint32(StructuredParams.NewPlayerTeam));
@@ -4821,25 +3846,16 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_SendRPC(w
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerTryJoinGame, target: %s %s"),
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetlocation>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servertryjoingame>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewSelf_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerViewSelf_Parms StructuredParams = *static_cast<PlayerController_eventServerViewSelf_Parms*>(Parameters);
@@ -4855,11 +3871,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_SendRPC(work
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerViewSelfRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerViewSelfRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_transitionparams_blendtime(StructuredParams.TransitionParams.BlendTime);
 		RPCPayload.set_field_transitionparams_blendfunction(uint32_t(StructuredParams.TransitionParams.BlendFunction));
 		RPCPayload.set_field_transitionparams_blendexp(StructuredParams.TransitionParams.BlendExp);
@@ -4872,20 +3884,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_SendRPC(work
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewself>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewself>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4898,11 +3902,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_SendRP
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerViewPrevPlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerViewPrevPlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4911,20 +3911,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_SendRP
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewprevplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewprevplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4937,11 +3929,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_SendRP
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerViewNextPlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerViewNextPlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4950,20 +3938,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_SendRP
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewnextplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewnextplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -4976,11 +3956,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_Send
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerVerifyViewTargetRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerVerifyViewTargetRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -4989,20 +3965,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_Send
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserververifyviewtarget>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serververifyviewtarget>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsVisibility_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerUpdateMultipleLevelsVisibility_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateMultipleLevelsVisibility_Parms*>(Parameters);
@@ -5018,11 +3986,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerUpdateMultipleLevelsVisibilityRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerUpdateMultipleLevelsVisibilityRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		::worker::List<std::string> List;
 		for(int i = 0; i < StructuredParams.LevelVisibilities.Num(); i++)
 		{
@@ -5040,20 +4004,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatemultiplelevelsvisibility>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatemultiplelevelsvisibility>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerUpdateLevelVisibility_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateLevelVisibility_Parms*>(Parameters);
@@ -5069,11 +4025,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerUpdateLevelVisibilityRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerUpdateLevelVisibilityRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_packagename(TCHAR_TO_UTF8(*StructuredParams.PackageName.ToString()));
 		RPCPayload.set_field_bisvisible(StructuredParams.bIsVisible);
 
@@ -5084,20 +4036,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatelevelvisibility>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatelevelvisibility>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateCamera_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerUpdateCamera_Parms StructuredParams = *static_cast<PlayerController_eventServerUpdateCamera_Parms*>(Parameters);
@@ -5113,11 +4057,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_SendRPC(
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerUpdateCameraRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerUpdateCameraRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -5135,20 +4075,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_SendRPC(
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatecamera>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatecamera>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerUnmutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventServerUnmutePlayer_Parms*>(Parameters);
@@ -5164,11 +4096,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_SendRPC(
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerUnmutePlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerUnmutePlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -5185,20 +4113,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_SendRPC(
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverunmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverunmuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerToggleAILogging_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5211,11 +4131,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_SendR
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerToggleAILoggingRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerToggleAILoggingRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5224,20 +4140,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_SendR
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservertoggleailogging>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servertoggleailogging>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerShortTimeout_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5250,11 +4158,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_SendRPC(
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerShortTimeoutRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerShortTimeoutRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5263,20 +4167,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_SendRPC(
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservershorttimeout>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servershorttimeout>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerSetSpectatorWaiting_Parms StructuredParams = *static_cast<PlayerController_eventServerSetSpectatorWaiting_Parms*>(Parameters);
@@ -5292,11 +4188,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_S
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerSetSpectatorWaitingRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerSetSpectatorWaitingRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_bwaiting(StructuredParams.bWaiting);
 
 		// Send RPC
@@ -5306,20 +4198,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_S
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserversetspectatorwaiting>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serversetspectatorwaiting>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerSetSpectatorLocation_Parms StructuredParams = *static_cast<PlayerController_eventServerSetSpectatorLocation_Parms*>(Parameters);
@@ -5335,11 +4219,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerSetSpectatorLocationRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerSetSpectatorLocationRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -5364,20 +4244,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserversetspectatorlocation>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serversetspectatorlocation>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerRestartPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5390,11 +4262,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_SendRPC
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerRestartPlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerRestartPlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5403,20 +4271,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_SendRPC
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverrestartplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverrestartplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerPause_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerPause_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5429,11 +4289,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_SendRPC(worker:
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerPauseRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerPauseRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5442,20 +4298,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_SendRPC(worker:
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverpause>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverpause>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerNotifyLoadedWorld_Parms StructuredParams = *static_cast<PlayerController_eventServerNotifyLoadedWorld_Parms*>(Parameters);
@@ -5471,11 +4319,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_Sen
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerNotifyLoadedWorldRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerNotifyLoadedWorldRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_worldpackagename(TCHAR_TO_UTF8(*StructuredParams.WorldPackageName.ToString()));
 
 		// Send RPC
@@ -5485,20 +4329,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_Sen
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservernotifyloadedworld>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servernotifyloadedworld>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerMutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerMutePlayer_Parms StructuredParams = *static_cast<PlayerController_eventServerMutePlayer_Parms*>(Parameters);
@@ -5514,11 +4350,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_SendRPC(wo
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerMutePlayerRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerMutePlayerRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -5535,20 +4367,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_SendRPC(wo
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservermuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servermuteplayer>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossessionReliable_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5561,11 +4385,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerCheckClientPossessionReliableRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerCheckClientPossessionReliableRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5574,20 +4394,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercheckclientpossessionreliable>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercheckclientpossessionreliable>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
 	{
@@ -5600,11 +4412,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerCheckClientPossessionRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerCheckClientPossessionRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -5613,20 +4421,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercheckclientpossession>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercheckclientpossession>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerChangeName_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerChangeName_Parms StructuredParams = *static_cast<PlayerController_eventServerChangeName_Parms*>(Parameters);
@@ -5642,11 +4442,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_SendRPC(wo
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerChangeNameRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerChangeNameRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_s(TCHAR_TO_UTF8(*StructuredParams.S));
 
 		// Send RPC
@@ -5656,20 +4452,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_SendRPC(wo
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverchangename>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverchangename>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCamera_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerCamera_Parms StructuredParams = *static_cast<PlayerController_eventServerCamera_Parms*>(Parameters);
@@ -5685,11 +4473,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_SendRPC(worker
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerCameraRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerCameraRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		RPCPayload.set_field_newmode(TCHAR_TO_UTF8(*StructuredParams.NewMode.ToString()));
 
 		// Send RPC
@@ -5699,20 +4483,12 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_SendRPC(worker
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercamera>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercamera>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	// This struct is declared in PlayerController.generated.h (in a macro that is then put in PlayerController.h UCLASS macro)
 	PlayerController_eventServerAcknowledgePossession_Parms StructuredParams = *static_cast<PlayerController_eventServerAcknowledgePossession_Parms*>(Parameters);
@@ -5728,11 +4504,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-		improbable::unreal::generated::UnrealServerAcknowledgePossessionRequest RPCPayload;
-=======
 		improbable::unreal::generated::playercontroller::ServerAcknowledgePossessionRequest RPCPayload;
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 		if (StructuredParams.P != nullptr)
 		{
 			FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.P);
@@ -5766,18 +4538,11 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserveracknowledgepossession>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serveracknowledgepossession>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::OnServerStartedVisualLogger_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrolleronserverstartedvisuallogger>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientjoinresults>& Op)
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
@@ -5831,7 +4596,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayl
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
 void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Onserverstartedvisuallogger>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -5883,11 +4647,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientWasKicked_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientwaskicked>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientwaskicked>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -5939,11 +4699,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_OnRPCPayloa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientVoiceHandshakeComplete_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientvoicehandshakecomplete>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplete_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientvoicehandshakecomplete>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -5988,11 +4744,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientupdatemultiplelevelsstreamingstatus>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientupdatemultiplelevelsstreamingstatus>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6055,11 +4807,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUpdateLevelStreamingStatus_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientupdatelevelstreamingstatus>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingStatus_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientupdatelevelstreamingstatus>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6115,11 +4863,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientUnmutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientunmuteplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientunmuteplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6179,11 +4923,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_OnRPCPay
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientTravelInternal_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclienttravelinternal>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clienttravelinternal>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6241,11 +4981,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_OnRPCP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientTeamMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientteammessage>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientteammessage>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6327,11 +5063,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayl
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopForceFeedback_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopforcefeedback>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopforcefeedback>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6411,11 +5143,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnR
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopCameraShake_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopcamerashake>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopcamerashake>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6468,11 +5196,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStopCameraAnim_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstopcameraanim>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstopcameraanim>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6551,11 +5275,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientStartOnlineSession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientstartonlinesession>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientstartonlinesession>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6600,11 +5320,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_On
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSpawnCameraLensEffect_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientspawncameralenseffect>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientspawncameralenseffect>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6656,11 +5372,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetViewTarget_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetviewtarget>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetviewtarget>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6743,11 +5455,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetSpectatorWaiting_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetspectatorwaiting>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetspectatorwaiting>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6799,11 +5507,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_O
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetHUD_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsethud>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsethud>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6855,11 +5559,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(c
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetForceMipLevelsToBeResident_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetforcemiplevelstoberesident>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBeResident_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetforcemiplevelstoberesident>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6940,11 +5640,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCinematicMode_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcinematicmode>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcinematicmode>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -6999,11 +5695,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_OnRP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCameraMode_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcameramode>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcameramode>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7055,11 +5747,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_OnRPCPa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetCameraFade_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetcamerafade>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetcamerafade>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7126,11 +5814,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_OnRPCPa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetBlockOnAsyncLoading_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetblockonasyncloading>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoading_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetblockonasyncloading>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7175,11 +5859,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenuWithTextReason_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreturntomainmenuwithtextreason>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithTextReason_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreturntomainmenuwithtextreason>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7231,11 +5911,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReturnToMainMenu_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreturntomainmenu>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreturntomainmenu>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7287,11 +5963,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_OnRP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRetryClientRestart_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientretryclientrestart>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientretryclientrestart>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7370,11 +6042,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_On
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRestart_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientrestart>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientrestart>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7453,11 +6121,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReset_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreset>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReset_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreset>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7502,11 +6166,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_OnRPCPayload(co
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientRepObjRef_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientrepobjref>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientrepobjref>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7585,11 +6245,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayloa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientReceiveLocalizedMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientreceivelocalizedmessage>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientreceivelocalizedmessage>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7726,11 +6382,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPrestreamTextures_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientprestreamtextures>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientprestreamtextures>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7812,11 +6464,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnR
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPrepareMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientpreparemapchange>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientpreparemapchange>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7870,11 +6518,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_OnRP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlaySoundAtLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaysoundatlocation>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaysoundatlocation>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -7964,11 +6608,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_O
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlaySound_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaysound>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaysound>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8049,11 +6689,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayloa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayForceFeedback_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplayforcefeedback>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplayforcefeedback>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8135,11 +6771,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnR
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayCameraShake_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaycamerashake>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaycamerashake>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8202,11 +6834,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientPlayCameraAnim_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientplaycameraanim>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientplaycameraanim>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8301,11 +6929,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientMutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientmuteplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientmuteplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8365,11 +6989,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_OnRPCPaylo
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientmessage>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientmessage>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8423,11 +7043,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_OnRPCPayload(
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientIgnoreMoveInput_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientignoremoveinput>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientignoremoveinput>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8479,11 +7095,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientIgnoreLookInput_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientignorelookinput>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientignorelookinput>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8535,11 +7147,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientGotoState_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientgotostate>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientgotostate>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8591,11 +7199,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_OnRPCPayloa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientGameEnded_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientgameended>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientgameended>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8675,11 +7279,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayloa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientForceGarbageCollection_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientforcegarbagecollection>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollection_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientforcegarbagecollection>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8724,11 +7324,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientFlushLevelStreaming_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientflushlevelstreaming>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientflushlevelstreaming>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8773,11 +7369,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_O
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientEndOnlineSession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientendonlinesession>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientendonlinesession>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8822,11 +7414,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_OnRP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientEnableNetworkVoice_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientenablenetworkvoice>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientenablenetworkvoice>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8878,11 +7466,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_On
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCommitMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcommitmapchange>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcommitmapchange>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8927,11 +7511,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientClearCameraLensEffects_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientclearcameralenseffects>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffects_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientclearcameralenseffects>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -8976,11 +7556,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCapBandwidth_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcapbandwidth>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcapbandwidth>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9032,11 +7608,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_OnRPCPay
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientCancelPendingMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientcancelpendingmapchange>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChange_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientcancelpendingmapchange>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9081,11 +7653,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientAddTextureStreamingLoc_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientaddtexturestreamingloc>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLoc_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientaddtexturestreamingloc>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9147,11 +7715,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetRotation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetrotation>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetrotation>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9212,11 +7776,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_OnRPCPayl
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ClientSetLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerClientRPCs::Commands::Playercontrollerclientsetlocation>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientsetlocation>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9285,9 +7845,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_OnRPCPayl
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewSelf_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewself>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servertryjoingame>& Op)
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
@@ -9342,7 +7899,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_OnRPCPayl
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewself>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9397,11 +7953,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_OnRPCPayload
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewPrevPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewprevplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewprevplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9446,11 +7998,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_OnRPCP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerViewNextPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverviewnextplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverviewnextplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9495,11 +8043,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_OnRPCP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerVerifyViewTarget_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserververifyviewtarget>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serververifyviewtarget>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9544,11 +8088,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_OnRP
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateMultipleLevelsVisibility_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatemultiplelevelsvisibility>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsVisibility_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatemultiplelevelsvisibility>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9611,11 +8151,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateLevelVisibility_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatelevelvisibility>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatelevelvisibility>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9668,11 +8204,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUpdateCamera_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverupdatecamera>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverupdatecamera>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9733,11 +8265,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_OnRPCPay
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerUnmutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverunmuteplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverunmuteplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9797,11 +8325,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_OnRPCPay
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerToggleAILogging_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservertoggleailogging>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servertoggleailogging>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9846,11 +8370,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_OnRPC
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerShortTimeout_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservershorttimeout>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servershorttimeout>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9895,11 +8415,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_OnRPCPay
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorWaiting_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserversetspectatorwaiting>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serversetspectatorwaiting>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -9951,11 +8467,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_O
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerSetSpectatorLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserversetspectatorlocation>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serversetspectatorlocation>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10024,11 +8536,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerRestartPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverrestartplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverrestartplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10073,11 +8581,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_OnRPCPa
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerPause_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverpause>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerPause_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverpause>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10122,11 +8626,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_OnRPCPayload(co
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerNotifyLoadedWorld_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservernotifyloadedworld>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servernotifyloadedworld>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10178,11 +8678,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_OnR
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerMutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservermuteplayer>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servermuteplayer>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10242,11 +8738,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_OnRPCPaylo
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossessionReliable_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercheckclientpossessionreliable>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossessionReliable_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercheckclientpossessionreliable>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10291,11 +8783,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCheckClientPossession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercheckclientpossession>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercheckclientpossession>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10340,11 +8828,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerChangeName_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserverchangename>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serverchangename>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10396,11 +8880,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_OnRPCPaylo
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerCamera_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerservercamera>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Servercamera>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10452,11 +8932,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_OnRPCPayload(c
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-void USpatialTypeBinding_PlayerController::ServerAcknowledgePossession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealPlayerControllerServerRPCs::Commands::Playercontrollerserveracknowledgepossession>& Op)
-=======
 void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Commands::Serveracknowledgepossession>& Op)
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -10534,14 +9010,11 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		return {};
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
-<<<<<<< HEAD:Game/Source/SampleGame/Generated/SpatialTypeBinding_PlayerController.cpp
-=======
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Clientjoinresults>& Op)
 {
 	Interop->HandleCommandResponse_Internal(TEXT("ClientJoinResults"), Op.RequestId.Id, Op.EntityId, Op.StatusCode, FString(UTF8_TO_TCHAR(Op.Message.c_str())));
->>>>>>> master:Game/Source/SampleGame/Generated/SpatialTypeBinding_SampleGamePlayerController.cpp
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Commands::Onserverstartedvisuallogger>& Op)

@@ -102,19 +102,11 @@ void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-<<<<<<< HEAD
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealInstantWeaponMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealInstantWeaponMigratableData>& Op)
-			{
-				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealInstantWeaponMigratableData::ComponentId))
-=======
 			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>([this](
 				const worker::ComponentUpdateOp<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::ComponentId))
->>>>>>> master
 				{
 					return;
 				}
@@ -124,38 +116,22 @@ void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
 			}));
 		}
 	}
-<<<<<<< HEAD
-	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>([this](
-		const worker::ComponentUpdateOp<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>& Op)
-	{
-		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::ComponentId))
-=======
 	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>([this](
 		const worker::ComponentUpdateOp<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>& Op)
 	{
 		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
 		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::ComponentId))
->>>>>>> master
 		{
 			return;
 		}
 		ReceiveUpdate_NetMulticastRPCs(Op.EntityId, Op.Update);
 	}));
 
-<<<<<<< HEAD
-	using ServerRPCCommandTypes = improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Instantweaponserverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Instantweaponserverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandResponse, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Instantweaponserverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandResponse, this, std::placeholders::_1)));
-=======
 	using ServerRPCCommandTypes = improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands;
 	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Serverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Serverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Serverdidmiss>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnCommandResponse, this, std::placeholders::_1)));
 	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Serverdidhit>(std::bind(&USpatialTypeBinding_InstantWeapon::ServerDidHit_OnCommandResponse, this, std::placeholders::_1)));
->>>>>>> master
 }
 
 void USpatialTypeBinding_InstantWeapon::UnbindFromView()
@@ -232,21 +208,12 @@ worker::Entity USpatialTypeBinding_InstantWeapon::CreateActorEntity(const FStrin
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-<<<<<<< HEAD
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponMigratableData>(MigratableData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponClientRPCs>(improbable::unreal::generated::UnrealInstantWeaponClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponServerRPCs>(improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs>(improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::Data{}, WorkersOnly)
-=======
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponSingleClientRepData>(SingleClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData>(MultiClientData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>(MigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Data{}, WorkersOnly)
->>>>>>> master
 		.Build();
 }
 
@@ -1461,11 +1428,7 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_Migratable(USpatialActorCh
 {
 }
 
-<<<<<<< HEAD
-void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::UnrealInstantWeaponNetMulticastRPCs::Update& Update)
-=======
 void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Update& Update)
->>>>>>> master
 {
 }
 void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
@@ -1484,11 +1447,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD
-		improbable::unreal::generated::UnrealServerDidMissRequest RPCPayload;
-=======
 		improbable::unreal::generated::instantweapon::ServerDidMissRequest RPCPayload;
->>>>>>> master
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -1538,11 +1497,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidmiss>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
@@ -1563,11 +1518,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC(worker::Connection*
 		}
 
 		// Build RPC Payload.
-<<<<<<< HEAD
-		improbable::unreal::generated::UnrealServerDidHitRequest RPCPayload;
-=======
 		improbable::unreal::generated::instantweapon::ServerDidHitRequest RPCPayload;
->>>>>>> master
 		{
 			TArray<uint8> ValueData;
 			FMemoryWriter ValueDataWriter(ValueData);
@@ -1617,20 +1568,12 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC(worker::Connection*
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
 
-<<<<<<< HEAD
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>(TargetObjectRef.entity(), RPCPayload, 0);
-=======
 			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidhit>(TargetObjectRef.entity(), RPCPayload, 0);
->>>>>>> master
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
 }
-<<<<<<< HEAD
-void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidmiss>& Op)
-=======
 void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidmiss>& Op)
->>>>>>> master
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{
@@ -1727,11 +1670,7 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker:
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
 }
-<<<<<<< HEAD
-void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::UnrealInstantWeaponServerRPCs::Commands::Instantweaponserverdidhit>& Op)
-=======
 void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidhit>& Op)
->>>>>>> master
 {
 	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
 	{

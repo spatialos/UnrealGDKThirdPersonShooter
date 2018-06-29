@@ -4,17 +4,10 @@ package improbable.unreal.generated.samplegameplayerstate;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-<<<<<<< HEAD:spatial/schema/improbable/unreal/generated/UnrealPlayerState.schema
-component UnrealPlayerStateSingleClientRepData {
-	id = 100016;
-}
-component UnrealPlayerStateMultiClientRepData {
-=======
 component SampleGamePlayerStateSingleClientRepData {
 	id = 100016;
 }
 component SampleGamePlayerStateMultiClientRepData {
->>>>>>> master:spatial/schema/improbable/unreal/generated/UnrealSampleGamePlayerState.schema
 	id = 100017;
 	bool field_bhidden = 1; // COND_None // ::Actor
 	bool field_breplicatemovement = 2; // COND_None // ::Actor
@@ -44,27 +37,12 @@ component SampleGamePlayerStateMultiClientRepData {
 	string field_playernameprivate = 26; // COND_None // ::PlayerState
 	uint32 field_selectedteam = 27; // COND_None // ::SampleGamePlayerState
 }
-<<<<<<< HEAD:spatial/schema/improbable/unreal/generated/UnrealPlayerState.schema
-component UnrealPlayerStateMigratableData {
-	id = 100018;
-}
-
-component UnrealPlayerStateClientRPCs {
-	id = 100019;
-}
-component UnrealPlayerStateServerRPCs {
-	id = 100020;
-}
-component UnrealPlayerStateNetMulticastRPCs {
-	id = 100021;
-=======
 component SampleGamePlayerStateMigratableData {
 	id = 100018;
 }
 
 component SampleGamePlayerStateClientRPCs {
 	id = 100019;
->>>>>>> master:spatial/schema/improbable/unreal/generated/UnrealSampleGamePlayerState.schema
 }
 component SampleGamePlayerStateServerRPCs {
 	id = 100020;
