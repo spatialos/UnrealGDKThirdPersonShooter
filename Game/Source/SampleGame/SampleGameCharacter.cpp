@@ -191,6 +191,7 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 
 	DOREPLIFETIME(ASampleGameCharacter, EquippedWeapon);
 	DOREPLIFETIME(ASampleGameCharacter, bIsRagdoll);
+	DOREPLIFETIME(ASampleGameCharacter, Team);
 
 	// Only replicate health to the owning client.
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
@@ -412,6 +413,11 @@ void ASampleGameCharacter::OnRep_IsRagdoll()
 
 void ASampleGameCharacter::OnRep_Team()
 {
+	if (GetNetMode() != NM_Client)
+	{
+		return;
+	}
+
 	UpdateTeamColor();
 }
 

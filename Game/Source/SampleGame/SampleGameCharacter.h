@@ -153,11 +153,11 @@ private:
 	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
 	int32 CurrentHealth;
 
-	// If true, the character is currently dead and ragdoll-ing.
+	// If true, the character is currently ragdoll-ing.
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
 
-	// If true, the character is currently dead and ragdoll-ing.
+	// Indicates which team this Character is associated with
 	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	ESampleGameTeam Team;
 
