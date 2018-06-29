@@ -438,6 +438,13 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		return 0;
 	}
 
+	// Ignore friendly fire
+	ASampleGameCharacter* DamageDealer = Cast<ASampleGameCharacter>(DamageCauser->GetAttachmentReplication().AttachParent);
+	if (DamageDealer != nullptr && DamageDealer->GetTeam() == Team)
+	{
+		return 0;
+	}
+
 	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);
 	CurrentHealth -= DamageDealt;
 
