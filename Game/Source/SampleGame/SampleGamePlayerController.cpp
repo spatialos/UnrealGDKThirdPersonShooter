@@ -165,6 +165,7 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
+	const FString CorrectedNewPlayerName = (NewPlayerName.IsEmpty() ? GetName() : NewPlayerName);
 	bool bJoinWasSuccessful = true;
 
 	// Validate PlayerState

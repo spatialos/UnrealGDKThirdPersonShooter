@@ -31,6 +31,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void OnJoinGameButtonClicked() const;
 
+	UFUNCTION(BlueprintPure, Category = "Debug")
+	bool IsAutoJoinReady() const { return (PlayerController != nullptr); }
+
 // -= Class Functionality =-
 private:
 	ASampleGamePlayerController* PlayerController;
@@ -39,6 +42,6 @@ public:
 	// Informs the UI Widget which PlayerController instance is controlling it.  Must be called and given a valid PlayerController before 'OnJoinGameButtonClicked' can be invoked.
 	void SetOwnerPlayerController(ASampleGamePlayerController* NewPlayerContoller) { PlayerController = NewPlayerContoller; }
 
-	// This method will be called from PlayerController if the join reqeust sent by 'OnJoinGameButtonClicked' to 'PlayerController' fails server-side.
+	// This method will be called from PlayerController if the join request sent by 'OnJoinGameButtonClicked' to 'PlayerController' fails server-side.
 	void JoinGameWasRejected();
 };
