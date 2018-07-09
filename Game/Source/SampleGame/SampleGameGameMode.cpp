@@ -51,24 +51,18 @@ AActor* ASampleGameGameMode::ChoosePlayerStart_Implementation(AController* Playe
 	if (SGPlayerController != nullptr)
 	{
 		ESampleGameTeam SelectedTeam = ESampleGameTeam::Team_None;
+		if (ASampleGamePlayerState* SGPlayerState = Cast<ASampleGamePlayerState>(SGPlayerController->PlayerState))
 		{
-			ASampleGamePlayerState* SGPlayerState = Cast<ASampleGamePlayerState>(SGPlayerController->PlayerState);
-			if (SGPlayerState != nullptr)
-			{
-				SelectedTeam = SGPlayerState->GetSelectedTeam();
-			}
+			SelectedTeam = SGPlayerState->GetSelectedTeam();
 		}
 		
 		TArray<ASampleGameTeamPlayerStart*> UnoccupiedStartPoints;
 		TArray<ASampleGameTeamPlayerStart*> OccupiedStartPoints;
 
 		APawn* PawnToFit = nullptr;
+		if (UClass* PawnClass = GetDefaultPawnClassForController(Player))
 		{
-			UClass* PawnClass = GetDefaultPawnClassForController(Player);
-			if (PawnClass != nullptr)
-			{
-				PawnToFit = PawnClass->GetDefaultObject<APawn>();
-			}
+			PawnToFit = PawnClass->GetDefaultObject<APawn>();
 		}
 
 		for (TActorIterator<ASampleGameTeamPlayerStart> It(GetWorld()); It; ++It)
@@ -77,7 +71,7 @@ AActor* ASampleGameGameMode::ChoosePlayerStart_Implementation(AController* Playe
 
 			if (PlayerStart->TeamToSpawn == SelectedTeam)
 			{
-				FVector ActorLocation = PlayerStart->GetActorLocation();
+				const FVector ActorLocation = PlayerStart->GetActorLocation();
 				const FRotator ActorRotation = PlayerStart->GetActorRotation();
 				if (!GetWorld()->EncroachingBlockingGeometry(PawnToFit, ActorLocation, ActorRotation))
 				{
