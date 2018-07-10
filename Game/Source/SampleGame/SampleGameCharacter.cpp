@@ -18,7 +18,7 @@
 #include "SGCharacterMovementComponent.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
-#include "Weapons/Weapon.h"
+#include "Weapons/InstantWeapon.h"
 
 
 static const FName kRightGunSocketName("GunSocket_r");
@@ -487,6 +487,19 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 	if (!HasAuthority())
 	{
 		return 0;
+	}
+
+	// Ignore friendly fire
+	const AInstantWeapon* DamageSourceWeapon = Cast<AInstantWeapon>(DamageCauser);
+	if (DamageSourceWeapon != nullptr)
+	{
+		const ASampleGameCharacter* DamageDealer = Cast<ASampleGameCharacter>(DamageSourceWeapon->GetWeilder());
+		if (DamageDealer != nullptr
+			&& Team != ESampleGameTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
+			&& DamageDealer->GetTeam() == Team)
+		{
+			return 0;
+		}
 	}
 
 	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);

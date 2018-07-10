@@ -165,6 +165,7 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
+	const FString CorrectedNewPlayerName = (NewPlayerName.IsEmpty() ? GetName() : NewPlayerName);
 	bool bJoinWasSuccessful = true;
 
 	// Validate PlayerState
@@ -194,6 +195,17 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 		// Set the player-selected values
 		PlayerState->SetPlayerName(NewPlayerName);
 		Cast<ASampleGamePlayerState>(PlayerState)->SetSelectedTeam(NewPlayerTeam);
+
+		// Recalculate our PlayerStart using the new SelectedTeam information
+		AActor* const NewStartSpot = GetWorld()->GetAuthGameMode()->ChoosePlayerStart(this);
+		if (NewStartSpot != nullptr)
+		{
+			// Set the player controller / camera in this new location
+			FRotator InitialControllerRot = NewStartSpot->GetActorRotation();
+			InitialControllerRot.Roll = 0.f;
+			SetInitialLocationAndRotation(NewStartSpot->GetActorLocation(), InitialControllerRot);
+			StartSpot = NewStartSpot;
+		}
 
 		// Spawn the Pawn
 		RespawnCharacter();
