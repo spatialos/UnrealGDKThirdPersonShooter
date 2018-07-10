@@ -55,8 +55,8 @@ if not exist %~dp0\Game\Binaries\ThirdParty\ (
 )
 
 REM Ensure schema folder exists, mklink doesn't recursively create
-if not exist %~dp0\schema\improbable\unreal\ (
-	mkdir %~dp0\schema\improbable\unreal\
+if not exist %~dp0\spatial\schema\improbable\unreal\ (
+	mkdir %~dp0\spatial\schema\improbable\unreal\
 )
 
 REM Make new symlinks
