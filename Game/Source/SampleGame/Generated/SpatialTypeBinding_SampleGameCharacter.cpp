@@ -17,7 +17,7 @@
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 #include "SampleGameCharacter.h"
-#include "SampleGameTeams.h"
+#include "Teams/SampleGameTeams.h"
 #include "Weapons/Weapon.h"
 
 #include "SampleGameCharacterSingleClientRepDataAddComponentOp.h"

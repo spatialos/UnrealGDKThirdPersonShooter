@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "SampleGameTeams.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGamePlayerState.generated.h"
 
 

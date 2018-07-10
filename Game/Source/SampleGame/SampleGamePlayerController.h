@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "SampleGameTeams.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGamePlayerController.generated.h"
 
 /**

@@ -65,6 +65,8 @@ public:
 	bool ServerDidMiss_Validate(const FInstantHitInfo& HitInfo);
 	void ServerDidMiss_Implementation(const FInstantHitInfo& HitInfo);
 
+	const AActor* GetWeilder() const { return GetAttachmentReplication().AttachParent; }
+
 protected:
 	virtual void BeginPlay() override;
 
