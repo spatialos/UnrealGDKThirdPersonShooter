@@ -50,9 +50,9 @@ private:
 	// (e.g. the player is moving in a direction within SprintDirectionTolerance of the camera direction).
 	uint8 bWantsToSprint : 1;
 
-	// If true, the player will attempt to interpolate all the way to the control rotation. Used to correct for
+	// If true, the player will attempt to rotate all the way to the control rotation. Used to correct for
 	// over-rotation while standing still (e.g. trying have an aim offset of > 90 degrees).
-	uint8 bShouldInterpToControlRotation : 1;
+	uint8 bShouldOrientToControlRotation : 1;
 
 	// Multiply max speed by this factor when sprinting.
 	UPROPERTY(EditAnywhere, Category = "Sprint")

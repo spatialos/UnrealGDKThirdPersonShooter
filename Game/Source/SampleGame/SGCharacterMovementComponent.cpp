@@ -13,7 +13,7 @@ USGCharacterMovementComponent::USGCharacterMovementComponent(const FObjectInitia
 	, SprintSpeedMultiplier(1.5f)
 	, SprintAccelerationMultiplier(1.5f)
 	, SprintDirectionTolerance(0.7f)
-	, bShouldInterpToControlRotation(false)
+	, bShouldOrientToControlRotation(false)
 {}
 
 void USGCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
@@ -60,18 +60,18 @@ void USGCharacterMovementComponent::PhysicsRotation(float DeltaTime)
 		{
 			// If we're standing still and looking more than 90 degrees from the character's forward yaw, pull the character back
 			// towards the control rotation.
-			bShouldInterpToControlRotation = true;
+			bShouldOrientToControlRotation = true;
 		}
 		else if (ForwardDotLook > 0.9f)
 		{
 			// If we've just about reached the control rotation, stop pulling.
-			bShouldInterpToControlRotation = false;
+			bShouldOrientToControlRotation = false;
 		}
 	}
 	else
 	{
 		// If we've started moving, stop interpolating towards the control rotation.
-		bShouldInterpToControlRotation = false;
+		bShouldOrientToControlRotation = false;
 	}
 
 	Super::PhysicsRotation(DeltaTime);
@@ -91,7 +91,7 @@ FRotator USGCharacterMovementComponent::ComputeOrientToMovementRotation(const FR
 
 	if (Acceleration.SizeSquared() < KINDA_SMALL_NUMBER)
 	{
-		if (bShouldInterpToControlRotation)
+		if (bShouldOrientToControlRotation)
 		{
 			// If we've over-rotated, push the character's rotation back towards the camera rotation.
 			return LookForward.GetSafeNormal().Rotation();
