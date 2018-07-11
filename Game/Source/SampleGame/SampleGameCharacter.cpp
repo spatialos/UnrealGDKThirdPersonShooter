@@ -21,6 +21,8 @@
 #include "Weapons/InstantWeapon.h"
 
 
+static const FName kRightGunSocketName("GunSocket_r");
+
 //////////////////////////////////////////////////////////////////////////
 // ASampleGameCharacter
 
@@ -73,6 +75,10 @@ ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectIniti
 	MaxHealth = 100;
 	CurrentHealth = 0;
 	bIsRagdoll = false;
+	AimYaw = 0.0f;
+	AimPitch = 0.0f;
+	LocalAimUpdateThreshold = 0.01f;
+	RemoteAimUpdateThreshold = 2.0f;
 }
 
 void ASampleGameCharacter::BeginPlay()
@@ -98,17 +104,15 @@ void ASampleGameCharacter::BeginPlay()
 	}
 }
 
-void ASampleGameCharacter::EndPlay(const EEndPlayReason::Type Reason)
+void ASampleGameCharacter::Tick(float DeltaSeconds)
 {
-	Super::EndPlay(Reason);
-
-	if (HasAuthority())
+	if (Role == ROLE_Authority)
 	{
-		// Destroy weapon actor.
-		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
-		{
-			GetWorld()->DestroyActor(EquippedWeapon);
-		}
+		UpdateAimRotation(RemoteAimUpdateThreshold);
+	}
+	else if (Role == ROLE_AutonomousProxy)
+	{
+		UpdateAimRotation(LocalAimUpdateThreshold);
 	}
 }
 
@@ -193,6 +197,10 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME(ASampleGameCharacter, bIsRagdoll);
 	DOREPLIFETIME(ASampleGameCharacter, Team);
 
+	// Skip the owner here because we're updating the values locally on the owning client.
+	DOREPLIFETIME_CONDITION(ASampleGameCharacter, AimYaw, COND_SkipOwner);
+	DOREPLIFETIME_CONDITION(ASampleGameCharacter, AimPitch, COND_SkipOwner);
+
 	// Only replicate health to the owning client.
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
 }
@@ -253,9 +261,11 @@ void ASampleGameCharacter::SpawnStarterWeapon()
 		return;
 	}
 
-	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform());
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform(), SpawnParams);
 	StartWeapon->SetOwningCharacter(this);
-	StartWeapon->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	StartWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, kRightGunSocketName);
 
 	UE_LOG(LogSampleGame, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());
 	EquippedWeapon = StartWeapon;
@@ -266,6 +276,9 @@ void ASampleGameCharacter::StartFire()
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
+		// Don't allow sprinting and shooting at the same time.
+		StopSprinting();
+
 		Weapon->StartFire();
 	}
 }
@@ -287,6 +300,12 @@ void ASampleGameCharacter::Die()
 		if (PC)
 		{
 			PC->KillCharacter();
+		}
+
+		// Destroy weapon actor if there is one.
+		if (EquippedWeapon != nullptr && !EquippedWeapon->IsPendingKill())
+		{
+			GetWorld()->DestroyActor(EquippedWeapon);
 		}
 
 		bIsRagdoll = true;
@@ -351,6 +370,38 @@ void ASampleGameCharacter::StartRagdoll()
 		CameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
 		CameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
 	}
+}
+
+void ASampleGameCharacter::UpdateAimRotation(float AngleUpdateThreshold)
+{
+	FRotator AimDelta = GetControlRotation() - GetActorRotation();
+	AimDelta.Normalize();
+	float NewAimYaw = FMath::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
+	float NewAimPitch = FMath::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+
+	if (FMath::Abs(NewAimYaw - AimYaw) > AngleUpdateThreshold)
+	{
+		AimYaw = FMath::ClampAngle(AimDelta.Yaw, -90.0f, 90.0f);
+	}
+	if (FMath::Abs(NewAimPitch - AimPitch) > AngleUpdateThreshold)
+	{
+		AimPitch = FMath::ClampAngle(AimDelta.Pitch, -90.0f, 90.0f);
+	}
+}
+
+float ASampleGameCharacter::GetAimYaw()
+{
+	return AimYaw;
+}
+
+float ASampleGameCharacter::GetAimPitch()
+{
+	return AimPitch;
+}
+
+bool ASampleGameCharacter::CanFire()
+{
+	return EquippedWeapon && !IsSprinting();
 }
 
 AWeapon* ASampleGameCharacter::GetEquippedWeapon() const

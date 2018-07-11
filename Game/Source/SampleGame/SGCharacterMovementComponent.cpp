@@ -13,6 +13,7 @@ USGCharacterMovementComponent::USGCharacterMovementComponent(const FObjectInitia
 	, SprintSpeedMultiplier(1.5f)
 	, SprintAccelerationMultiplier(1.5f)
 	, SprintDirectionTolerance(0.7f)
+	, bShouldOrientToControlRotation(false)
 {}
 
 void USGCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
@@ -38,6 +39,79 @@ class FNetworkPredictionData_Client* USGCharacterMovementComponent::GetPredictio
 	}
 
 	return ClientPredictionData;
+}
+
+void USGCharacterMovementComponent::PhysicsRotation(float DeltaTime)
+{
+	FVector LookForward = PawnOwner->GetActorForwardVector();
+	if (ASampleGameCharacter* Character = Cast<ASampleGameCharacter>(PawnOwner))
+	{
+		if (AController* Controller = Character->GetController())
+		{
+			// Ideally our LookForward vector is the camera's forward vector.
+			LookForward = Controller->GetControlRotation().Vector();
+		}
+	}
+
+	if (Acceleration.SizeSquared() < KINDA_SMALL_NUMBER)
+	{
+		float ForwardDotLook = FVector::DotProduct(PawnOwner->GetActorForwardVector(), LookForward);
+		if (ForwardDotLook < -KINDA_SMALL_NUMBER)
+		{
+			// If we're standing still and looking more than 90 degrees from the character's forward yaw, pull the character back
+			// towards the control rotation.
+			bShouldOrientToControlRotation = true;
+		}
+		else if (ForwardDotLook > 0.9f)
+		{
+			// If we've just about reached the control rotation, stop pulling.
+			bShouldOrientToControlRotation = false;
+		}
+	}
+	else
+	{
+		// If we've started moving, stop interpolating towards the control rotation.
+		bShouldOrientToControlRotation = false;
+	}
+
+	Super::PhysicsRotation(DeltaTime);
+}
+
+FRotator USGCharacterMovementComponent::ComputeOrientToMovementRotation(const FRotator& CurrentRotation, float DeltaTime, FRotator& DeltaRotation) const
+{
+	FVector LookForward = PawnOwner->GetActorForwardVector();
+	if (ASampleGameCharacter* Character = Cast<ASampleGameCharacter>(PawnOwner))
+	{
+		if (AController* Controller = Character->GetController())
+		{
+			// Ideally our LookForward vector is the camera's forward vector.
+			LookForward = Controller->GetControlRotation().Vector();
+		}
+	}
+
+	if (Acceleration.SizeSquared() < KINDA_SMALL_NUMBER)
+	{
+		if (bShouldOrientToControlRotation)
+		{
+			// If we've over-rotated, push the character's rotation back towards the camera rotation.
+			return LookForward.GetSafeNormal().Rotation();
+		}
+		// Don't rotate if there's no acceleration.
+		return CurrentRotation;
+	}
+
+	// If acceleration is more than 90 degrees (plus a pretty big fudge factor) in either direction of the
+	// forward vector (usually the camera direction) then invert the character's forward direction to make
+	// it look like it's running backward.
+	// Note that this is a tiny bit buggy when the character is running full right and turning the camera to the right,
+	// but for now it's a decent solution.
+	if (FVector::DotProduct(Acceleration, LookForward) < -0.2)
+	{
+		return Acceleration.GetSafeNormal().Rotation() + FRotator(0, -180, 0);
+	}
+
+	// This is what UCharacterMovementComponent::ComputeOrientToMovementRotation does in the default case.
+	return Acceleration.GetSafeNormal().Rotation();
 }
 
 void USGCharacterMovementComponent::SetWantsToSprint(bool bSprinting)

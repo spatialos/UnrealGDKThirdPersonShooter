@@ -110,7 +110,9 @@ void USpatialTypeBinding_SampleGameCharacter::Init(USpatialInterop* InInterop, U
 	RepHandleToPropertyMap.Add(44, FRepHandleData(Class, {"EquippedWeapon"}, COND_None, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(45, FRepHandleData(Class, {"CurrentHealth"}, COND_AutonomousOnly, REPNOTIFY_OnChanged, 0));
 	RepHandleToPropertyMap.Add(46, FRepHandleData(Class, {"bIsRagdoll"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(47, FRepHandleData(Class, {"Team"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(47, FRepHandleData(Class, {"AimYaw"}, COND_SkipOwner, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(48, FRepHandleData(Class, {"AimPitch"}, COND_SkipOwner, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(49, FRepHandleData(Class, {"Team"}, COND_None, REPNOTIFY_OnChanged, 0));
 }
 
 void USpatialTypeBinding_SampleGameCharacter::BindToView(bool bIsClient)
@@ -1097,7 +1099,21 @@ void USpatialTypeBinding_SampleGameCharacter::ServerSendUpdate_MultiClient(const
 			OutUpdate.set_field_bisragdoll(Value);
 			break;
 		}
-		case 47: // field_team
+		case 47: // field_aimyaw
+		{
+			float Value = *(reinterpret_cast<float const*>(Data));
+
+			OutUpdate.set_field_aimyaw(Value);
+			break;
+		}
+		case 48: // field_aimpitch
+		{
+			float Value = *(reinterpret_cast<float const*>(Data));
+
+			OutUpdate.set_field_aimpitch(Value);
+			break;
+		}
+		case 49: // field_team
 		{
 			ESampleGameTeam Value = *(reinterpret_cast<ESampleGameTeam const*>(Data));
 
@@ -2618,10 +2634,54 @@ void USpatialTypeBinding_SampleGameCharacter::ReceiveUpdate_MultiClient(USpatial
 				Handle);
 		}
 	}
+	if (!Update.field_aimyaw().empty())
+	{
+		// field_aimyaw
+		uint16 Handle = 47;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			float Value = *(reinterpret_cast<float const*>(PropertyData));
+
+			Value = (*Update.field_aimyaw().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
+	if (!Update.field_aimpitch().empty())
+	{
+		// field_aimpitch
+		uint16 Handle = 48;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			float Value = *(reinterpret_cast<float const*>(PropertyData));
+
+			Value = (*Update.field_aimpitch().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
 	if (!Update.field_team().empty())
 	{
 		// field_team
-		uint16 Handle = 47;
+		uint16 Handle = 49;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{

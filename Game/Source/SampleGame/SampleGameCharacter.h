@@ -18,7 +18,7 @@ public:
 
 	virtual void BeginPlay() override;
 
-	virtual void EndPlay(const EEndPlayReason::Type Reason) override;
+	virtual void Tick(float DeltaSeconds) override;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -78,8 +78,18 @@ public:
 		return MaxHealth;
 	}
 
+	// [server + client] Returns true if the character is currently sprinting.
 	UFUNCTION(BlueprintPure, Category = "Movement")
 	bool IsSprinting();
+
+	UFUNCTION(BlueprintPure, Category = "Aim")
+	float GetAimYaw();
+
+	UFUNCTION(BlueprintPure, Category = "Aim")
+	float GetAimPitch();
+
+	// [server + client] Returns true if the character is able to shoot at the given moment.
+	bool CanFire();
 
 protected:
 	// APawn interface
@@ -109,6 +119,11 @@ private:
 
 	// [client + server] Puts the player in ragdoll mode.
 	void StartRagdoll();
+
+	// [owning client + server] Updates the aim variables to be sync-ed out to clients, or updates the values locally
+	// if we're executing on the owning client.
+	// Will only update the angles if they differ from the current stored value by more than AngleUpdateThreshold.
+	void UpdateAimRotation(float AngleUpdateThreshold);
 
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
@@ -157,6 +172,32 @@ private:
 	UPROPERTY(ReplicatedUsing = OnRep_IsRagdoll)
 	bool bIsRagdoll;
 
+	// Used for telling clients where the player should appear to be looking.
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "Aim")
+	float AimYaw;
+
+	// Used for telling clients where the player should appear to be looking.
+	UPROPERTY(VisibleAnywhere, Replicated, Category = "Aim")
+	float AimPitch;
+
+	// If the aim offset angles change more than this threshold, update our local aim offset values (only applies on the owning client).
+	// Value is in degrees.
+	UPROPERTY(EditDefaultsOnly, Category = "Aim")
+	float LocalAimUpdateThreshold;
+
+	// If the aim offset angles change more than this threshold, update our replicated aim offset values.
+	// Value is in degrees.
+	UPROPERTY(EditDefaultsOnly, Category = "Aim")
+	float RemoteAimUpdateThreshold;
+
+	/** Camera boom positioning the camera behind the character */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class USpringArmComponent* CameraBoom;
+
+	/** Follow camera */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	class UCameraComponent* FollowCamera;
+
 	// Indicates which team this Character is associated with
 	UPROPERTY(ReplicatedUsing = OnRep_Team)
 	ESampleGameTeam Team;
@@ -167,22 +208,22 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* RedTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* GreenTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* BlueTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* YellowTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* PurpleTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* BlackTeamMaterial;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* WhiteTeamMaterial;
 
@@ -190,14 +231,6 @@ public:
 	// Change the color of this character to match their chosen team
 	UFUNCTION()
 	void UpdateTeamColor();
-	
-	/** Camera boom positioning the camera behind the character */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
-
-	/** Follow camera */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* FollowCamera;
 
 	// [server] Sets the Character's Team value.
 	void SetTeam(ESampleGameTeam NewTeam);

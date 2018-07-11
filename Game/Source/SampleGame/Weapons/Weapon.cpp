@@ -8,6 +8,8 @@
 
 
 AWeapon::AWeapon()
+	: CurrentState(EWeaponState::Idle)
+	, OwningCharacter(nullptr)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	
@@ -17,8 +19,8 @@ AWeapon::AWeapon()
 	LocationComponent = CreateDefaultSubobject<USceneComponent>(TEXT("RootComponent"));
 	SetRootComponent(LocationComponent);
 
-	CurrentState = EWeaponState::Idle;
-	OwningCharacter = nullptr;
+	Mesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
+	Mesh->SetupAttachment(RootComponent);
 }
 
 class ASampleGameCharacter* AWeapon::GetOwningCharacter() const
