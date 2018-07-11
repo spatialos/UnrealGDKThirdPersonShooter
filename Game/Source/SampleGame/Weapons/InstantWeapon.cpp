@@ -30,6 +30,12 @@ void AInstantWeapon::StartFire()
 {
 	check(GetNetMode() == NM_Client);
 
+	if (!GetOwningCharacter()->CanFire())
+	{
+		// Don't attempt to fire if the character can't.
+		return;
+	}
+
 	float Now = UGameplayStatics::GetRealTimeSeconds(GetWorld());
 	if (GetWeaponState() == EWeaponState::Idle && Now > LastBurstTime + BurstInterval)
 	{
@@ -90,6 +96,12 @@ void AInstantWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 void AInstantWeapon::DoFire()
 {
 	check(GetNetMode() == NM_Client);
+
+	if (!GetOwningCharacter()->CanFire())
+	{
+		// Don't attempt to fire if the character can't.
+		return;
+	}
 
 	FInstantHitInfo HitInfo;
 	if (DoLineTrace(HitInfo))
@@ -222,6 +234,12 @@ bool AInstantWeapon::ServerDidHit_Validate(const FInstantHitInfo& HitInfo)
 
 void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 {
+	if (!GetOwningCharacter()->CanFire())
+	{
+		UE_LOG(LogSampleGame, Verbose, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
+		return;
+	}
+
 	bool bDoNotifyHit = false;
 
 	if (HitInfo.HitActor == nullptr)

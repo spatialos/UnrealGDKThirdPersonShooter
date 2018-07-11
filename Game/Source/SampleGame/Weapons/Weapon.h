@@ -45,5 +45,9 @@ private:
 	// Character that currently owns this weapon.
 	UPROPERTY(Replicated)
 	class ASampleGameCharacter* OwningCharacter;
+
+	// Weapon mesh.
+	UPROPERTY(VisibleAnywhere, Category = "Weapons", meta = (AllowPrivateAccess = "true"))
+	class USkeletalMeshComponent* Mesh;
 	
 };
