@@ -37,20 +37,19 @@ markEndOfBlock "Run the GDK setup script"
 
 markStartOfBlock "Build the SampleGame"
   # Build each target to ensure scripts are correct, skipping code generation on all but the first to save some time.
-  Game/Scripts/Build.bat "SampleGameEditor" "Win64" "Development" "Game/SampleGame.uproject"
+  Game/Scripts/Build.bat "SampleGameEditor" "Win64" "Development" "SampleGame.uproject"
   if [[ ! -f "spatial/build/assembly/worker/UnrealEditor@Windows.zip" ]]; then
     echo "Editor was not properly built."
     exit 1
   fi
 
-  # UNR-276 - This is disabled until TC agents have UE4.19 properly configured.
-  # Game/Scripts/Build.bat "SampleGameServer" "Linux" "Development" "Game/SampleGame.uproject" --skip-codegen
-  # if [[ ! -f "spatial/build/assembly/worker/UnrealWorker@Linux.zip" ]]; then
-  #   echo "Linux Server was not properly built."
-  #   exit 1
-  # fi
+  Game/Scripts/Build.bat "SampleGameServer" "Linux" "Development" "SampleGame.uproject" --skip-codegen
+  if [[ ! -f "spatial/build/assembly/worker/UnrealWorker@Linux.zip" ]]; then
+    echo "Linux Server was not properly built."
+    exit 1
+  fi
 
-  Game/Scripts/Build.bat "SampleGame" "Win64" "Development" "Game/SampleGame.uproject" --skip-codegen
+  Game/Scripts/Build.bat "SampleGame" "Win64" "Development" "SampleGame.uproject" --skip-codegen
   if [[ ! -f "spatial/build/assembly/worker/UnrealClient@Windows.zip" ]]; then
      echo "Client was not properly built."
      exit 1

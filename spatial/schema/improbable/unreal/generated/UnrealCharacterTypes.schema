@@ -6,17 +6,17 @@ import "improbable/unreal/gdk/core_types.schema";
 
 type RootMotionDebugClientPrintOnScreenRequest {
 	uint32 target_subobject_offset = 1;
-	string field_instring = 2;
+	string field_instring0 = 2;
 }
 type ClientVeryShortAdjustPositionRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	bytes field_newloc = 3;
-	UnrealObjectRef field_newbase = 4;
-	string field_newbasebonename = 5;
-	bool field_bhasbase = 6;
-	bool field_bbaserelativeposition = 7;
-	uint32 field_servermovementmode = 8;
+	float field_timestamp0 = 2;
+	bytes field_newloc0 = 3;
+	UnrealObjectRef field_newbase0 = 4;
+	string field_newbasebonename0 = 5;
+	bool field_bhasbase0 = 6;
+	bool field_bbaserelativeposition0 = 7;
+	uint32 field_servermovementmode0 = 8;
 }
 type ClientCheatWalkRequest {
 	uint32 target_subobject_offset = 1;
@@ -29,118 +29,118 @@ type ClientCheatFlyRequest {
 }
 type ClientAdjustRootMotionSourcePositionRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	bytes field_serverrootmotion = 3;
-	bool field_bhasanimrootmotion = 4;
-	float field_servermontagetrackposition = 5;
-	bytes field_serverloc = 6;
-	bytes field_serverrotation = 7;
-	float field_servervelz = 8;
-	UnrealObjectRef field_serverbase = 9;
-	string field_serverbonename = 10;
-	bool field_bhasbase = 11;
-	bool field_bbaserelativeposition = 12;
-	uint32 field_servermovementmode = 13;
+	float field_timestamp0 = 2;
+	bytes field_serverrootmotion0 = 3;
+	bool field_bhasanimrootmotion0 = 4;
+	float field_servermontagetrackposition0 = 5;
+	bytes field_serverloc0 = 6;
+	bytes field_serverrotation0 = 7;
+	float field_servervelz0 = 8;
+	UnrealObjectRef field_serverbase0 = 9;
+	string field_serverbonename0 = 10;
+	bool field_bhasbase0 = 11;
+	bool field_bbaserelativeposition0 = 12;
+	uint32 field_servermovementmode0 = 13;
 }
 type ClientAdjustRootMotionPositionRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	float field_servermontagetrackposition = 3;
-	bytes field_serverloc = 4;
-	bytes field_serverrotation = 5;
-	float field_servervelz = 6;
-	UnrealObjectRef field_serverbase = 7;
-	string field_serverbonename = 8;
-	bool field_bhasbase = 9;
-	bool field_bbaserelativeposition = 10;
-	uint32 field_servermovementmode = 11;
+	float field_timestamp0 = 2;
+	float field_servermontagetrackposition0 = 3;
+	bytes field_serverloc0 = 4;
+	bytes field_serverrotation0 = 5;
+	float field_servervelz0 = 6;
+	UnrealObjectRef field_serverbase0 = 7;
+	string field_serverbonename0 = 8;
+	bool field_bhasbase0 = 9;
+	bool field_bbaserelativeposition0 = 10;
+	uint32 field_servermovementmode0 = 11;
 }
 type ClientAdjustPositionRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	bytes field_newloc = 3;
-	bytes field_newvel = 4;
-	UnrealObjectRef field_newbase = 5;
-	string field_newbasebonename = 6;
-	bool field_bhasbase = 7;
-	bool field_bbaserelativeposition = 8;
-	uint32 field_servermovementmode = 9;
+	float field_timestamp0 = 2;
+	bytes field_newloc0 = 3;
+	bytes field_newvel0 = 4;
+	UnrealObjectRef field_newbase0 = 5;
+	string field_newbasebonename0 = 6;
+	bool field_bhasbase0 = 7;
+	bool field_bbaserelativeposition0 = 8;
+	uint32 field_servermovementmode0 = 9;
 }
 type ClientAckGoodMoveRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
+	float field_timestamp0 = 2;
 }
 type ServerMoveOldRequest {
 	uint32 target_subobject_offset = 1;
-	float field_oldtimestamp = 2;
-	bytes field_oldaccel = 3;
-	uint32 field_oldmoveflags = 4;
+	float field_oldtimestamp0 = 2;
+	bytes field_oldaccel0 = 3;
+	uint32 field_oldmoveflags0 = 4;
 }
 type ServerMoveNoBaseRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	bytes field_inaccel = 3;
-	bytes field_clientloc = 4;
-	uint32 field_compressedmoveflags = 5;
-	uint32 field_clientroll = 6;
-	uint32 field_view = 7;
-	uint32 field_clientmovementmode = 8;
+	float field_timestamp0 = 2;
+	bytes field_inaccel0 = 3;
+	bytes field_clientloc0 = 4;
+	uint32 field_compressedmoveflags0 = 5;
+	uint32 field_clientroll0 = 6;
+	uint32 field_view0 = 7;
+	uint32 field_clientmovementmode0 = 8;
 }
 type ServerMoveDualNoBaseRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp0 = 2;
-	bytes field_inaccel0 = 3;
-	uint32 field_pendingflags = 4;
-	uint32 field_view0 = 5;
-	float field_timestamp = 6;
-	bytes field_inaccel = 7;
-	bytes field_clientloc = 8;
-	uint32 field_newflags = 9;
-	uint32 field_clientroll = 10;
-	uint32 field_view = 11;
-	uint32 field_clientmovementmode = 12;
+	float field_timestamp00 = 2;
+	bytes field_inaccel00 = 3;
+	uint32 field_pendingflags0 = 4;
+	uint32 field_view00 = 5;
+	float field_timestamp0 = 6;
+	bytes field_inaccel0 = 7;
+	bytes field_clientloc0 = 8;
+	uint32 field_newflags0 = 9;
+	uint32 field_clientroll0 = 10;
+	uint32 field_view0 = 11;
+	uint32 field_clientmovementmode0 = 12;
 }
 type ServerMoveDualHybridRootMotionRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp0 = 2;
-	bytes field_inaccel0 = 3;
-	uint32 field_pendingflags = 4;
-	uint32 field_view0 = 5;
-	float field_timestamp = 6;
-	bytes field_inaccel = 7;
-	bytes field_clientloc = 8;
-	uint32 field_newflags = 9;
-	uint32 field_clientroll = 10;
-	uint32 field_view = 11;
-	UnrealObjectRef field_clientmovementbase = 12;
-	string field_clientbasebonename = 13;
-	uint32 field_clientmovementmode = 14;
+	float field_timestamp00 = 2;
+	bytes field_inaccel00 = 3;
+	uint32 field_pendingflags0 = 4;
+	uint32 field_view00 = 5;
+	float field_timestamp0 = 6;
+	bytes field_inaccel0 = 7;
+	bytes field_clientloc0 = 8;
+	uint32 field_newflags0 = 9;
+	uint32 field_clientroll0 = 10;
+	uint32 field_view0 = 11;
+	UnrealObjectRef field_clientmovementbase0 = 12;
+	string field_clientbasebonename0 = 13;
+	uint32 field_clientmovementmode0 = 14;
 }
 type ServerMoveDualRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp0 = 2;
-	bytes field_inaccel0 = 3;
-	uint32 field_pendingflags = 4;
-	uint32 field_view0 = 5;
-	float field_timestamp = 6;
-	bytes field_inaccel = 7;
-	bytes field_clientloc = 8;
-	uint32 field_newflags = 9;
-	uint32 field_clientroll = 10;
-	uint32 field_view = 11;
-	UnrealObjectRef field_clientmovementbase = 12;
-	string field_clientbasebonename = 13;
-	uint32 field_clientmovementmode = 14;
+	float field_timestamp00 = 2;
+	bytes field_inaccel00 = 3;
+	uint32 field_pendingflags0 = 4;
+	uint32 field_view00 = 5;
+	float field_timestamp0 = 6;
+	bytes field_inaccel0 = 7;
+	bytes field_clientloc0 = 8;
+	uint32 field_newflags0 = 9;
+	uint32 field_clientroll0 = 10;
+	uint32 field_view0 = 11;
+	UnrealObjectRef field_clientmovementbase0 = 12;
+	string field_clientbasebonename0 = 13;
+	uint32 field_clientmovementmode0 = 14;
 }
 type ServerMoveRequest {
 	uint32 target_subobject_offset = 1;
-	float field_timestamp = 2;
-	bytes field_inaccel = 3;
-	bytes field_clientloc = 4;
-	uint32 field_compressedmoveflags = 5;
-	uint32 field_clientroll = 6;
-	uint32 field_view = 7;
-	UnrealObjectRef field_clientmovementbase = 8;
-	string field_clientbasebonename = 9;
-	uint32 field_clientmovementmode = 10;
+	float field_timestamp0 = 2;
+	bytes field_inaccel0 = 3;
+	bytes field_clientloc0 = 4;
+	uint32 field_compressedmoveflags0 = 5;
+	uint32 field_clientroll0 = 6;
+	uint32 field_view0 = 7;
+	UnrealObjectRef field_clientmovementbase0 = 8;
+	string field_clientbasebonename0 = 9;
+	uint32 field_clientmovementmode0 = 10;
 }

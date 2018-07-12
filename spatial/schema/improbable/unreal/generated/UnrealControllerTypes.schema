@@ -6,11 +6,11 @@ import "improbable/unreal/gdk/core_types.schema";
 
 type ClientSetRotationRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_newrotation = 2;
-	bool field_bresetcamera = 3;
+	bytes field_newrotation0 = 2;
+	bool field_bresetcamera0 = 3;
 }
 type ClientSetLocationRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_newlocation = 2;
-	bytes field_newrotation = 3;
+	bytes field_newlocation0 = 2;
+	bytes field_newrotation0 = 3;
 }
