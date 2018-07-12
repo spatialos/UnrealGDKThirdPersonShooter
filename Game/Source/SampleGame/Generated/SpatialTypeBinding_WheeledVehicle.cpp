@@ -14,6 +14,8 @@
 #include "SpatialUnrealObjectRef.h"
 #include "SpatialActorChannel.h"
 #include "SpatialPackageMapClient.h"
+#include "SpatialMemoryReader.h"
+#include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 #include "WheeledVehicle.h"
@@ -47,24 +49,24 @@ void USpatialTypeBinding_WheeledVehicle::Init(USpatialInterop* InInterop, USpati
 	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("WheeledVehicle"));
 
 	// Populate RepHandleToPropertyMap.
-	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(2, FRepHandleData(Class, {"bReplicateMovement"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(3, FRepHandleData(Class, {"bTearOff"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(4, FRepHandleData(Class, {"bCanBeDamaged"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(5, FRepHandleData(Class, {"RemoteRole"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(6, FRepHandleData(Class, {"ReplicatedMovement"}, COND_SimulatedOrPhysics, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(7, FRepHandleData(Class, {"AttachmentReplication", "AttachParent"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(8, FRepHandleData(Class, {"AttachmentReplication", "LocationOffset"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(9, FRepHandleData(Class, {"AttachmentReplication", "RelativeScale3D"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(10, FRepHandleData(Class, {"AttachmentReplication", "RotationOffset"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(11, FRepHandleData(Class, {"AttachmentReplication", "AttachSocket"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(12, FRepHandleData(Class, {"AttachmentReplication", "AttachComponent"}, COND_Custom, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"PlayerState"}, COND_None, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"RemoteViewPitch"}, COND_SkipOwner, REPNOTIFY_OnChanged, 0));
-	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"Controller"}, COND_None, REPNOTIFY_OnChanged, 0));
+	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(2, FRepHandleData(Class, {"bReplicateMovement"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(3, FRepHandleData(Class, {"bTearOff"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(4, FRepHandleData(Class, {"bCanBeDamaged"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(5, FRepHandleData(Class, {"RemoteRole"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(6, FRepHandleData(Class, {"ReplicatedMovement"}, {0}, COND_SimulatedOrPhysics, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(7, FRepHandleData(Class, {"AttachmentReplication", "AttachParent"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(8, FRepHandleData(Class, {"AttachmentReplication", "LocationOffset"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(9, FRepHandleData(Class, {"AttachmentReplication", "RelativeScale3D"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(10, FRepHandleData(Class, {"AttachmentReplication", "RotationOffset"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(11, FRepHandleData(Class, {"AttachmentReplication", "AttachSocket"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(12, FRepHandleData(Class, {"AttachmentReplication", "AttachComponent"}, {0, 0}, COND_Custom, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"PlayerState"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"RemoteViewPitch"}, {0}, COND_SkipOwner, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"Controller"}, {0}, COND_None, REPNOTIFY_OnChanged));
 }
 
 void USpatialTypeBinding_WheeledVehicle::BindToView(bool bIsClient)
@@ -362,56 +364,64 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 {
 	switch (Handle)
 	{
-		case 1: // field_bhidden
+		case 1: // field_bhidden0
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
-			OutUpdate.set_field_bhidden(Value);
+			OutUpdate.set_field_bhidden0(Value);
 			break;
 		}
-		case 2: // field_breplicatemovement
+		case 2: // field_breplicatemovement0
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
-			OutUpdate.set_field_breplicatemovement(Value);
+			OutUpdate.set_field_breplicatemovement0(Value);
 			break;
 		}
-		case 3: // field_btearoff
+		case 3: // field_btearoff0
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
-			OutUpdate.set_field_btearoff(Value);
+			OutUpdate.set_field_btearoff0(Value);
 			break;
 		}
-		case 4: // field_bcanbedamaged
+		case 4: // field_bcanbedamaged0
 		{
 			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
 
-			OutUpdate.set_field_bcanbedamaged(Value);
+			OutUpdate.set_field_bcanbedamaged0(Value);
 			break;
 		}
-		case 5: // field_remoterole
+		case 5: // field_remoterole0
 		{
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(Data));
 
-			OutUpdate.set_field_remoterole(uint32_t(Value));
+			OutUpdate.set_field_remoterole0(uint32_t(Value));
 			break;
 		}
-		case 6: // field_replicatedmovement
+		case 6: // field_replicatedmovement0
 		{
 			const FRepMovement& Value = *(reinterpret_cast<FRepMovement const*>(Data));
 
+			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 6);
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FRepMovement&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
+			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			if (UnresolvedObjects.Num() == 0)
 			{
-				TArray<uint8> ValueData;
-				FMemoryWriter ValueDataWriter(ValueData);
-				bool bSuccess = true;
-				(const_cast<FRepMovement&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
-				OutUpdate.set_field_replicatedmovement(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+				OutUpdate.set_field_replicatedmovement0(Result);
+			}
+			else
+			{
+				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 6);
 			}
 			break;
 		}
-		case 7: // field_attachmentreplication_attachparent
+		case 7: // field_attachmentreplication0_attachparent0
 		{
 			AActor* Value = *(reinterpret_cast<AActor* const*>(Data));
 
@@ -434,65 +444,89 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_attachmentreplication_attachparent(ObjectRef);
+					OutUpdate.set_field_attachmentreplication0_attachparent0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_attachmentreplication_attachparent(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_attachmentreplication0_attachparent0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
-		case 8: // field_attachmentreplication_locationoffset
+		case 8: // field_attachmentreplication0_locationoffset0
 		{
 			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
+			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 8);
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
+			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			if (UnresolvedObjects.Num() == 0)
 			{
-				TArray<uint8> ValueData;
-				FMemoryWriter ValueDataWriter(ValueData);
-				bool bSuccess = true;
-				(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
-				OutUpdate.set_field_attachmentreplication_locationoffset(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+				OutUpdate.set_field_attachmentreplication0_locationoffset0(Result);
+			}
+			else
+			{
+				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 8);
 			}
 			break;
 		}
-		case 9: // field_attachmentreplication_relativescale3d
+		case 9: // field_attachmentreplication0_relativescale3d0
 		{
 			const FVector_NetQuantize100& Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(Data));
 
+			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 9);
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
+			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			if (UnresolvedObjects.Num() == 0)
 			{
-				TArray<uint8> ValueData;
-				FMemoryWriter ValueDataWriter(ValueData);
-				bool bSuccess = true;
-				(const_cast<FVector_NetQuantize100&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
-				OutUpdate.set_field_attachmentreplication_relativescale3d(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+				OutUpdate.set_field_attachmentreplication0_relativescale3d0(Result);
+			}
+			else
+			{
+				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 9);
 			}
 			break;
 		}
-		case 10: // field_attachmentreplication_rotationoffset
+		case 10: // field_attachmentreplication0_rotationoffset0
 		{
 			const FRotator& Value = *(reinterpret_cast<FRotator const*>(Data));
 
+			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 10);
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FRotator&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
+			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			if (UnresolvedObjects.Num() == 0)
 			{
-				TArray<uint8> ValueData;
-				FMemoryWriter ValueDataWriter(ValueData);
-				bool bSuccess = true;
-				(const_cast<FRotator&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
-				OutUpdate.set_field_attachmentreplication_rotationoffset(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+				OutUpdate.set_field_attachmentreplication0_rotationoffset0(Result);
+			}
+			else
+			{
+				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 10);
 			}
 			break;
 		}
-		case 11: // field_attachmentreplication_attachsocket
+		case 11: // field_attachmentreplication0_attachsocket0
 		{
 			FName Value = *(reinterpret_cast<FName const*>(Data));
 
-			OutUpdate.set_field_attachmentreplication_attachsocket(TCHAR_TO_UTF8(*Value.ToString()));
+			OutUpdate.set_field_attachmentreplication0_attachsocket0(TCHAR_TO_UTF8(*Value.ToString()));
 			break;
 		}
-		case 12: // field_attachmentreplication_attachcomponent
+		case 12: // field_attachmentreplication0_attachcomponent0
 		{
 			USceneComponent* Value = *(reinterpret_cast<USceneComponent* const*>(Data));
 
@@ -515,16 +549,16 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_attachmentreplication_attachcomponent(ObjectRef);
+					OutUpdate.set_field_attachmentreplication0_attachcomponent0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_attachmentreplication_attachcomponent(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_attachmentreplication0_attachcomponent0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
-		case 13: // field_owner
+		case 13: // field_owner0
 		{
 			AActor* Value = *(reinterpret_cast<AActor* const*>(Data));
 
@@ -547,23 +581,23 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_owner(ObjectRef);
+					OutUpdate.set_field_owner0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_owner(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_owner0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
-		case 14: // field_role
+		case 14: // field_role0
 		{
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(Data));
 
-			OutUpdate.set_field_role(uint32_t(Value));
+			OutUpdate.set_field_role0(uint32_t(Value));
 			break;
 		}
-		case 15: // field_instigator
+		case 15: // field_instigator0
 		{
 			APawn* Value = *(reinterpret_cast<APawn* const*>(Data));
 
@@ -586,16 +620,16 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_instigator(ObjectRef);
+					OutUpdate.set_field_instigator0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_instigator(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_instigator0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
-		case 16: // field_playerstate
+		case 16: // field_playerstate0
 		{
 			APlayerState* Value = *(reinterpret_cast<APlayerState* const*>(Data));
 
@@ -618,23 +652,23 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_playerstate(ObjectRef);
+					OutUpdate.set_field_playerstate0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_playerstate(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_playerstate0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
-		case 17: // field_remoteviewpitch
+		case 17: // field_remoteviewpitch0
 		{
 			uint8 Value = *(reinterpret_cast<uint8 const*>(Data));
 
-			OutUpdate.set_field_remoteviewpitch(uint32_t(Value));
+			OutUpdate.set_field_remoteviewpitch0(uint32_t(Value));
 			break;
 		}
-		case 18: // field_controller
+		case 18: // field_controller0
 		{
 			AController* Value = *(reinterpret_cast<AController* const*>(Data));
 
@@ -657,12 +691,12 @@ void USpatialTypeBinding_WheeledVehicle::ServerSendUpdate_MultiClient(const uint
 				}
 				else
 				{
-					OutUpdate.set_field_controller(ObjectRef);
+					OutUpdate.set_field_controller0(ObjectRef);
 				}
 			}
 			else
 			{
-				OutUpdate.set_field_controller(SpatialConstants::NULL_OBJECT_REF);
+				OutUpdate.set_field_controller0(SpatialConstants::NULL_OBJECT_REF);
 			}
 			break;
 		}
@@ -693,9 +727,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 	const FRepHandlePropertyMap& HandleToPropertyMap = GetRepHandlePropertyMap();
 	FSpatialConditionMapFilter ConditionMap(ActorChannel, bAutonomousProxy);
 
-	if (!Update.field_bhidden().empty())
+	if (!Update.field_bhidden0().empty())
 	{
-		// field_bhidden
+		// field_bhidden0
 		uint16 Handle = 1;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -703,7 +737,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
-			Value = (*Update.field_bhidden().data());
+			Value = (*Update.field_bhidden0().data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -715,9 +749,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_breplicatemovement().empty())
+	if (!Update.field_breplicatemovement0().empty())
 	{
-		// field_breplicatemovement
+		// field_breplicatemovement0
 		uint16 Handle = 2;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -725,7 +759,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
-			Value = (*Update.field_breplicatemovement().data());
+			Value = (*Update.field_breplicatemovement0().data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -737,9 +771,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_btearoff().empty())
+	if (!Update.field_btearoff0().empty())
 	{
-		// field_btearoff
+		// field_btearoff0
 		uint16 Handle = 3;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -747,7 +781,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
-			Value = (*Update.field_btearoff().data());
+			Value = (*Update.field_btearoff0().data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -759,9 +793,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_bcanbedamaged().empty())
+	if (!Update.field_bcanbedamaged0().empty())
 	{
-		// field_bcanbedamaged
+		// field_bcanbedamaged0
 		uint16 Handle = 4;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -769,7 +803,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
-			Value = (*Update.field_bcanbedamaged().data());
+			Value = (*Update.field_bcanbedamaged0().data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -781,9 +815,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_remoterole().empty())
+	if (!Update.field_remoterole0().empty())
 	{
-		// field_remoterole
+		// field_remoterole0
 		uint16 Handle = 5;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -798,7 +832,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
-			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_remoterole().data())));
+			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_remoterole0().data())));
 
 			// Downgrade role from AutonomousProxy to SimulatedProxy if we aren't authoritative over
 			// the server RPCs component.
@@ -817,9 +851,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_replicatedmovement().empty())
+	if (!Update.field_replicatedmovement0().empty())
 	{
-		// field_replicatedmovement
+		// field_replicatedmovement0
 		uint16 Handle = 6;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -827,15 +861,13 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			FRepMovement Value = *(reinterpret_cast<FRepMovement const*>(PropertyData));
 
-			{
-				auto& ValueDataStr = (*Update.field_replicatedmovement().data());
-				TArray<uint8> ValueData;
-				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess = true;
-				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
-			}
+			auto& ValueDataStr = (*Update.field_replicatedmovement0().data());
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+			bool bSuccess = true;
+			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -847,9 +879,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_attachmentreplication_attachparent().empty())
+	if (!Update.field_attachmentreplication0_attachparent0().empty())
 	{
-		// field_attachmentreplication_attachparent
+		// field_attachmentreplication0_attachparent0
 		uint16 Handle = 7;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -858,37 +890,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachparent0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication_attachparent().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<AActor>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<AActor>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -905,9 +935,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	if (!Update.field_attachmentreplication_locationoffset().empty())
+	if (!Update.field_attachmentreplication0_locationoffset0().empty())
 	{
-		// field_attachmentreplication_locationoffset
+		// field_attachmentreplication0_locationoffset0
 		uint16 Handle = 8;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -915,15 +945,13 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
-			{
-				auto& ValueDataStr = (*Update.field_attachmentreplication_locationoffset().data());
-				TArray<uint8> ValueData;
-				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess = true;
-				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
-			}
+			auto& ValueDataStr = (*Update.field_attachmentreplication0_locationoffset0().data());
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+			bool bSuccess = true;
+			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -935,9 +963,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_attachmentreplication_relativescale3d().empty())
+	if (!Update.field_attachmentreplication0_relativescale3d0().empty())
 	{
-		// field_attachmentreplication_relativescale3d
+		// field_attachmentreplication0_relativescale3d0
 		uint16 Handle = 9;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -945,15 +973,13 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
-			{
-				auto& ValueDataStr = (*Update.field_attachmentreplication_relativescale3d().data());
-				TArray<uint8> ValueData;
-				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess = true;
-				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
-			}
+			auto& ValueDataStr = (*Update.field_attachmentreplication0_relativescale3d0().data());
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+			bool bSuccess = true;
+			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -965,9 +991,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_attachmentreplication_rotationoffset().empty())
+	if (!Update.field_attachmentreplication0_rotationoffset0().empty())
 	{
-		// field_attachmentreplication_rotationoffset
+		// field_attachmentreplication0_rotationoffset0
 		uint16 Handle = 10;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -975,15 +1001,13 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			FRotator Value = *(reinterpret_cast<FRotator const*>(PropertyData));
 
-			{
-				auto& ValueDataStr = (*Update.field_attachmentreplication_rotationoffset().data());
-				TArray<uint8> ValueData;
-				ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-				FMemoryReader ValueDataReader(ValueData);
-				bool bSuccess = true;
-				Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-				checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
-			}
+			auto& ValueDataStr = (*Update.field_attachmentreplication0_rotationoffset0().data());
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+			bool bSuccess = true;
+			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -995,9 +1019,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_attachmentreplication_attachsocket().empty())
+	if (!Update.field_attachmentreplication0_attachsocket0().empty())
 	{
-		// field_attachmentreplication_attachsocket
+		// field_attachmentreplication0_attachsocket0
 		uint16 Handle = 11;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1005,7 +1029,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			FName Value = *(reinterpret_cast<FName const*>(PropertyData));
 
-			Value = FName(((*Update.field_attachmentreplication_attachsocket().data())).data());
+			Value = FName(((*Update.field_attachmentreplication0_attachsocket0().data())).data());
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -1017,9 +1041,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_attachmentreplication_attachcomponent().empty())
+	if (!Update.field_attachmentreplication0_attachcomponent0().empty())
 	{
-		// field_attachmentreplication_attachcomponent
+		// field_attachmentreplication0_attachcomponent0
 		uint16 Handle = 12;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1028,37 +1052,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			USceneComponent* Value = *(reinterpret_cast<USceneComponent* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachcomponent0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication_attachcomponent().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<USceneComponent>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<USceneComponent>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<USceneComponent>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<USceneComponent>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -1075,9 +1097,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	if (!Update.field_owner().empty())
+	if (!Update.field_owner0().empty())
 	{
-		// field_owner
+		// field_owner0
 		uint16 Handle = 13;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1086,37 +1108,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<AActor>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<AActor>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -1133,9 +1153,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	if (!Update.field_role().empty())
+	if (!Update.field_role0().empty())
 	{
-		// field_role
+		// field_role0
 		uint16 Handle = 14;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1150,7 +1170,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
-			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_role().data())));
+			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_role0().data())));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -1162,9 +1182,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_instigator().empty())
+	if (!Update.field_instigator0().empty())
 	{
-		// field_instigator
+		// field_instigator0
 		uint16 Handle = 15;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1173,37 +1193,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			APawn* Value = *(reinterpret_cast<APawn* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_instigator0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_instigator().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<APawn>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<APawn>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<APawn>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<APawn>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -1220,9 +1238,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	if (!Update.field_playerstate().empty())
+	if (!Update.field_playerstate0().empty())
 	{
-		// field_playerstate
+		// field_playerstate0
 		uint16 Handle = 16;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1231,37 +1249,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			APlayerState* Value = *(reinterpret_cast<APlayerState* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_playerstate0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_playerstate().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<APlayerState>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<APlayerState>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<APlayerState>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<APlayerState>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -1278,9 +1294,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			}
 		}
 	}
-	if (!Update.field_remoteviewpitch().empty())
+	if (!Update.field_remoteviewpitch0().empty())
 	{
-		// field_remoteviewpitch
+		// field_remoteviewpitch0
 		uint16 Handle = 17;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1288,7 +1304,7 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			uint8 Value = *(reinterpret_cast<uint8 const*>(PropertyData));
 
-			Value = uint8(uint8((*Update.field_remoteviewpitch().data())));
+			Value = uint8(uint8((*Update.field_remoteviewpitch0().data())));
 
 			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
 
@@ -1300,9 +1316,9 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 				Handle);
 		}
 	}
-	if (!Update.field_controller().empty())
+	if (!Update.field_controller0().empty())
 	{
-		// field_controller
+		// field_controller0
 		uint16 Handle = 18;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
@@ -1311,37 +1327,35 @@ void USpatialTypeBinding_WheeledVehicle::ReceiveUpdate_MultiClient(USpatialActor
 			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
 			AController* Value = *(reinterpret_cast<AController* const*>(PropertyData));
 
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_controller0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
 			{
-				improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_controller().data());
-				check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-				if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
 				{
-					Value = nullptr;
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AController>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<AController>(Object_Raw);
 				}
 				else
 				{
-					FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-					if (NetGUID.IsValid())
-					{
-						UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-						checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-						checkf(Cast<AController>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-						Value = Cast<AController>(Object_Raw);
-					}
-					else
-					{
-						UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-							*Interop->GetSpatialOS()->GetWorkerId(),
-							*ObjectRefToString(ObjectRef),
-							*ActorChannel->Actor->GetName(),
-							ActorChannel->GetEntityId().ToSpatialEntityId(),
-							*RepData->Property->GetName(),
-							Handle);
-						// A legal static object reference should never be unresolved.
-						check(ObjectRef.path().empty());
-						bWriteObjectProperty = false;
-						Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-					}
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
 				}
 			}
 
@@ -1385,11 +1399,21 @@ void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_SendRPC(worker::Conne
 
 		// Build RPC Payload.
 		improbable::unreal::generated::wheeledvehiclemovementcomponent::ServerUpdateStateRequest RPCPayload;
-		RPCPayload.set_field_insteeringinput(StructuredParams.InSteeringInput);
-		RPCPayload.set_field_inthrottleinput(StructuredParams.InThrottleInput);
-		RPCPayload.set_field_inbrakeinput(StructuredParams.InBrakeInput);
-		RPCPayload.set_field_inhandbrakeinput(StructuredParams.InHandbrakeInput);
-		RPCPayload.set_field_currentgear(int32_t(StructuredParams.CurrentGear));
+		{
+			RPCPayload.set_field_insteeringinput0(StructuredParams.InSteeringInput);
+		}
+		{
+			RPCPayload.set_field_inthrottleinput0(StructuredParams.InThrottleInput);
+		}
+		{
+			RPCPayload.set_field_inbrakeinput0(StructuredParams.InBrakeInput);
+		}
+		{
+			RPCPayload.set_field_inhandbrakeinput0(StructuredParams.InHandbrakeInput);
+		}
+		{
+			RPCPayload.set_field_currentgear0(int32_t(StructuredParams.CurrentGear));
+		}
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1429,11 +1453,21 @@ void USpatialTypeBinding_WheeledVehicle::ServerUpdateState_OnRPCPayload(const wo
 		WheeledVehicleMovementComponent_eventServerUpdateState_Parms Parameters;
 
 		// Extract from request data.
-		Parameters.InSteeringInput = Op.Request.field_insteeringinput();
-		Parameters.InThrottleInput = Op.Request.field_inthrottleinput();
-		Parameters.InBrakeInput = Op.Request.field_inbrakeinput();
-		Parameters.InHandbrakeInput = Op.Request.field_inhandbrakeinput();
-		Parameters.CurrentGear = Op.Request.field_currentgear();
+		{
+			Parameters.InSteeringInput = Op.Request.field_insteeringinput0();
+		}
+		{
+			Parameters.InThrottleInput = Op.Request.field_inthrottleinput0();
+		}
+		{
+			Parameters.InBrakeInput = Op.Request.field_inbrakeinput0();
+		}
+		{
+			Parameters.InHandbrakeInput = Op.Request.field_inhandbrakeinput0();
+		}
+		{
+			Parameters.CurrentGear = Op.Request.field_currentgear0();
+		}
 
 		// Call implementation.
 		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateState, target: %s %s"),
