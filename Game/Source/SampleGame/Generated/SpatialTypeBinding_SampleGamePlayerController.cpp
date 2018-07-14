@@ -24,6 +24,7 @@
 #include "GameFramework/HUD.h"
 #include "GameFramework/LocalMessage.h"
 #include "Particles/EmitterCameraLensEffectBase.h"
+#include "SGGameState.h"
 
 #include "SampleGamePlayerControllerSingleClientRepDataAddComponentOp.h"
 #include "SampleGamePlayerControllerMultiClientRepDataAddComponentOp.h"
@@ -146,6 +147,7 @@ void USpatialTypeBinding_SampleGamePlayerController::Init(USpatialInterop* InInt
 	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"Pawn"}, {0}, COND_None, REPNOTIFY_Always));
 	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"TargetViewRotation"}, {0}, COND_OwnerOnly, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, {0}, COND_OwnerOnly, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"CustomGameState"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
 	// Populate MigratableHandleToPropertyMap.
 	MigratableHandleToPropertyMap.Add(1, FMigratableHandleData(Class, {"AcknowledgedPawn"}));
@@ -975,6 +977,38 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSendUpdate_MultiClien
 			}
 			break;
 		}
+		case 20: // field_customgamestate0
+		{
+			ASGGameState* Value = *(reinterpret_cast<ASGGameState* const*>(Data));
+
+			if (Value != nullptr)
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
+				if (!NetGUID.IsValid())
+				{
+					if (Value->IsFullNameStableForNetworking())
+					{
+						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
+					}
+				}
+				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
+				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+				{
+					// A legal static object reference should never be unresolved.
+					check(!Value->IsFullNameStableForNetworking())
+					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 20);
+				}
+				else
+				{
+					OutUpdate.set_field_customgamestate0(ObjectRef);
+				}
+			}
+			else
+			{
+				OutUpdate.set_field_customgamestate0(SpatialConstants::NULL_OBJECT_REF);
+			}
+			break;
+		}
 	default:
 		checkf(false, TEXT("Unknown replication handle %d encountered when creating a SpatialOS update."));
 		break;
@@ -1693,6 +1727,62 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
 					checkf(Cast<APawn>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
 					Value = Cast<APawn>(Object_Raw);
+				}
+				else
+				{
+					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+				}
+			}
+
+			if (bWriteObjectProperty)
+			{
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+
+				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+					*Interop->GetSpatialOS()->GetWorkerId(),
+					*ActorChannel->Actor->GetName(),
+					ActorChannel->GetEntityId().ToSpatialEntityId(),
+					*RepData->Property->GetName(),
+					Handle);
+			}
+		}
+	}
+	if (!Update.field_customgamestate0().empty())
+	{
+		// field_customgamestate0
+		uint16 Handle = 20;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			bool bWriteObjectProperty = true;
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			ASGGameState* Value = *(reinterpret_cast<ASGGameState* const*>(PropertyData));
+
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_customgamestate0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+			{
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
+				{
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<ASGGameState>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<ASGGameState>(Object_Raw);
 				}
 				else
 				{

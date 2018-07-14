@@ -28,7 +28,8 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 
 	// [server] Tells the controller that it's time for the player to die, and sets up conditions for respawn.
-	void KillCharacter();
+	// @param Killer  The player who killed me. Can be null if it wasn't a player who dealt the damage that killed me.
+	void KillCharacter(const class ASampleGameCharacter* Killer);
 
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
@@ -36,6 +37,9 @@ public:
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
+
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const;
 
 private:
 	// [client] Informs the invoking client whether the join request suceeded or failed
@@ -74,6 +78,10 @@ private:
 	// Time for which to keep the character's body around before deleting it.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
 	float DeleteCharacterDelay;
+
+	// TODO: remove this
+	UPROPERTY(Replicated)
+	class ASGGameState* CustomGameState;
 
 	// Pawn to be deleted when the DeletePawn timer expires.
 	class APawn* PawnToDelete;

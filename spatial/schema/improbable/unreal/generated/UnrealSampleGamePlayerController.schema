@@ -5,12 +5,12 @@ package improbable.unreal.generated.samplegameplayercontroller;
 import "improbable/unreal/gdk/core_types.schema";
 
 component SampleGamePlayerControllerSingleClientRepData {
-	id = 100010;
+	id = 100022;
 	bytes field_targetviewrotation0 = 1; // COND_OwnerOnly // ::PlayerController
 	bytes field_spawnlocation0 = 2; // COND_OwnerOnly // ::PlayerController
 }
 component SampleGamePlayerControllerMultiClientRepData {
-	id = 100011;
+	id = 100023;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -28,9 +28,10 @@ component SampleGamePlayerControllerMultiClientRepData {
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
 	UnrealObjectRef field_playerstate0 = 16; // COND_None // ::Controller
 	UnrealObjectRef field_pawn0 = 17; // COND_None // ::Controller
+	UnrealObjectRef field_customgamestate0 = 18; // COND_None // ::SampleGamePlayerController
 }
 component SampleGamePlayerControllerMigratableData {
-	id = 100012;
+	id = 100024;
 	UnrealObjectRef field_acknowledgedpawn0 = 1;
 }
 import "improbable/unreal/generated/UnrealSampleGamePlayerControllerTypes.schema";
@@ -38,7 +39,7 @@ import "improbable/unreal/generated/UnrealPlayerControllerTypes.schema";
 import "improbable/unreal/generated/UnrealControllerTypes.schema";
 
 component SampleGamePlayerControllerClientRPCs {
-	id = 100013;
+	id = 100025;
 	command UnrealRPCCommandResponse clientjoinresults(samplegameplayercontroller.ClientJoinResultsRequest);
 	command UnrealRPCCommandResponse onserverstartedvisuallogger(playercontroller.OnServerStartedVisualLoggerRequest);
 	command UnrealRPCCommandResponse clientwaskicked(playercontroller.ClientWasKickedRequest);
@@ -94,7 +95,7 @@ component SampleGamePlayerControllerClientRPCs {
 	command UnrealRPCCommandResponse clientsetlocation(controller.ClientSetLocationRequest);
 }
 component SampleGamePlayerControllerServerRPCs {
-	id = 100014;
+	id = 100026;
 	command UnrealRPCCommandResponse servertryjoingame(samplegameplayercontroller.ServerTryJoinGameRequest);
 	command UnrealRPCCommandResponse serverviewself(playercontroller.ServerViewSelfRequest);
 	command UnrealRPCCommandResponse serverviewprevplayer(playercontroller.ServerViewPrevPlayerRequest);
@@ -119,5 +120,5 @@ component SampleGamePlayerControllerServerRPCs {
 	command UnrealRPCCommandResponse serveracknowledgepossession(playercontroller.ServerAcknowledgePossessionRequest);
 }
 component SampleGamePlayerControllerNetMulticastRPCs {
-	id = 100015;
+	id = 100027;
 }

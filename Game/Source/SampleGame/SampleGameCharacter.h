@@ -66,6 +66,8 @@ public:
 	// Returns the direction in which to perform a line trace so it lines up with the center of the crosshair.
 	FVector GetLineTraceDirection() const;
 
+	FString GetPlayerName() const;
+
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	FORCEINLINE float GetCurrentHealth() const
@@ -115,7 +117,8 @@ private:
 	void StopFire();
 
 	// [server] Tells this player that it's time to die.
-	void Die();
+	// @param Killer  The player who killed me. Can be null if it wasn't a player who dealt the damage that killed me.
+	void Die(const class ASampleGameCharacter* Killer);
 
 	// [client + server] Puts the player in ragdoll mode.
 	void StartRagdoll();

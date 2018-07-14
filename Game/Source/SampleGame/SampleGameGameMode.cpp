@@ -6,6 +6,7 @@
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
 #include "SampleGamePlayerState.h"
+#include "SGGameState.h"
 #include "Teams/SampleGameTeamPlayerStart.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UI/SampleGameHUD.h"
@@ -147,4 +148,20 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 
 	// Default behavior, if no starts found otherwise
 	return Super::FindPlayerStart_Implementation(Player, IncomingName);
+}
+
+void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, FString KillerName, ESampleGameTeam KillerTeam)
+{
+	if (CustomGameState)
+	{
+		CustomGameState->AddKill(KillerTeam, KillerName);
+	}
+}
+
+void ASampleGameGameMode::BeginPlay()
+{
+	if (HasAuthority())
+	{
+		CustomGameState = GetWorld()->SpawnActor<ASGGameState>(FVector::ZeroVector, FRotator::ZeroRotator);
+	}
 }

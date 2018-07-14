@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGameGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -25,4 +26,20 @@ public:
 	// This will either use a specified startactor, if it matches Player's team affiliation,
 	// or calls ChoosePlayerStart to select a startactor matching Player's team affiliation.
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
+
+	// TODO: mark this as a W2W RPC
+	void NotifyPlayerKilled(FString PlayerName, FString KillerName, ESampleGameTeam KillerTeam);
+
+	// TODO: remove this
+	class ASGGameState* GetCustomGameState()
+	{
+		return CustomGameState;
+	}
+
+protected:
+	virtual void BeginPlay() override;
+
+private:
+	// TODO: remove this
+	class ASGGameState* CustomGameState;
 };

@@ -4,10 +4,12 @@
 
 #include "SampleGamePlayerState.h"
 #include "SampleGameCharacter.h"
+#include "SampleGameGameMode.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
 #include "UI/SampleGameLoginUI.h"
 #include "UI/SampleGameUI.h"
+#include "UnrealNetwork.h"
 
 #include "SpatialNetDriver.h"
 
@@ -58,13 +60,29 @@ void ASampleGamePlayerController::SetPawn(APawn* InPawn)
 	}
 }
 
-void ASampleGamePlayerController::KillCharacter()
+void ASampleGamePlayerController::KillCharacter(const ASampleGameCharacter* Killer)
 {
 	check(GetNetMode() == NM_DedicatedServer);
 
 	if (!HasAuthority())
 	{
 		return;
+	}
+
+	FString KillerName;
+	ESampleGameTeam KillerTeam = ESampleGameTeam::Team_None;
+	if (Killer)
+	{
+		KillerName = Killer->GetPlayerName();
+		KillerTeam = Killer->GetTeam();
+	}
+
+	if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
+		{
+			GM->NotifyPlayerKilled(PS->GetPlayerName(), KillerName, KillerTeam);
+		}
 	}
 
 	PawnToDelete = GetPawn();
@@ -113,6 +131,13 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 			SampleGameUI->RemoveFromViewport();
 		}
 	}
+}
+
+void ASampleGamePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(ASampleGamePlayerController, CustomGameState);
 }
 
 void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
@@ -275,5 +300,14 @@ void ASampleGamePlayerController::Tick(float DeltaSeconds)
 	{
 		bHasShownLoginHud = true;
 		SetLoginUIVisible(true);
+	}
+
+	// TODO: remove this
+	if (CustomGameState == nullptr && HasAuthority())
+	{
+		if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			CustomGameState = GM->GetCustomGameState();
+		}
 	}
 }

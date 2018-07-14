@@ -1,14 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated.instantweapon;
+package improbable.unreal.generated.sggamestate;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-component InstantWeaponSingleClientRepData {
-	id = 100016;
+component SGGameStateSingleClientRepData {
+	id = 100010;
 }
-component InstantWeaponMultiClientRepData {
-	id = 100017;
+component SGGameStateMultiClientRepData {
+	id = 100011;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -24,24 +24,18 @@ component InstantWeaponMultiClientRepData {
 	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
 	uint32 field_role0 = 14; // COND_None // ::Actor
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
-	UnrealObjectRef field_owningcharacter0 = 16; // COND_None // ::Weapon
-	bytes field_hitnotify0_location0 = 17; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
-	UnrealObjectRef field_hitnotify0_hitactor0 = 18; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
-	bytes field_hitnotify0_timestamp0 = 19; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
+	list<bytes> field_teamscores0 = 16; // COND_None // ::SGGameState
 }
-component InstantWeaponMigratableData {
-	id = 100018;
+component SGGameStateMigratableData {
+	id = 100012;
 }
-import "improbable/unreal/generated/UnrealInstantWeaponTypes.schema";
 
-component InstantWeaponClientRPCs {
-	id = 100019;
+component SGGameStateClientRPCs {
+	id = 100013;
 }
-component InstantWeaponServerRPCs {
-	id = 100020;
-	command UnrealRPCCommandResponse serverdidmiss(instantweapon.ServerDidMissRequest);
-	command UnrealRPCCommandResponse serverdidhit(instantweapon.ServerDidHitRequest);
+component SGGameStateServerRPCs {
+	id = 100014;
 }
-component InstantWeaponNetMulticastRPCs {
-	id = 100021;
+component SGGameStateNetMulticastRPCs {
+	id = 100015;
 }
