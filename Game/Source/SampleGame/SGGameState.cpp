@@ -5,6 +5,8 @@
 #include "Teams/SampleGameTeams.h"
 #include "UnrealNetwork.h"
 
+#include "SGDebug.h"
+
 
 // Sets default values
 ASGGameState::ASGGameState()
@@ -28,9 +30,7 @@ void ASGGameState::AddKill(ESampleGameTeam Team, FString Killer)
 
 void ASGGameState::BeginPlay()
 {
-	(((((
-	// TODO: this doesn't work properly
-	if (HasAuthority() && TeamScores.Num() > 0)
+	if (HasAuthority() && TeamScores.Num() == 0)
 	{
 		// Initialize team scores for all possible teams.
 		const uint32 TeamMax = static_cast<uint32>(ESampleGameTeam::Team_MAX);
