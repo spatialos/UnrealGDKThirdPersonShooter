@@ -4,9 +4,19 @@ package improbable.unreal.generated.samplegamecharacter;
 
 import "improbable/unreal/gdk/core_types.schema";
 
+type WeaponPickupRequest {
+	uint32 target_subobject_offset = 1;
+}
+type WeaponDeleteRequest {
+	uint32 target_subobject_offset = 1;
+}
 type ServerSpawnCubeRequest {
 	uint32 target_subobject_offset = 1;
 }
 type DebugResetCharacterRequest {
 	uint32 target_subobject_offset = 1;
+}
+type DeleteWeaponRequest {
+	uint32 target_subobject_offset = 1;
+	UnrealObjectRef field_weapontodelete0 = 2;
 }

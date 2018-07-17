@@ -6,13 +6,13 @@ import "improbable/unreal/gdk/core_types.schema";
 
 type ServerDidMissRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_hitinfo_location = 2;
-	UnrealObjectRef field_hitinfo_hitactor = 3;
-	bytes field_hitinfo_timestamp = 4;
+	bytes field_hitinfo0_location0 = 2;
+	UnrealObjectRef field_hitinfo0_hitactor0 = 3;
+	bytes field_hitinfo0_timestamp0 = 4;
 }
 type ServerDidHitRequest {
 	uint32 target_subobject_offset = 1;
-	bytes field_hitinfo_location = 2;
-	UnrealObjectRef field_hitinfo_hitactor = 3;
-	bytes field_hitinfo_timestamp = 4;
+	bytes field_hitinfo0_location0 = 2;
+	UnrealObjectRef field_hitinfo0_hitactor0 = 3;
+	bytes field_hitinfo0_timestamp0 = 4;
 }

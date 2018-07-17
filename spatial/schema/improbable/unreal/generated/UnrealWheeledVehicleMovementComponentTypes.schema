@@ -6,9 +6,9 @@ import "improbable/unreal/gdk/core_types.schema";
 
 type ServerUpdateStateRequest {
 	uint32 target_subobject_offset = 1;
-	float field_insteeringinput = 2;
-	float field_inthrottleinput = 3;
-	float field_inbrakeinput = 4;
-	float field_inhandbrakeinput = 5;
-	int32 field_currentgear = 6;
+	float field_insteeringinput0 = 2;
+	float field_inthrottleinput0 = 3;
+	float field_inbrakeinput0 = 4;
+	float field_inhandbrakeinput0 = 5;
+	int32 field_currentgear0 = 6;
 }
