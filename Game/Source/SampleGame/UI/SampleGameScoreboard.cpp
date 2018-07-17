@@ -2,6 +2,7 @@
 
 #include "SampleGameScoreboard.h"
 
+#include "Components/PanelWidget.h"
 #include "Teams/SGTeamScores.h"
 #include "UI/SGTeamScoreWidget.h"
 
@@ -11,12 +12,16 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 	{
 		if (!TeamScoreWidgets.Contains(TeamScore.Team))
 		{
-			// TODO: add new widget
-			// TOOD: add newly created widget to container
+			// TODO: validate all necessary pointers used below
+
+			USGTeamScoreWidget* NewWidget = CreateWidget<USGTeamScoreWidget>(GetOwningPlayer(), TeamScoreWidgetTemplate);
+			NewWidget->SetTeam(TeamScore.Team);
+			TeamScoreWidgets.Emplace(TeamScore.Team, NewWidget);
+			TeamScoresContainerWidget->AddChild(NewWidget);
 		}
 
 		USGTeamScoreWidget* TeamWidget = TeamScoreWidgets[TeamScore.Team];
-		// TODO: set score of the team
+		TeamWidget->SetKills(TeamScore.TeamKills);
 	}
 
 	// TODO: sort the team score widgets by score in the UI

@@ -5,6 +5,7 @@
 #include "SampleGamePlayerState.h"
 #include "SampleGameCharacter.h"
 #include "SampleGameGameMode.h"
+#include "SGGameState.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
 #include "UI/SampleGameLoginUI.h"
@@ -208,6 +209,10 @@ void ASampleGamePlayerController::InitScoreboard()
 		UE_LOG(LogSampleGame, Error, TEXT("Failed to create scoreboard widget for %s"), *this->GetName());
 		return;
 	}
+
+	FSGTeamScoresUpdatedDelegate UpdateScoreboardCallback;
+	UpdateScoreboardCallback.BindUObject(Scoreboard, &USampleGameScoreboard::UpdateTeamScores);
+	CustomGameState->RegisterScoreChangeListener(UpdateScoreboardCallback);
 }
 
 void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)

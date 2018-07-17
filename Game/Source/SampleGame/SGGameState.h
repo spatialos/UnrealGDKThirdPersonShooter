@@ -9,6 +9,8 @@
 #include "SGGameState.generated.h"
 
 
+DECLARE_DELEGATE_OneParam(FSGTeamScoresUpdatedDelegate, const TArray<FTeamScore>&);
+
 // TODO: make this a subclass of GameState once its replication is properly handled by the Unreal GDK
 UCLASS()
 class SAMPLEGAME_API ASGGameState : public AActor
@@ -18,7 +20,11 @@ class SAMPLEGAME_API ASGGameState : public AActor
 public:	
 	ASGGameState();
 
-	void AddKill(ESampleGameTeam Team, FString Killer);
+	void AddKill(ESampleGameTeam Team, const FString& Killer);
+
+	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);
+
+	const TArray<FTeamScore>& GetTeamScores() { return TeamScores; }
 
 protected:
 	virtual void BeginPlay() override;
@@ -33,5 +39,7 @@ private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TeamScores)
 	TArray<FTeamScore> TeamScores;
+
+	FSGTeamScoresUpdatedDelegate TeamScoresUpdatedCallback;
 
 };

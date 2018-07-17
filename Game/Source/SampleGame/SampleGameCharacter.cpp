@@ -187,6 +187,9 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASampleGameCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASampleGameCharacter::StopFire);
+
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &ASampleGameCharacter::ShowScoreboard);
+	PlayerInputComponent->BindAction("ShowScoreboard", IE_Released, this, &ASampleGameCharacter::HideScoreboard);
 }
 
 void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -575,6 +578,24 @@ void ASampleGameCharacter::StopSprinting()
 	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
 	{
 		MovementComponent->SetWantsToSprint(false);
+	}
+}
+
+void ASampleGameCharacter::ShowScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
+	{
+		PC->SetScoreboardIsVisible(true);
+	}
+}
+
+void ASampleGameCharacter::HideScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
+	{
+		PC->SetScoreboardIsVisible(false);
 	}
 }
 

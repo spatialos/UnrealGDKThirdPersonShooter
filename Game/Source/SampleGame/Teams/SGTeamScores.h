@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Teams/SampleGameTeams.h"
+#include "SGTeamScores.generated.h"
 
 USTRUCT()
 struct FPlayerScore {

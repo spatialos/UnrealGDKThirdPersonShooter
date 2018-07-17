@@ -58,6 +58,9 @@ protected:
 
 	void StopSprinting();
 
+	void ShowScoreboard();
+	void HideScoreboard();
+
 public:
 	// Returns a position from which to start a line trace.
 	// Use this so your line trace doesn't collide with the player character.

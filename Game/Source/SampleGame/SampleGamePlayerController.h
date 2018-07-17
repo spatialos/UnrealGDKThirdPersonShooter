@@ -34,6 +34,9 @@ public:
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
 
+	// [client] Sets whether the scoreboard should be visible.
+	void SetScoreboardIsVisible(bool bIsVisible);
+
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
@@ -57,9 +60,6 @@ private:
 
 	// [client] Initializes the scoreboard UI.
 	void InitScoreboard();
-
-	// [client] Sets whether the scoreboard should be visible.
-	void SetScoreboardIsVisible(bool bIsVisible);
 
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")

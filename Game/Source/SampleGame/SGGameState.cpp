@@ -16,7 +16,7 @@ ASGGameState::ASGGameState()
 	SetReplicates(true);
 }
 
-void ASGGameState::AddKill(ESampleGameTeam Team, FString Killer)
+void ASGGameState::AddKill(ESampleGameTeam Team, const FString& Killer)
 {
 	if (Team != ESampleGameTeam::Team_None && Team != ESampleGameTeam::Team_MAX)
 	{
@@ -26,6 +26,12 @@ void ASGGameState::AddKill(ESampleGameTeam Team, FString Killer)
 			// TODO(davedolben): adjust top players accordingly
 		}
 	}
+}
+
+void ASGGameState::RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback)
+{
+	TeamScoresUpdatedCallback = Callback;
+	Callback.ExecuteIfBound(TeamScores);
 }
 
 void ASGGameState::BeginPlay()
@@ -65,6 +71,8 @@ void ASGGameState::OnRep_TeamScores()
 		}
 		UE_LOG(LogTemp, Log, TEXT("%s team score: %d"), *TeamName, Kills);
 	}
+
+	TeamScoresUpdatedCallback.ExecuteIfBound(TeamScores);
 }
 
 FTeamScore* ASGGameState::GetScoreForTeam(ESampleGameTeam Team)
