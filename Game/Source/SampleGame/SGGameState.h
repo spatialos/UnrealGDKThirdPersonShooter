@@ -5,32 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Teams/SampleGameTeams.h"
+#include "Teams/SGTeamScores.h"
 #include "SGGameState.generated.h"
-
-USTRUCT()
-struct FPlayerScore {
-	GENERATED_BODY()
-
-	UPROPERTY()
-	FString PlayerName;
-
-	UPROPERTY()
-	int32 Kills;
-};
-
-USTRUCT()
-struct FTeamScore {
-	GENERATED_BODY()
-
-	UPROPERTY()
-	ESampleGameTeam Team;
-
-	UPROPERTY()
-	int32 TeamKills;
-
-	UPROPERTY()
-	TArray<FPlayerScore> TopPlayers;
-};
 
 
 // TODO: make this a subclass of GameState once its replication is properly handled by the Unreal GDK

@@ -8,6 +8,7 @@
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
 #include "UI/SampleGameLoginUI.h"
+#include "UI/SampleGameScoreboard.h"
 #include "UI/SampleGameUI.h"
 #include "UnrealNetwork.h"
 
@@ -16,6 +17,8 @@
 
 ASampleGamePlayerController::ASampleGamePlayerController()
 	: SampleGameUI(nullptr)
+	, Scoreboard(nullptr)
+	, SampleGameLoginUI(nullptr)
 	, RespawnCharacterDelay(5.0f)
 	, DeleteCharacterDelay(15.0f)
 	, PawnToDelete(nullptr)
@@ -188,6 +191,42 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::InitScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (Scoreboard)
+	{
+		return;
+	}
+
+	check(ScoreboardTemplate != nullptr);
+	Scoreboard = CreateWidget<USampleGameScoreboard>(this, ScoreboardTemplate);
+
+	if (Scoreboard == nullptr)
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("Failed to create scoreboard widget for %s"), *this->GetName());
+		return;
+	}
+}
+
+void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
+{
+	if (Scoreboard == nullptr || Scoreboard->IsInViewport() == bIsVisible)
+	{
+		return;
+	}
+
+	if (bIsVisible)
+	{
+		Scoreboard->AddToViewport();
+	}
+	else
+	{
+		Scoreboard->RemoveFromViewport();
+	}
+}
+
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
 	const FString CorrectedNewPlayerName = (NewPlayerName.IsEmpty() ? GetName() : NewPlayerName);
@@ -256,6 +295,8 @@ void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJ
 	{
 		SampleGameLoginUI->JoinGameWasRejected();
 	}
+
+	InitScoreboard();
 }
 
 void ASampleGamePlayerController::RespawnCharacter()

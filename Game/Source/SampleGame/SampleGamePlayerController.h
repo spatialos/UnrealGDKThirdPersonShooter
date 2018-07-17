@@ -55,6 +55,12 @@ private:
 	// [client] Sets whether or not the login UI should be visible.
 	void SetLoginUIVisible(bool bIsVisible);
 
+	// [client] Initializes the scoreboard UI.
+	void InitScoreboard();
+
+	// [client] Sets whether the scoreboard should be visible.
+	void SetScoreboardIsVisible(bool bIsVisible);
+
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
 	TSubclassOf<class USampleGameUI> UITemplate;
@@ -62,6 +68,14 @@ private:
 	// The current game UI.
 	UPROPERTY(Transient)
 	class USampleGameUI* SampleGameUI;
+
+	// Scoreboard UI class to use in-game.
+	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	TSubclassOf<class USampleGameScoreboard> ScoreboardTemplate;
+
+	// The current scoreboard UI widget instance.
+	UPROPERTY(Transient)
+	class USampleGameScoreboard* Scoreboard;
 
 	// Login UI class template to load at player join.
 	UPROPERTY(EditDefaultsOnly, Category = "SampleGameUI")
