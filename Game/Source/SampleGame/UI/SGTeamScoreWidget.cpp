@@ -18,7 +18,7 @@ void USGTeamScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 	Team = NewTeam;
 	if (TeamNameText)
 	{
-		TeamNameText->SetText(FText::FromString(SampleGameTeamName(GetWorld(), Team)));
+		TeamNameText->SetText(FText::FromString(SampleGameTeamName(Team)));
 	}
 }
 

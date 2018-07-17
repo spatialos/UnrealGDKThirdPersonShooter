@@ -19,10 +19,4 @@ enum class ESampleGameTeam : uint8
 	Team_MAX		// Upper limit so we can iterate through all teams programmatically
 };
 
-
-inline FString SampleGameTeamName(UObject* WorldContextObject, ESampleGameTeam Team)
-{
-	//UEnum* pEnum = WorldContextObject->GetWorld()->FindObject<UEnum>(ANY_PACKAGE, TEXT("ESampleGameTeam"), true);
-	UEnum* pEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESampleGameTeam"), true);
-	return pEnum ? pEnum->GetNameStringByIndex(static_cast<uint8>(Team)) : "UNKNOWN TEAM";
-}
+FString SampleGameTeamName(ESampleGameTeam Team);

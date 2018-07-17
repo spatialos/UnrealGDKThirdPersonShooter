@@ -5,8 +5,6 @@
 #include "Teams/SampleGameTeams.h"
 #include "UnrealNetwork.h"
 
-#include "SGDebug.h"
-
 
 // Sets default values
 ASGGameState::ASGGameState()
@@ -23,7 +21,23 @@ void ASGGameState::AddKill(ESampleGameTeam Team, const FString& Killer)
 		if (FTeamScore* TeamScore = GetScoreForTeam(Team))
 		{
 			++TeamScore->TeamKills;
-			// TODO(davedolben): adjust top players accordingly
+
+			bool bFoundPlayer = false;
+			for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
+			{
+				if (PlayerScore.PlayerName.Compare(Killer) == 0)
+				{
+					++PlayerScore.Kills;
+				}
+			}
+
+			if (!bFoundPlayer)
+			{
+				FPlayerScore NewPlayerScore;
+				NewPlayerScore.PlayerName = Killer;
+				NewPlayerScore.Kills = 1;
+				TeamScore->TopPlayers.Emplace(NewPlayerScore);
+			}
 		}
 	}
 }

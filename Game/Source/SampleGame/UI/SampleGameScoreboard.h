@@ -20,9 +20,18 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Team Score")
 	TSubclassOf<class USGTeamScoreWidget> TeamScoreWidgetTemplate;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Team Score", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, Category = "Team Score")
 	TMap<ESampleGameTeam, class USGTeamScoreWidget*> TeamScoreWidgets;
 
-	UPROPERTY(VisibleAnywhere, Category = "TeamScore", meta = (BindWidget))
+	UPROPERTY(meta = (BindWidget))
 	class UPanelWidget* TeamScoresContainerWidget;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Team Score")
+	TSubclassOf<class USGTeamPlayersScoreWidget> PlayersScoreWidgetTemplate;
+
+	UPROPERTY(VisibleAnywhere, Category = "Team Score")
+	TMap<ESampleGameTeam, class USGTeamPlayersScoreWidget*> PlayersScoreWidgets;
+
+	UPROPERTY(meta = (BindWidget))
+	class UPanelWidget* PlayerScoresContainerWidget;
 };
