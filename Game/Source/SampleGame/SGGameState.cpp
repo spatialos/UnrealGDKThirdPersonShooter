@@ -28,6 +28,8 @@ void ASGGameState::AddKill(ESampleGameTeam Team, const FString& Killer)
 				if (PlayerScore.PlayerName.Compare(Killer) == 0)
 				{
 					++PlayerScore.Kills;
+					bFoundPlayer = true;
+					break;
 				}
 			}
 
