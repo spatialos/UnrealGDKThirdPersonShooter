@@ -154,7 +154,7 @@ void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, FString KillerN
 {
 	if (CustomGameState)
 	{
-		CustomGameState->AddKill(KillerTeam, KillerName);
+		CustomGameState->AddKill(KillerTeam, KillerName, PlayerName);
 	}
 }
 

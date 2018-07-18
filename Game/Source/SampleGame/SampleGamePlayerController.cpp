@@ -177,18 +177,14 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
 		SampleGameLoginUI->SetOwnerPlayerController(this);
 		// Set Mouse Cursor to SHOW, and only interact with the UI
-		bShowMouseCursor = true;
-		SetIgnoreLookInput(true);
-		SetIgnoreMoveInput(true);
+		SetCursorUIMode(true);
 	}
 	else
 	{
 		// Hide the Login UI
 		SampleGameLoginUI->RemoveFromViewport();
 		// Hide the Mouse Cursor, restore Look and Move control
-		bShowMouseCursor = false;
-		SetIgnoreLookInput(false);
-		SetIgnoreMoveInput(false);
+		SetCursorUIMode(false);
 	}
 }
 
@@ -225,11 +221,20 @@ void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
 	if (bIsVisible)
 	{
 		Scoreboard->AddToViewport();
+		SetCursorUIMode(true);
 	}
 	else
 	{
 		Scoreboard->RemoveFromViewport();
+		SetCursorUIMode(false);
 	}
+}
+
+void ASampleGamePlayerController::SetCursorUIMode(bool bIsUIMode)
+{
+	bShowMouseCursor = bIsUIMode;
+	SetIgnoreLookInput(bIsUIMode);
+	SetIgnoreMoveInput(bIsUIMode);
 }
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)

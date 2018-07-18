@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Teams/SGTeamScores.h"
 #include "SGPlayerScoreWidget.generated.h"
 
 /**
@@ -16,11 +17,14 @@ class SAMPLEGAME_API USGPlayerScoreWidget : public UUserWidget
 
 public:
 	void SetPlayerName(const FString& NewPlayerName);
-	void SetKills(int32 NewKills);
-	
+	void SetScores(const FPlayerScore& NewPlayerScore);
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* PlayerNameText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UTextBlock* PlayerDeathsText;
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* PlayerKillsText;

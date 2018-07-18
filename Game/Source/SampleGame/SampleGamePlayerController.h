@@ -37,6 +37,10 @@ public:
 	// [client] Sets whether the scoreboard should be visible.
 	void SetScoreboardIsVisible(bool bIsVisible);
 
+	// [client] Sets whether the cursor is in "UI mode", meaning it is visible and can be moved around the screen,
+	// instead of locked, invisible, and used for aiming.
+	void SetCursorUIMode(bool bIsUIMode);
+
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);

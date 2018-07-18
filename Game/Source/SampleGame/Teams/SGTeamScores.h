@@ -15,6 +15,9 @@ struct FPlayerScore {
 
 	UPROPERTY()
 	int32 Kills;
+
+	UPROPERTY()
+	int32 Deaths;
 };
 
 USTRUCT()

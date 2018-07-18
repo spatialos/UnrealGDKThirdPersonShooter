@@ -40,7 +40,7 @@ void USGTeamPlayersScoreWidget::SetPlayerScores(const TArray<FPlayerScore>& Play
 		}
 
 		USGPlayerScoreWidget* PlayerScoreWidget = PlayerScoreWidgets[PlayerName];
-		PlayerScoreWidget->SetKills(PlayerScore.Kills);
+		PlayerScoreWidget->SetScores(PlayerScore);
 	}
 
 	// TODO: sort players by kills

@@ -13,10 +13,14 @@ void USGPlayerScoreWidget::SetPlayerName(const FString& NewPlayerName)
 	}
 }
 
-void USGPlayerScoreWidget::SetKills(int32 NewKills)
+void USGPlayerScoreWidget::SetScores(const FPlayerScore& NewPlayerScore)
 {
+	if (PlayerDeathsText)
+	{
+		PlayerDeathsText->SetText(FText::AsNumber(NewPlayerScore.Deaths));
+	}
 	if (PlayerKillsText)
 	{
-		PlayerKillsText->SetText(FText::AsNumber(NewKills));
+		PlayerKillsText->SetText(FText::AsNumber(NewPlayerScore.Kills));
 	}
 }

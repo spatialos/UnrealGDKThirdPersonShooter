@@ -2,6 +2,7 @@
 
 #include "SGGameState.h"
 
+#include "SampleGameLogging.h"
 #include "Teams/SampleGameTeams.h"
 #include "UnrealNetwork.h"
 
@@ -22,59 +23,40 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 		return;
 	}
 
-	if (FTeamScore* TeamScore = GetScoreForTeam(Team))
+	if (!PlayerScores.Contains(FName(*Player)))
 	{
-		bool bFoundPlayer = false;
-		for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
-		{
-			if (PlayerScore.PlayerName.Compare(Player) == 0)
-			{
-				bFoundPlayer = true;
-				break;
-			}
-		}
-
-		if (!bFoundPlayer)
-		{
-			FPlayerScore NewPlayerScore;
-			NewPlayerScore.PlayerName = Player;
-			NewPlayerScore.Kills = 0;
-			TeamScore->TopPlayers.Emplace(NewPlayerScore);
-		}
+		AddPlayerImpl(Team, Player);
 	}
 }
 
-void ASGGameState::AddKill(ESampleGameTeam Team, const FString& Killer)
+void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, const FString& Victim)
 {
-	if (Team == ESampleGameTeam::Team_None || Team >= ESampleGameTeam::Team_MAX)
+	if (KillerTeam == ESampleGameTeam::Team_None || KillerTeam >= ESampleGameTeam::Team_MAX)
 	{
 		// Ignore invalid teams.
 		return;
 	}
 
-	if (FTeamScore* TeamScore = GetScoreForTeam(Team))
+	if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
 	{
 		++TeamScore->TeamKills;
-
-		bool bFoundPlayer = false;
-		for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
-		{
-			if (PlayerScore.PlayerName.Compare(Killer) == 0)
-			{
-				++PlayerScore.Kills;
-				bFoundPlayer = true;
-				break;
-			}
-		}
-
-		if (!bFoundPlayer)
-		{
-			FPlayerScore NewPlayerScore;
-			NewPlayerScore.PlayerName = Killer;
-			NewPlayerScore.Kills = 1;
-			TeamScore->TopPlayers.Emplace(NewPlayerScore);
-		}
 	}
+
+	FName KillerKey(*Killer);
+	if (!PlayerScores.Contains(KillerKey))
+	{
+		// TODO: do I need this? Can I just throw an error?
+		AddPlayerImpl(KillerTeam, Killer);
+	}
+	++PlayerScores[KillerKey]->Kills;
+
+	FName VictimKey(*Victim);
+	if (!PlayerScores.Contains(VictimKey))
+	{
+		// TODO: do I need this? Can I just throw an error?
+		//AddPlayerImpl(KillerTeam, Killer);
+	}
+	++PlayerScores[VictimKey]->Deaths;
 }
 
 void ASGGameState::RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback)
@@ -110,6 +92,7 @@ void ASGGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void ASGGameState::OnRep_TeamScores()
 {
+	// TODO: delete or disable debug printing of scores
 	const uint32 TeamMax = static_cast<uint32>(ESampleGameTeam::Team_MAX);
 	for (uint32 i = 0; i < TeamMax; ++i)
 	{
@@ -139,3 +122,21 @@ FTeamScore* ASGGameState::GetScoreForTeam(ESampleGameTeam Team)
 	return nullptr;
 }
 
+void ASGGameState::AddPlayerImpl(ESampleGameTeam Team, const FString& Player)
+{
+	FTeamScore* TeamScore = GetScoreForTeam(Team);
+	if (TeamScore == nullptr)
+	{
+		UE_LOG(LogSampleGame, Warning, TEXT("[GameState] Tried to add a player (%s) to the score list with an invalid team (%d)"),
+			*Player, static_cast<uint8>(Team));
+		return;
+	}
+
+	FPlayerScore NewPlayerScore;
+	NewPlayerScore.PlayerName = Player;
+	NewPlayerScore.Kills = 0;
+	NewPlayerScore.Deaths = 0;
+	TeamScore->TopPlayers.Emplace(NewPlayerScore);
+
+	PlayerScores.Emplace(FName(*Player), &TeamScore->TopPlayers.Last());
+}
