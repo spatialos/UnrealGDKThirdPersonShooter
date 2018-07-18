@@ -1,5 +1,7 @@
 
 #include "SampleGameLoginUI.h"
+
+#include "SpatialNetDriver.h"
 #include "SampleGamePlayerController.h"
 
 
@@ -14,6 +16,18 @@ void USampleGameLoginUI::OnJoinGameButtonClicked() const
 
 	// Inform PlayerController, update PlayerState, etc
 	PlayerController->ServerTryJoinGame(PlayerName.ToString(), TeamId);
+}
+
+void USampleGameLoginUI::SetAutomaticName()
+{
+	if (USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetOwningPlayer()->GetNetDriver()))
+	{
+		PlayerName = FText::FromString(NetDriver->GetSpatialOS()->GetWorkerId());
+	}
+	else
+	{
+		PlayerName = FText::FromString("Player" + FGuid::NewGuid().ToString());
+	}
 }
 
 void USampleGameLoginUI::JoinGameWasRejected()
