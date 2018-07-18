@@ -14,38 +14,73 @@ ASGGameState::ASGGameState()
 	SetReplicates(true);
 }
 
+void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
+{
+	if (Team == ESampleGameTeam::Team_None || Team >= ESampleGameTeam::Team_MAX)
+	{
+		// Ignore invalid teams.
+		return;
+	}
+
+	if (FTeamScore* TeamScore = GetScoreForTeam(Team))
+	{
+		bool bFoundPlayer = false;
+		for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
+		{
+			if (PlayerScore.PlayerName.Compare(Player) == 0)
+			{
+				bFoundPlayer = true;
+				break;
+			}
+		}
+
+		if (!bFoundPlayer)
+		{
+			FPlayerScore NewPlayerScore;
+			NewPlayerScore.PlayerName = Player;
+			NewPlayerScore.Kills = 0;
+			TeamScore->TopPlayers.Emplace(NewPlayerScore);
+		}
+	}
+}
+
 void ASGGameState::AddKill(ESampleGameTeam Team, const FString& Killer)
 {
-	if (Team != ESampleGameTeam::Team_None && Team != ESampleGameTeam::Team_MAX)
+	if (Team == ESampleGameTeam::Team_None || Team >= ESampleGameTeam::Team_MAX)
 	{
-		if (FTeamScore* TeamScore = GetScoreForTeam(Team))
+		// Ignore invalid teams.
+		return;
+	}
+
+	if (FTeamScore* TeamScore = GetScoreForTeam(Team))
+	{
+		++TeamScore->TeamKills;
+
+		bool bFoundPlayer = false;
+		for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
 		{
-			++TeamScore->TeamKills;
-
-			bool bFoundPlayer = false;
-			for (FPlayerScore& PlayerScore : TeamScore->TopPlayers)
+			if (PlayerScore.PlayerName.Compare(Killer) == 0)
 			{
-				if (PlayerScore.PlayerName.Compare(Killer) == 0)
-				{
-					++PlayerScore.Kills;
-					bFoundPlayer = true;
-					break;
-				}
+				++PlayerScore.Kills;
+				bFoundPlayer = true;
+				break;
 			}
+		}
 
-			if (!bFoundPlayer)
-			{
-				FPlayerScore NewPlayerScore;
-				NewPlayerScore.PlayerName = Killer;
-				NewPlayerScore.Kills = 1;
-				TeamScore->TopPlayers.Emplace(NewPlayerScore);
-			}
+		if (!bFoundPlayer)
+		{
+			FPlayerScore NewPlayerScore;
+			NewPlayerScore.PlayerName = Killer;
+			NewPlayerScore.Kills = 1;
+			TeamScore->TopPlayers.Emplace(NewPlayerScore);
 		}
 	}
 }
 
 void ASGGameState::RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback)
 {
+	check(GetNetMode() != NM_DedicatedServer);
+
 	TeamScoresUpdatedCallback = Callback;
 	Callback.ExecuteIfBound(TeamScores);
 }

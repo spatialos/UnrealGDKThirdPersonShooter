@@ -20,11 +20,15 @@ class SAMPLEGAME_API ASGGameState : public AActor
 public:	
 	ASGGameState();
 
+	// TODO: this needs to be a reliable worker-to-worker RPC
+	// Adds a player to the game's score data with empty stats.
+	void AddPlayer(ESampleGameTeam Team, const FString& Player);
+
+	// TODO: this needs to be a reliable worker-to-worker RPC
 	void AddKill(ESampleGameTeam Team, const FString& Killer);
 
+	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);
-
-	const TArray<FTeamScore>& GetTeamScores() { return TeamScores; }
 
 protected:
 	virtual void BeginPlay() override;

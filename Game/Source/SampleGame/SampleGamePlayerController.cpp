@@ -278,6 +278,9 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 
 		// Spawn the Pawn
 		RespawnCharacter();
+
+		// Add the player to the game's scoreboard.
+		CustomGameState->AddPlayer(NewPlayerTeam, NewPlayerName);
 	}
 
 }
