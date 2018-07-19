@@ -9,6 +9,10 @@
 
 void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScores)
 {
+	// Clear children so we can re-add them in sorted order.
+	TeamScoresContainerWidget->ClearChildren();
+	PlayerScoresContainerWidget->ClearChildren();
+
 	for (const FTeamScore& TeamScore : TeamScores)
 	{
 		if (TeamScore.Team == ESampleGameTeam::Team_None || TeamScore.Team >= ESampleGameTeam::Team_MAX)
@@ -24,11 +28,11 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 			USGTeamScoreWidget* NewWidget = CreateWidget<USGTeamScoreWidget>(GetOwningPlayer(), TeamScoreWidgetTemplate);
 			NewWidget->SetTeam(TeamScore.Team);
 			TeamScoreWidgets.Emplace(TeamScore.Team, NewWidget);
-			TeamScoresContainerWidget->AddChild(NewWidget);
 		}
 
 		USGTeamScoreWidget* TeamWidget = TeamScoreWidgets[TeamScore.Team];
 		TeamWidget->SetKills(TeamScore.TeamKills);
+		TeamScoresContainerWidget->AddChild(TeamWidget);
 
 		if (!PlayersScoreWidgets.Contains(TeamScore.Team))
 		{
@@ -37,11 +41,11 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 			USGTeamPlayersScoreWidget* NewWidget = CreateWidget<USGTeamPlayersScoreWidget>(GetOwningPlayer(), PlayersScoreWidgetTemplate);
 			NewWidget->SetTeam(TeamScore.Team);
 			PlayersScoreWidgets.Emplace(TeamScore.Team, NewWidget);
-			PlayerScoresContainerWidget->AddChild(NewWidget);
 		}
 
 		USGTeamPlayersScoreWidget* TeamPlayersWidget = PlayersScoreWidgets[TeamScore.Team];
 		TeamPlayersWidget->SetPlayerScores(TeamScore.TopPlayers);
+		PlayerScoresContainerWidget->AddChild(TeamPlayersWidget);
 	}
 
 	// TODO: sort the team score widgets by score in the UI

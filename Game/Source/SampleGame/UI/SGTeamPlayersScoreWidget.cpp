@@ -26,6 +26,9 @@ void USGTeamPlayersScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 
 void USGTeamPlayersScoreWidget::SetPlayerScores(const TArray<FPlayerScore>& PlayerScores)
 {
+	// Clear the container so we can re-add player scores in sorted order.
+	PlayerScoresContainer->ClearChildren();
+
 	for (const FPlayerScore& PlayerScore : PlayerScores)
 	{
 		FName PlayerName(*PlayerScore.PlayerName);
@@ -36,11 +39,11 @@ void USGTeamPlayersScoreWidget::SetPlayerScores(const TArray<FPlayerScore>& Play
 			USGPlayerScoreWidget* NewWidget = CreateWidget<USGPlayerScoreWidget>(GetOwningPlayer(), PlayerScoreWidgetTemplate);
 			NewWidget->SetPlayerName(PlayerScore.PlayerName);
 			PlayerScoreWidgets.Emplace(PlayerName, NewWidget);
-			PlayerScoresContainer->AddChild(NewWidget);
 		}
 
 		USGPlayerScoreWidget* PlayerScoreWidget = PlayerScoreWidgets[PlayerName];
 		PlayerScoreWidget->SetScores(PlayerScore);
+		PlayerScoresContainer->AddChild(PlayerScoreWidget);
 	}
 
 	// TODO: sort players by kills

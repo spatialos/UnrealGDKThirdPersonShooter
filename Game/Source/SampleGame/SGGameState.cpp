@@ -12,6 +12,7 @@ ASGGameState::ASGGameState()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
+	// TODO: not sure if we'll need this once we use AGameStateBase as a parent
 	SetReplicates(true);
 }
 
@@ -37,11 +38,6 @@ void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, co
 		return;
 	}
 
-	if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
-	{
-		++TeamScore->TeamKills;
-	}
-
 	FName KillerKey(*Killer);
 	if (!PlayerScores.Contains(KillerKey))
 	{
@@ -57,6 +53,24 @@ void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, co
 		//AddPlayerImpl(KillerTeam, Killer);
 	}
 	++PlayerScores[VictimKey]->Deaths;
+
+	if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
+	{
+		++TeamScore->TeamKills;
+
+		// The player score has already been updated, so re-sort the team's top player array here.
+		TeamScore->TopPlayers.Sort([](const FPlayerScore& lhs, const FPlayerScore& rhs)
+		{
+			// Sort in reverse order.
+			return lhs.Kills > rhs.Kills;
+		});
+	}
+	// Re-sort team scores after updating the killer's team score.
+	TeamScores.Sort([](const FTeamScore& lhs, const FTeamScore& rhs)
+	{
+		// Sort in reverse order.
+		return lhs.TeamKills > rhs.TeamKills;
+	});
 }
 
 void ASGGameState::RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback)
