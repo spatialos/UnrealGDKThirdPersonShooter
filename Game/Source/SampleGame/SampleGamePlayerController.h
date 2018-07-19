@@ -39,13 +39,22 @@ public:
 
 	// [client] Sets whether the cursor is in "UI mode", meaning it is visible and can be moved around the screen,
 	// instead of locked, invisible, and used for aiming.
-	void SetCursorUIMode(bool bIsUIMode);
+	void SetUIMode(bool bIsUIMode, bool bAllowMovement = false);
+
+	// [client] Sets whether we should ignore action input. For this to work properly, the character
+	// must check the result of IgnoreActionInput before applying any action inputs.
+	void SetIgnoreActionInput(bool bIgnoreInput) { bIgnoreActionInput = bIgnoreInput; }
+
+	// [client] If true, action input should be ignored. This should be called from the character, or any other object
+	// which handles user input.
+	bool IgnoreActionInput() const { return bIgnoreActionInput; }
 
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 protected:
+	virtual void SetupInputComponent() override;
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const;
 
 private:
@@ -64,6 +73,13 @@ private:
 
 	// [client] Initializes the scoreboard UI.
 	void InitScoreboard();
+
+	void ShowScoreboard();
+	void HideScoreboard();
+
+	// If true, action input should be ignored.
+	// Default value is false.
+	bool bIgnoreActionInput;
 
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")

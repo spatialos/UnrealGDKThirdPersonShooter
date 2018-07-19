@@ -17,7 +17,8 @@
 
 
 ASampleGamePlayerController::ASampleGamePlayerController()
-	: SampleGameUI(nullptr)
+	: bIgnoreActionInput(false)
+	, SampleGameUI(nullptr)
 	, Scoreboard(nullptr)
 	, SampleGameLoginUI(nullptr)
 	, RespawnCharacterDelay(5.0f)
@@ -137,6 +138,14 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &ASampleGamePlayerController::ShowScoreboard);
+	InputComponent->BindAction("ShowScoreboard", IE_Released, this, &ASampleGamePlayerController::HideScoreboard);
+}
+
 void ASampleGamePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -177,14 +186,14 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
 		SampleGameLoginUI->SetOwnerPlayerController(this);
 		// Set Mouse Cursor to SHOW, and only interact with the UI
-		SetCursorUIMode(true);
+		SetUIMode(true);
 	}
 	else
 	{
 		// Hide the Login UI
 		SampleGameLoginUI->RemoveFromViewport();
 		// Hide the Mouse Cursor, restore Look and Move control
-		SetCursorUIMode(false);
+		SetUIMode(false);
 	}
 }
 
@@ -211,6 +220,25 @@ void ASampleGamePlayerController::InitScoreboard()
 	CustomGameState->RegisterScoreChangeListener(UpdateScoreboardCallback);
 }
 
+void ASampleGamePlayerController::ShowScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	// Make sure we stop firing when the user pulls up the scoreboard.
+	if (ASampleGameCharacter* SGCharacter = Cast<ASampleGameCharacter>(GetCharacter()))
+	{
+		SGCharacter->StopFire();
+	}
+
+	SetScoreboardIsVisible(true);
+}
+
+void ASampleGamePlayerController::HideScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	SetScoreboardIsVisible(false);
+}
+
 void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
 {
 	if (Scoreboard == nullptr || Scoreboard->IsInViewport() == bIsVisible)
@@ -221,20 +249,29 @@ void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
 	if (bIsVisible)
 	{
 		Scoreboard->AddToViewport();
-		SetCursorUIMode(true);
+		SetUIMode(true, true);
 	}
 	else
 	{
 		Scoreboard->RemoveFromViewport();
-		SetCursorUIMode(false);
+		SetUIMode(false, true);
 	}
 }
 
-void ASampleGamePlayerController::SetCursorUIMode(bool bIsUIMode)
+void ASampleGamePlayerController::SetUIMode(bool bIsUIMode, bool bAllowMovement)
 {
 	bShowMouseCursor = bIsUIMode;
 	SetIgnoreLookInput(bIsUIMode);
-	SetIgnoreMoveInput(bIsUIMode);
+	SetIgnoreMoveInput(bIsUIMode && !bAllowMovement);
+	SetIgnoreActionInput(bIsUIMode);
+	if (bIsUIMode)
+	{
+		SetInputMode(FInputModeGameAndUI());
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly());
+	}
 }
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)

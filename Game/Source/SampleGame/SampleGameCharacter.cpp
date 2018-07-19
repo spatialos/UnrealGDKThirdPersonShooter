@@ -187,9 +187,6 @@ void ASampleGameCharacter::SetupPlayerInputComponent(class UInputComponent* Play
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ASampleGameCharacter::StartFire);
 	PlayerInputComponent->BindAction("Fire", IE_Released, this, &ASampleGameCharacter::StopFire);
-
-	PlayerInputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &ASampleGameCharacter::ShowScoreboard);
-	PlayerInputComponent->BindAction("ShowScoreboard", IE_Released, this, &ASampleGameCharacter::HideScoreboard);
 }
 
 void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -208,9 +205,25 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
 }
 
+bool ASampleGameCharacter::IgnoreActionInput() const
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
+	{
+		return PC->IgnoreActionInput();
+	}
+	return false;
+}
+
 void ASampleGameCharacter::Interact()
 {
 	check(GetNetMode() == NM_Client);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
 
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("SampleGame_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
@@ -248,6 +261,11 @@ void ASampleGameCharacter::Interact()
 
 void ASampleGameCharacter::SpawnCube()
 {
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	ServerSpawnCube();
 }
 
@@ -276,6 +294,13 @@ void ASampleGameCharacter::SpawnStarterWeapon()
 
 void ASampleGameCharacter::StartFire()
 {
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
@@ -288,6 +313,13 @@ void ASampleGameCharacter::StartFire()
 
 void ASampleGameCharacter::StopFire()
 {
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
@@ -578,24 +610,6 @@ void ASampleGameCharacter::StopSprinting()
 	if (USGCharacterMovementComponent* MovementComponent = Cast<USGCharacterMovementComponent>(GetCharacterMovement()))
 	{
 		MovementComponent->SetWantsToSprint(false);
-	}
-}
-
-void ASampleGameCharacter::ShowScoreboard()
-{
-	check(GetNetMode() != NM_DedicatedServer);
-	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
-	{
-		PC->SetScoreboardIsVisible(true);
-	}
-}
-
-void ASampleGameCharacter::HideScoreboard()
-{
-	check(GetNetMode() != NM_DedicatedServer);
-	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
-	{
-		PC->SetScoreboardIsVisible(false);
 	}
 }
 
