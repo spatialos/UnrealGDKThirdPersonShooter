@@ -93,7 +93,7 @@ void ASampleGamePlayerController::KillCharacter(const ASampleGameCharacter* Kill
 		FString MyName;
 		if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
 		{
-			PS->GetPlayerName();
+			MyName = PS->GetPlayerName();
 		}
 		GM->NotifyPlayerKilled(MyName, MyTeam, KillerName, KillerTeam);
 	}
