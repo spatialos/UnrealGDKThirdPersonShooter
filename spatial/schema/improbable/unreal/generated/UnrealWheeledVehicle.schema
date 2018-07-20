@@ -38,7 +38,6 @@ component WheeledVehicleClientRPCs {
 }
 component WheeledVehicleServerRPCs {
 	id = 100050;
-	command UnrealRPCCommandResponse serverupdatestate(wheeledvehiclemovementcomponent.ServerUpdateStateRequest);
 }
 component WheeledVehicleNetMulticastRPCs {
 	id = 100051;

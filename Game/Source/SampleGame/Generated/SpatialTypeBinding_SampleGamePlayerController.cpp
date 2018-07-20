@@ -147,7 +147,6 @@ void USpatialTypeBinding_SampleGamePlayerController::Init(USpatialInterop* InInt
 	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"Pawn"}, {0}, COND_None, REPNOTIFY_Always));
 	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"TargetViewRotation"}, {0}, COND_OwnerOnly, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, {0}, COND_OwnerOnly, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"CustomGameState"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
 	// Populate MigratableHandleToPropertyMap.
 	MigratableHandleToPropertyMap.Add(1, FMigratableHandleData(Class, {"AcknowledgedPawn"}));
@@ -381,19 +380,21 @@ worker::Entity USpatialTypeBinding_SampleGamePlayerController::CreateActorEntity
 	}
 
 	// Setup initial data.
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Data SingleClientData;
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update SingleClientUpdate;
-	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Data MultiClientData;
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update MultiClientUpdate;
-	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Data MigratableData;
-	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update MigratableDataUpdate;
-	bool bMigratableDataUpdateChanged = false;
-	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
-	SingleClientUpdate.ApplyTo(SingleClientData);
-	MultiClientUpdate.ApplyTo(MultiClientData);
-	MigratableDataUpdate.ApplyTo(MigratableData);
+
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Data SingleClientSampleGamePlayerControllerData;
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update SingleClientSampleGamePlayerControllerUpdate;
+	bool bSingleClientSampleGamePlayerControllerUpdateChanged = false;
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Data MultiClientSampleGamePlayerControllerData;
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update MultiClientSampleGamePlayerControllerUpdate;
+	bool bMultiClientSampleGamePlayerControllerUpdateChanged = false;
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Data SampleGamePlayerControllerMigratableData;
+	improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update SampleGamePlayerControllerMigratableDataUpdate;
+	bool bSampleGamePlayerControllerMigratableDataUpdateChanged = false;
+
+	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientSampleGamePlayerControllerUpdate, bSingleClientSampleGamePlayerControllerUpdateChanged, MultiClientSampleGamePlayerControllerUpdate, bMultiClientSampleGamePlayerControllerUpdateChanged, SampleGamePlayerControllerMigratableDataUpdate, bSampleGamePlayerControllerMigratableDataUpdateChanged);
+	SingleClientSampleGamePlayerControllerUpdate.ApplyTo(SingleClientSampleGamePlayerControllerData);
+	MultiClientSampleGamePlayerControllerUpdate.ApplyTo(MultiClientSampleGamePlayerControllerData);
+	SampleGamePlayerControllerMigratableDataUpdate.ApplyTo(SampleGamePlayerControllerMigratableData);
 
 	// Create entity.
 	std::string ClientWorkerIdString = TCHAR_TO_UTF8(*ClientWorkerId);
@@ -440,9 +441,9 @@ worker::Entity USpatialTypeBinding_SampleGamePlayerController::CreateActorEntity
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrOwningClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData>(MigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData>(SingleClientSampleGamePlayerControllerData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData>(MultiClientSampleGamePlayerControllerData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData>(SampleGamePlayerControllerMigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs>(improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerNetMulticastRPCs::Data{}, WorkersOnly)
@@ -482,7 +483,7 @@ void USpatialTypeBinding_SampleGamePlayerController::SendRPCCommand(UObject* Tar
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	if (SenderFuncIterator == nullptr)
 	{
-		UE_LOG(LogSpatialOSInterop, Error, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
+		UE_LOG(LogSpatialGDKInterop, Error, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
 		return;
 	}
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has been registered as null."), *Function->GetFName().ToString());
@@ -496,18 +497,21 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveAddComponent(USpatia
 	{
 		auto Update = improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
 		ReceiveUpdate_SingleClient(Channel, Update);
+		return;
 	}
 	auto* MultiClientAddOp = Cast<USampleGamePlayerControllerMultiClientRepDataAddComponentOp>(AddComponentOp);
 	if (MultiClientAddOp)
 	{
 		auto Update = improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
 		ReceiveUpdate_MultiClient(Channel, Update);
+		return;
 	}
 	auto* MigratableDataAddOp = Cast<USampleGamePlayerControllerMigratableDataAddComponentOp>(AddComponentOp);
 	if (MigratableDataAddOp)
 	{
 		auto Update = improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
 		ReceiveUpdate_Migratable(Channel, Update);
+		return;
 	}
 }
 
@@ -547,7 +551,7 @@ void USpatialTypeBinding_SampleGamePlayerController::BuildSpatialComponentUpdate
 			const FRepLayoutCmd& Cmd = Changes.RepCmds[HandleIterator.CmdIndex];
 			const FRepHandleData& PropertyMapData = RepPropertyMap[HandleIterator.Handle];
 			const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData) + HandleIterator.ArrayOffset;
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*Channel->Actor->GetName(),
 				Channel->GetEntityId().ToSpatialEntityId(),
@@ -579,7 +583,7 @@ void USpatialTypeBinding_SampleGamePlayerController::BuildSpatialComponentUpdate
 	{
 		const FMigratableHandleData& PropertyMapData = MigPropertyMap[ChangedHandle];
 		const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData);
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*Channel->Actor->GetName(),
 			Channel->GetEntityId().ToSpatialEntityId(),
@@ -977,38 +981,6 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSendUpdate_MultiClien
 			}
 			break;
 		}
-		case 20: // field_customgamestate0
-		{
-			ASGGameState* Value = *(reinterpret_cast<ASGGameState* const*>(Data));
-
-			if (Value != nullptr)
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
-				if (!NetGUID.IsValid())
-				{
-					if (Value->IsFullNameStableForNetworking())
-					{
-						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
-					}
-				}
-				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
-				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
-				{
-					// A legal static object reference should never be unresolved.
-					check(!Value->IsFullNameStableForNetworking())
-					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 20);
-				}
-				else
-				{
-					OutUpdate.set_field_customgamestate0(ObjectRef);
-				}
-			}
-			else
-			{
-				OutUpdate.set_field_customgamestate0(SpatialConstants::NULL_OBJECT_REF);
-			}
-			break;
-		}
 	default:
 		checkf(false, TEXT("Unknown replication handle %d encountered when creating a SpatialOS update."));
 		break;
@@ -1057,7 +1029,8 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSendUpdate_Migratable
 
 void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update& Update) const
 {
-	Interop->PreReceiveSpatialUpdate(ActorChannel);
+	AActor* TargetObject = ActorChannel->Actor;
+	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
@@ -1072,7 +1045,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FRotator Value = *(reinterpret_cast<FRotator const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_targetviewrotation0().data());
@@ -1083,9 +1056,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1100,7 +1073,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FVector Value = *(reinterpret_cast<FVector const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_spawnlocation0().data());
@@ -1111,9 +1084,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1121,12 +1094,13 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_SingleClient(
 				Handle);
 		}
 	}
-	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
+	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update& Update) const
 {
-	Interop->PreReceiveSpatialUpdate(ActorChannel);
+	AActor* TargetObject = ActorChannel->Actor;
+	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
@@ -1141,14 +1115,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_bhidden0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1163,14 +1137,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_breplicatemovement0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1185,14 +1159,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_btearoff0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1207,14 +1181,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_bcanbedamaged0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1236,7 +1210,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
 			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_remoterole0().data())));
@@ -1248,9 +1222,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				Value = ROLE_SimulatedProxy;
 			}
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1265,7 +1239,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FRepMovement Value = *(reinterpret_cast<FRepMovement const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_replicatedmovement0().data());
@@ -1276,9 +1250,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1294,7 +1268,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachparent0().data());
@@ -1315,7 +1289,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1331,9 +1305,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1349,7 +1323,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_locationoffset0().data());
@@ -1360,9 +1334,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1377,7 +1351,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_relativescale3d0().data());
@@ -1388,9 +1362,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1405,7 +1379,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FRotator Value = *(reinterpret_cast<FRotator const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_rotationoffset0().data());
@@ -1416,9 +1390,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1433,14 +1407,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FName Value = *(reinterpret_cast<FName const*>(PropertyData));
 
 			Value = FName(((*Update.field_attachmentreplication0_attachsocket0().data())).data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1456,7 +1430,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			USceneComponent* Value = *(reinterpret_cast<USceneComponent* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachcomponent0().data());
@@ -1477,7 +1451,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1493,9 +1467,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1512,7 +1486,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner0().data());
@@ -1533,7 +1507,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1549,9 +1523,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1574,14 +1548,14 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
 			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_role0().data())));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1597,7 +1571,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			APawn* Value = *(reinterpret_cast<APawn* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_instigator0().data());
@@ -1618,7 +1592,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1634,9 +1608,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1653,7 +1627,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			APlayerState* Value = *(reinterpret_cast<APlayerState* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_playerstate0().data());
@@ -1674,7 +1648,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1690,9 +1664,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1709,7 +1683,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			APawn* Value = *(reinterpret_cast<APawn* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_pawn0().data());
@@ -1730,7 +1704,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1746,9 +1720,9 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1757,63 +1731,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_MultiClient(U
 			}
 		}
 	}
-	if (!Update.field_customgamestate0().empty())
-	{
-		// field_customgamestate0
-		uint16 Handle = 20;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
-			ASGGameState* Value = *(reinterpret_cast<ASGGameState* const*>(PropertyData));
-
-			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_customgamestate0().data());
-			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
-			{
-				Value = nullptr;
-			}
-			else
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-				if (NetGUID.IsValid())
-				{
-					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					checkf(Cast<ASGGameState>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-					Value = Cast<ASGGameState>(Object_Raw);
-				}
-				else
-				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-						*Interop->GetSpatialOS()->GetWorkerId(),
-						*ObjectRefToString(ObjectRef),
-						*ActorChannel->Actor->GetName(),
-						ActorChannel->GetEntityId().ToSpatialEntityId(),
-						*RepData->Property->GetName(),
-						Handle);
-					// A legal static object reference should never be unresolved.
-					check(ObjectRef.path().empty());
-					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-				}
-			}
-
-			if (bWriteObjectProperty)
-			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
-
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-					*Interop->GetSpatialOS()->GetWorkerId(),
-					*ActorChannel->Actor->GetName(),
-					ActorChannel->GetEntityId().ToSpatialEntityId(),
-					*RepData->Property->GetName(),
-					Handle);
-			}
-		}
-	}
-	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
+	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
 void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update& Update) const
@@ -1847,7 +1765,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_Migratable(US
 			}
 			else
 			{
-				UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ObjectRefToString(ObjectRef),
 					*ActorChannel->Actor->GetName(),
@@ -1863,7 +1781,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ReceiveUpdate_Migratable(US
 		{
 			ApplyIncomingMigratablePropertyUpdate(*MigratableData, ActorChannel->Actor, static_cast<const void*>(&Value));
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received migratable property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received migratable property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1887,7 +1805,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientJoinResults queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientJoinResults queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -1899,7 +1817,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_SendRPC(w
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientJoinResults, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientJoinResults, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -1920,7 +1838,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC OnServerStartedVisualLogger queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC OnServerStartedVisualLogger queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -1932,7 +1850,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: OnServerStartedVisualLogger, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: OnServerStartedVisualLogger, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -1953,7 +1871,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC(wor
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientWasKicked queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientWasKicked queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -1965,7 +1883,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_SendRPC(wor
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientWasKicked, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientWasKicked, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -1983,7 +1901,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientVoiceHandshakeComplete queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientVoiceHandshakeComplete queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -1992,7 +1910,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientVoiceHandshakeComplete, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientVoiceHandshakeComplete, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2013,7 +1931,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientUpdateMultipleLevelsStreamingStatus queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientUpdateMultipleLevelsStreamingStatus queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2034,7 +1952,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientUpdateMultipleLevelsStreamingStatus, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientUpdateMultipleLevelsStreamingStatus, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2055,7 +1973,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientUpdateLevelStreamingStatus queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientUpdateLevelStreamingStatus queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2079,7 +1997,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientUpdateLevelStreamingStatus, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientUpdateLevelStreamingStatus, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2100,7 +2018,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_SendRPC(
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientUnmutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientUnmutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2118,7 +2036,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_SendRPC(
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientUnmutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientUnmutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2139,7 +2057,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_SendRP
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientTravelInternal queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientTravelInternal queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2169,7 +2087,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_SendRP
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientTravelInternal, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientTravelInternal, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2190,7 +2108,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2210,7 +2128,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(w
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. StructuredParams.SenderPlayerState is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientTeamMessage queued. StructuredParams.SenderPlayerState is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.SenderPlayerState)};
 				}
 				else
@@ -2235,7 +2153,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_SendRPC(w
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientTeamMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientTeamMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2256,7 +2174,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_Sen
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2276,7 +2194,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_Sen
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.ForceFeedbackEffect)};
 				}
 				else
@@ -2295,7 +2213,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_Sen
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientStopForceFeedback, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientStopForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2316,7 +2234,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraShake queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopCameraShake queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2336,7 +2254,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendR
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraShake queued. StructuredParams.Shake is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopCameraShake queued. StructuredParams.Shake is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Shake)};
 				}
 				else
@@ -2355,7 +2273,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientStopCameraShake, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientStopCameraShake, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2376,7 +2294,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRP
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2396,7 +2314,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRP
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. StructuredParams.AnimToStop is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStopCameraAnim queued. StructuredParams.AnimToStop is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.AnimToStop)};
 				}
 				else
@@ -2412,7 +2330,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_SendRP
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientStopCameraAnim, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientStopCameraAnim, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2430,7 +2348,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_Se
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientStartOnlineSession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientStartOnlineSession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2439,7 +2357,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_Se
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientStartOnlineSession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientStartOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2460,7 +2378,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSpawnCameraLensEffect queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSpawnCameraLensEffect queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2480,7 +2398,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSpawnCameraLensEffect queued. StructuredParams.LensEffectEmitterClass is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSpawnCameraLensEffect queued. StructuredParams.LensEffectEmitterClass is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.LensEffectEmitterClass)};
 				}
 				else
@@ -2496,7 +2414,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSpawnCameraLensEffect, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSpawnCameraLensEffect, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2517,7 +2435,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2537,7 +2455,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. StructuredParams.A is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetViewTarget queued. StructuredParams.A is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.A)};
 				}
 				else
@@ -2565,7 +2483,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_SendRPC
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetViewTarget, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2586,7 +2504,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_S
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetSpectatorWaiting queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetSpectatorWaiting queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2598,7 +2516,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_S
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetSpectatorWaiting, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2619,7 +2537,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetHUD queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetHUD queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2639,7 +2557,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetHUD queued. StructuredParams.NewHUDClass is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetHUD queued. StructuredParams.NewHUDClass is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.NewHUDClass)};
 				}
 				else
@@ -2655,7 +2573,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_SendRPC(worker
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetHUD, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetHUD, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2676,7 +2594,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2696,7 +2614,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. StructuredParams.Material is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetForceMipLevelsToBeResident queued. StructuredParams.Material is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Material)};
 				}
 				else
@@ -2718,7 +2636,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetForceMipLevelsToBeResident, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetForceMipLevelsToBeResident, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2739,7 +2657,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_Send
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetCinematicMode queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetCinematicMode queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2760,7 +2678,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_Send
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCinematicMode, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCinematicMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2781,7 +2699,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_SendRPC
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetCameraMode queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetCameraMode queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2793,7 +2711,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_SendRPC
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCameraMode, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCameraMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2814,7 +2732,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_SendRPC
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetCameraFade queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetCameraFade queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2853,7 +2771,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_SendRPC
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCameraFade, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetCameraFade, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2871,7 +2789,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetBlockOnAsyncLoading queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetBlockOnAsyncLoading queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2880,7 +2798,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetBlockOnAsyncLoading, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetBlockOnAsyncLoading, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2901,7 +2819,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReturnToMainMenuWithTextReason queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReturnToMainMenuWithTextReason queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2913,7 +2831,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientReturnToMainMenuWithTextReason, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientReturnToMainMenuWithTextReason, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2934,7 +2852,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_Send
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReturnToMainMenu queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReturnToMainMenu queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2946,7 +2864,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_Send
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientReturnToMainMenu, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientReturnToMainMenu, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -2967,7 +2885,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_Se
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -2987,7 +2905,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_Se
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRetryClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.NewPawn)};
 				}
 				else
@@ -3003,7 +2921,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_Se
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientRetryClientRestart, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientRetryClientRestart, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3024,7 +2942,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worke
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRestart queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRestart queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3044,7 +2962,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worke
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRestart queued. StructuredParams.NewPawn is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.NewPawn)};
 				}
 				else
@@ -3060,7 +2978,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_SendRPC(worke
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientRestart, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientRestart, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3078,7 +2996,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_SendRPC(worker:
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReset queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReset queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3087,7 +3005,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_SendRPC(worker:
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientReset, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientReset, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3108,7 +3026,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(wor
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3128,7 +3046,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(wor
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. StructuredParams.Object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientRepObjRef queued. StructuredParams.Object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Object)};
 				}
 				else
@@ -3144,7 +3062,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_SendRPC(wor
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientRepObjRef, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientRepObjRef, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3165,7 +3083,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3185,7 +3103,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.Message is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.Message is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Message)};
 				}
 				else
@@ -3215,7 +3133,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_1 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_1 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.RelatedPlayerState_1)};
 				}
 				else
@@ -3242,7 +3160,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_2 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.RelatedPlayerState_2 is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.RelatedPlayerState_2)};
 				}
 				else
@@ -3269,7 +3187,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.OptionalObject is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientReceiveLocalizedMessage queued. StructuredParams.OptionalObject is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.OptionalObject)};
 				}
 				else
@@ -3285,7 +3203,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientReceiveLocalizedMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientReceiveLocalizedMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3306,7 +3224,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_Sen
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3326,7 +3244,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_Sen
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. StructuredParams.ForcedActor is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPrestreamTextures queued. StructuredParams.ForcedActor is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.ForcedActor)};
 				}
 				else
@@ -3351,7 +3269,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_Sen
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPrestreamTextures, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPrestreamTextures, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3372,7 +3290,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_Send
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPrepareMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPrepareMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3390,7 +3308,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_Send
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPrepareMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPrepareMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3411,7 +3329,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_S
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3431,7 +3349,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_S
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlaySoundAtLocation queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Sound)};
 				}
 				else
@@ -3462,7 +3380,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_S
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPlaySoundAtLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPlaySoundAtLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3483,7 +3401,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(wor
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySound queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlaySound queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3503,7 +3421,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(wor
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlaySound queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlaySound queued. StructuredParams.Sound is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Sound)};
 				}
 				else
@@ -3525,7 +3443,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_SendRPC(wor
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPlaySound, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPlaySound, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3546,7 +3464,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_Sen
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3566,7 +3484,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_Sen
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayForceFeedback queued. StructuredParams.ForceFeedbackEffect is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.ForceFeedbackEffect)};
 				}
 				else
@@ -3591,7 +3509,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_Sen
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayForceFeedback, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3612,7 +3530,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraShake queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayCameraShake queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3632,7 +3550,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendR
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraShake queued. StructuredParams.Shake is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayCameraShake queued. StructuredParams.Shake is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.Shake)};
 				}
 				else
@@ -3663,7 +3581,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayCameraShake, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayCameraShake, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3684,7 +3602,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRP
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3704,7 +3622,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRP
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. StructuredParams.AnimToPlay is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientPlayCameraAnim queued. StructuredParams.AnimToPlay is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.AnimToPlay)};
 				}
 				else
@@ -3750,7 +3668,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_SendRP
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayCameraAnim, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientPlayCameraAnim, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3771,7 +3689,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_SendRPC(wo
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientMutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientMutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3789,7 +3707,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_SendRPC(wo
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientMutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientMutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3810,7 +3728,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_SendRPC(worke
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientMessage queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3828,7 +3746,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_SendRPC(worke
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3849,7 +3767,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientIgnoreMoveInput queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientIgnoreMoveInput queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3861,7 +3779,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientIgnoreMoveInput, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientIgnoreMoveInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3882,7 +3800,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientIgnoreLookInput queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientIgnoreLookInput queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3894,7 +3812,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientIgnoreLookInput, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientIgnoreLookInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3915,7 +3833,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_SendRPC(wor
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientGotoState queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientGotoState queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3927,7 +3845,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_SendRPC(wor
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientGotoState, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientGotoState, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -3948,7 +3866,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(wor
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientGameEnded queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientGameEnded queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -3968,7 +3886,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(wor
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientGameEnded queued. StructuredParams.EndGameFocus is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientGameEnded queued. StructuredParams.EndGameFocus is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.EndGameFocus)};
 				}
 				else
@@ -3987,7 +3905,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_SendRPC(wor
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientGameEnded, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientGameEnded, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4005,7 +3923,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientForceGarbageCollection queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientForceGarbageCollection queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4014,7 +3932,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientForceGarbageCollection, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientForceGarbageCollection, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4032,7 +3950,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_S
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientFlushLevelStreaming queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientFlushLevelStreaming queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4041,7 +3959,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_S
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientFlushLevelStreaming, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientFlushLevelStreaming, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4059,7 +3977,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_Send
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientEndOnlineSession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientEndOnlineSession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4068,7 +3986,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_Send
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientEndOnlineSession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientEndOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4089,7 +4007,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_Se
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientEnableNetworkVoice queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientEnableNetworkVoice queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4101,7 +4019,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_Se
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientEnableNetworkVoice, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientEnableNetworkVoice, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4119,7 +4037,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientCommitMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientCommitMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4128,7 +4046,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientCommitMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientCommitMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4146,7 +4064,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientClearCameraLensEffects queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientClearCameraLensEffects queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4155,7 +4073,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientClearCameraLensEffects, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientClearCameraLensEffects, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4176,7 +4094,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_SendRPC(
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientCapBandwidth queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientCapBandwidth queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4188,7 +4106,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_SendRPC(
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientCapBandwidth, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientCapBandwidth, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4206,7 +4124,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientCancelPendingMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientCancelPendingMapChange queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4215,7 +4133,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientCancelPendingMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientCancelPendingMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4236,7 +4154,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientAddTextureStreamingLoc queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientAddTextureStreamingLoc queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4260,7 +4178,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientAddTextureStreamingLoc, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientAddTextureStreamingLoc, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4281,7 +4199,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetRotation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetRotation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4302,7 +4220,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_SendRPC(w
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetRotation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetRotation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4323,7 +4241,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ClientSetLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ClientSetLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4350,7 +4268,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_SendRPC(w
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ClientSetLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ClientSetLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4371,7 +4289,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_SendRPC(w
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerTryJoinGame queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerTryJoinGame queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4386,7 +4304,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_SendRPC(w
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerTryJoinGame, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerTryJoinGame, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4407,7 +4325,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_SendRPC(work
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerViewSelf queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerViewSelf queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4428,7 +4346,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_SendRPC(work
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerViewSelf, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerViewSelf, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4446,7 +4364,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_SendRP
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerViewPrevPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerViewPrevPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4455,7 +4373,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_SendRP
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerViewPrevPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerViewPrevPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4473,7 +4391,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_SendRP
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerViewNextPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerViewNextPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4482,7 +4400,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_SendRP
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerViewNextPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerViewNextPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4500,7 +4418,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_Send
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerVerifyViewTarget queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerVerifyViewTarget queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4509,7 +4427,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_Send
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerVerifyViewTarget, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerVerifyViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4530,7 +4448,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerUpdateMultipleLevelsVisibility queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerUpdateMultipleLevelsVisibility queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4551,7 +4469,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateMultipleLevelsVisibility, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateMultipleLevelsVisibility, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4572,7 +4490,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerUpdateLevelVisibility queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerUpdateLevelVisibility queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4587,7 +4505,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateLevelVisibility, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateLevelVisibility, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4608,7 +4526,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_SendRPC(
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerUpdateCamera queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerUpdateCamera queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4629,7 +4547,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_SendRPC(
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateCamera, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerUpdateCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4650,7 +4568,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_SendRPC(
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerUnmutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerUnmutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4668,7 +4586,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_SendRPC(
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerUnmutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerUnmutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4686,7 +4604,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_SendR
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerToggleAILogging queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerToggleAILogging queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4695,7 +4613,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_SendR
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerToggleAILogging, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerToggleAILogging, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4713,7 +4631,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_SendRPC(
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerShortTimeout queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerShortTimeout queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4722,7 +4640,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_SendRPC(
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerShortTimeout, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerShortTimeout, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4743,7 +4661,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_S
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerSetSpectatorWaiting queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerSetSpectatorWaiting queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4755,7 +4673,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_S
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerSetSpectatorWaiting, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4776,7 +4694,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerSetSpectatorLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerSetSpectatorLocation queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4803,7 +4721,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerSetSpectatorLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerSetSpectatorLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4821,7 +4739,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_SendRPC
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerRestartPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerRestartPlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4830,7 +4748,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_SendRPC
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerRestartPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerRestartPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4848,7 +4766,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_SendRPC(worker:
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerPause queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerPause queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4857,7 +4775,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_SendRPC(worker:
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerPause, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerPause, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4878,7 +4796,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_Sen
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerNotifyLoadedWorld queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerNotifyLoadedWorld queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4890,7 +4808,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_Sen
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerNotifyLoadedWorld, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerNotifyLoadedWorld, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4911,7 +4829,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_SendRPC(wo
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerMutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerMutePlayer queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4929,7 +4847,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_SendRPC(wo
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerMutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerMutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4947,7 +4865,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerCheckClientPossessionReliable queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerCheckClientPossessionReliable queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4956,7 +4874,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerCheckClientPossessionReliable, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerCheckClientPossessionReliable, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -4974,7 +4892,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerCheckClientPossession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerCheckClientPossession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -4983,7 +4901,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerCheckClientPossession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerCheckClientPossession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5004,7 +4922,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_SendRPC(wo
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerChangeName queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerChangeName queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -5016,7 +4934,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_SendRPC(wo
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerChangeName, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerChangeName, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5037,7 +4955,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_SendRPC(worker
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerCamera queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerCamera queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -5049,7 +4967,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_SendRPC(worker
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerCamera, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5070,7 +4988,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
 		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 		{
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 			return {TargetObject};
 		}
 
@@ -5090,7 +5008,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
 				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. StructuredParams.P is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerAcknowledgePossession queued. StructuredParams.P is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
 					return {Cast<UObject>(StructuredParams.P)};
 				}
 				else
@@ -5106,7 +5024,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending RPC: ServerAcknowledgePossession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerAcknowledgePossession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5126,7 +5044,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayl
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientJoinResults_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientJoinResults_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5147,7 +5065,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayl
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientJoinResults, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientJoinResults, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5158,7 +5076,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientJoinResults_OnRPCPayl
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientJoinResults_OnRPCPayload: Function not found. Object: %s, Function: ClientJoinResults."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientJoinResults_OnRPCPayload: Function not found. Object: %s, Function: ClientJoinResults."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5180,7 +5098,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: OnServerStartedVisualLogger_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: OnServerStartedVisualLogger_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5201,7 +5119,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: OnServerStartedVisualLogger, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: OnServerStartedVisualLogger, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5212,7 +5130,7 @@ void USpatialTypeBinding_SampleGamePlayerController::OnServerStartedVisualLogger
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: OnServerStartedVisualLogger_OnRPCPayload: Function not found. Object: %s, Function: OnServerStartedVisualLogger."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: OnServerStartedVisualLogger_OnRPCPayload: Function not found. Object: %s, Function: OnServerStartedVisualLogger."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5234,7 +5152,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_OnRPCPayloa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientWasKicked_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientWasKicked_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5255,7 +5173,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_OnRPCPayloa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientWasKicked, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientWasKicked, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5266,7 +5184,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientWasKicked_OnRPCPayloa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientWasKicked_OnRPCPayload: Function not found. Object: %s, Function: ClientWasKicked."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientWasKicked_OnRPCPayload: Function not found. Object: %s, Function: ClientWasKicked."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5288,7 +5206,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientVoiceHandshakeComplete_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientVoiceHandshakeComplete_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5300,7 +5218,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientVoiceHandshakeComplete, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientVoiceHandshakeComplete, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5311,7 +5229,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientVoiceHandshakeComplet
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientVoiceHandshakeComplete_OnRPCPayload: Function not found. Object: %s, Function: ClientVoiceHandshakeComplete."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientVoiceHandshakeComplete_OnRPCPayload: Function not found. Object: %s, Function: ClientVoiceHandshakeComplete."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5333,7 +5251,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5363,7 +5281,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientUpdateMultipleLevelsStreamingStatus, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientUpdateMultipleLevelsStreamingStatus, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5374,7 +5292,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateMultipleLevelsS
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload: Function not found. Object: %s, Function: ClientUpdateMultipleLevelsStreamingStatus."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientUpdateMultipleLevelsStreamingStatus_OnRPCPayload: Function not found. Object: %s, Function: ClientUpdateMultipleLevelsStreamingStatus."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5396,7 +5314,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientUpdateLevelStreamingStatus_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientUpdateLevelStreamingStatus_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5429,7 +5347,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientUpdateLevelStreamingStatus, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientUpdateLevelStreamingStatus, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5440,7 +5358,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUpdateLevelStreamingS
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUpdateLevelStreamingStatus_OnRPCPayload: Function not found. Object: %s, Function: ClientUpdateLevelStreamingStatus."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientUpdateLevelStreamingStatus_OnRPCPayload: Function not found. Object: %s, Function: ClientUpdateLevelStreamingStatus."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5462,7 +5380,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_OnRPCPay
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientUnmutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientUnmutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5489,7 +5407,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_OnRPCPay
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientUnmutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientUnmutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5500,7 +5418,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientUnmutePlayer_OnRPCPay
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientUnmutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ClientUnmutePlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientUnmutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ClientUnmutePlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5522,7 +5440,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_OnRPCP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientTravelInternal_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientTravelInternal_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5561,7 +5479,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_OnRPCP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientTravelInternal, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientTravelInternal, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5572,7 +5490,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTravelInternal_OnRPCP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientTravelInternal_OnRPCPayload: Function not found. Object: %s, Function: ClientTravelInternal."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientTravelInternal_OnRPCPayload: Function not found. Object: %s, Function: ClientTravelInternal."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5594,7 +5512,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayl
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientTeamMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientTeamMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5631,7 +5549,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayl
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientTeamMessage_OnRPCPayload: Parameters.SenderPlayerState %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientTeamMessage_OnRPCPayload: Parameters.SenderPlayerState %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5649,7 +5567,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayl
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientTeamMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientTeamMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5660,7 +5578,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientTeamMessage_OnRPCPayl
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientTeamMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientTeamMessage."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientTeamMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientTeamMessage."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5682,7 +5600,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnR
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5719,7 +5637,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnR
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5731,7 +5649,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnR
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStopForceFeedback, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientStopForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5742,7 +5660,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopForceFeedback_OnR
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Function not found. Object: %s, Function: ClientStopForceFeedback."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientStopForceFeedback_OnRPCPayload: Function not found. Object: %s, Function: ClientStopForceFeedback."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5764,7 +5682,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5801,7 +5719,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPC
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Parameters.Shake %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Parameters.Shake %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5813,7 +5731,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPC
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStopCameraShake, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientStopCameraShake, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5824,7 +5742,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraShake_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Function not found. Object: %s, Function: ClientStopCameraShake."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientStopCameraShake_OnRPCPayload: Function not found. Object: %s, Function: ClientStopCameraShake."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5846,7 +5764,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5883,7 +5801,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCP
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Parameters.AnimToStop %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Parameters.AnimToStop %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -5892,7 +5810,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStopCameraAnim, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientStopCameraAnim, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5903,7 +5821,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStopCameraAnim_OnRPCP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Function not found. Object: %s, Function: ClientStopCameraAnim."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientStopCameraAnim_OnRPCPayload: Function not found. Object: %s, Function: ClientStopCameraAnim."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5925,7 +5843,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_On
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientStartOnlineSession_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientStartOnlineSession_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -5937,7 +5855,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_On
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientStartOnlineSession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientStartOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -5948,7 +5866,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientStartOnlineSession_On
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientStartOnlineSession_OnRPCPayload: Function not found. Object: %s, Function: ClientStartOnlineSession."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientStartOnlineSession_OnRPCPayload: Function not found. Object: %s, Function: ClientStartOnlineSession."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -5970,7 +5888,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6007,7 +5925,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Parameters.LensEffectEmitterClass %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Parameters.LensEffectEmitterClass %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6016,7 +5934,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSpawnCameraLensEffect, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSpawnCameraLensEffect, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6027,7 +5945,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSpawnCameraLensEffect
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Function not found. Object: %s, Function: ClientSpawnCameraLensEffect."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSpawnCameraLensEffect_OnRPCPayload: Function not found. Object: %s, Function: ClientSpawnCameraLensEffect."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6049,7 +5967,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6086,7 +6004,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Parameters.A %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Parameters.A %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6107,7 +6025,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetViewTarget, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6118,7 +6036,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetViewTarget_OnRPCPa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Function not found. Object: %s, Function: ClientSetViewTarget."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetViewTarget_OnRPCPayload: Function not found. Object: %s, Function: ClientSetViewTarget."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6140,7 +6058,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_O
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetSpectatorWaiting_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetSpectatorWaiting_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6161,7 +6079,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_O
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetSpectatorWaiting, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6172,7 +6090,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetSpectatorWaiting_O
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetSpectatorWaiting_OnRPCPayload: Function not found. Object: %s, Function: ClientSetSpectatorWaiting."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetSpectatorWaiting_OnRPCPayload: Function not found. Object: %s, Function: ClientSetSpectatorWaiting."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6194,7 +6112,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(c
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetHUD_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetHUD_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6231,7 +6149,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(c
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetHUD_OnRPCPayload: Parameters.NewHUDClass %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetHUD_OnRPCPayload: Parameters.NewHUDClass %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6240,7 +6158,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(c
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetHUD, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetHUD, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6251,7 +6169,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetHUD_OnRPCPayload(c
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetHUD_OnRPCPayload: Function not found. Object: %s, Function: ClientSetHUD."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetHUD_OnRPCPayload: Function not found. Object: %s, Function: ClientSetHUD."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6273,7 +6191,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6310,7 +6228,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Parameters.Material %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Parameters.Material %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6325,7 +6243,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetForceMipLevelsToBeResident, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetForceMipLevelsToBeResident, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6336,7 +6254,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetForceMipLevelsToBe
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Function not found. Object: %s, Function: ClientSetForceMipLevelsToBeResident."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetForceMipLevelsToBeResident_OnRPCPayload: Function not found. Object: %s, Function: ClientSetForceMipLevelsToBeResident."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6358,7 +6276,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_OnRP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetCinematicMode_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetCinematicMode_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6388,7 +6306,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_OnRP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCinematicMode, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetCinematicMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6399,7 +6317,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCinematicMode_OnRP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCinematicMode_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCinematicMode."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetCinematicMode_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCinematicMode."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6421,7 +6339,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_OnRPCPa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetCameraMode_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetCameraMode_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6442,7 +6360,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_OnRPCPa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraMode, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraMode, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6453,7 +6371,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraMode_OnRPCPa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCameraMode_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCameraMode."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetCameraMode_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCameraMode."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6475,7 +6393,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_OnRPCPa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetCameraFade_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetCameraFade_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6523,7 +6441,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_OnRPCPa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraFade, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetCameraFade, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6534,7 +6452,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetCameraFade_OnRPCPa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetCameraFade_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCameraFade."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetCameraFade_OnRPCPayload: Function not found. Object: %s, Function: ClientSetCameraFade."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6556,7 +6474,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetBlockOnAsyncLoading_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetBlockOnAsyncLoading_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6568,7 +6486,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetBlockOnAsyncLoading, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetBlockOnAsyncLoading, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6579,7 +6497,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetBlockOnAsyncLoadin
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetBlockOnAsyncLoading_OnRPCPayload: Function not found. Object: %s, Function: ClientSetBlockOnAsyncLoading."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetBlockOnAsyncLoading_OnRPCPayload: Function not found. Object: %s, Function: ClientSetBlockOnAsyncLoading."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6601,7 +6519,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6622,7 +6540,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenuWithTextReason, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenuWithTextReason, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6633,7 +6551,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenuWithT
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnRPCPayload: Function not found. Object: %s, Function: ClientReturnToMainMenuWithTextReason."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientReturnToMainMenuWithTextReason_OnRPCPayload: Function not found. Object: %s, Function: ClientReturnToMainMenuWithTextReason."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6655,7 +6573,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_OnRP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReturnToMainMenu_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReturnToMainMenu_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6676,7 +6594,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_OnRP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenu, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientReturnToMainMenu, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6687,7 +6605,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReturnToMainMenu_OnRP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReturnToMainMenu_OnRPCPayload: Function not found. Object: %s, Function: ClientReturnToMainMenu."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientReturnToMainMenu_OnRPCPayload: Function not found. Object: %s, Function: ClientReturnToMainMenu."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6709,7 +6627,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_On
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6746,7 +6664,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_On
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Parameters.NewPawn %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Parameters.NewPawn %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6755,7 +6673,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_On
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientRetryClientRestart, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientRetryClientRestart, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6766,7 +6684,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRetryClientRestart_On
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Function not found. Object: %s, Function: ClientRetryClientRestart."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientRetryClientRestart_OnRPCPayload: Function not found. Object: %s, Function: ClientRetryClientRestart."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6788,7 +6706,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRestart_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRestart_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6825,7 +6743,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRestart_OnRPCPayload: Parameters.NewPawn %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRestart_OnRPCPayload: Parameters.NewPawn %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6834,7 +6752,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientRestart, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientRestart, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6845,7 +6763,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRestart_OnRPCPayload(
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRestart_OnRPCPayload: Function not found. Object: %s, Function: ClientRestart."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientRestart_OnRPCPayload: Function not found. Object: %s, Function: ClientRestart."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6867,7 +6785,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_OnRPCPayload(co
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReset_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReset_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6879,7 +6797,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_OnRPCPayload(co
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReset, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientReset, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6890,7 +6808,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReset_OnRPCPayload(co
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReset_OnRPCPayload: Function not found. Object: %s, Function: ClientReset."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientReset_OnRPCPayload: Function not found. Object: %s, Function: ClientReset."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6912,7 +6830,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayloa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRepObjRef_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRepObjRef_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -6949,7 +6867,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayloa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientRepObjRef_OnRPCPayload: Parameters.Object %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientRepObjRef_OnRPCPayload: Parameters.Object %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -6958,7 +6876,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayloa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientRepObjRef, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientRepObjRef, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -6969,7 +6887,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientRepObjRef_OnRPCPayloa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientRepObjRef_OnRPCPayload: Function not found. Object: %s, Function: ClientRepObjRef."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientRepObjRef_OnRPCPayload: Function not found. Object: %s, Function: ClientRepObjRef."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -6991,7 +6909,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7028,7 +6946,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.Message %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.Message %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7059,7 +6977,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.RelatedPlayerState_1 %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.RelatedPlayerState_1 %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7087,7 +7005,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.RelatedPlayerState_2 %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.RelatedPlayerState_2 %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7115,7 +7033,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.OptionalObject %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Parameters.OptionalObject %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7124,7 +7042,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientReceiveLocalizedMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientReceiveLocalizedMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7135,7 +7053,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientReceiveLocalizedMessa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientReceiveLocalizedMessage."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientReceiveLocalizedMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientReceiveLocalizedMessage."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7157,7 +7075,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnR
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7194,7 +7112,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnR
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Parameters.ForcedActor %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Parameters.ForcedActor %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7212,7 +7130,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnR
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPrestreamTextures, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPrestreamTextures, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7223,7 +7141,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrestreamTextures_OnR
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Function not found. Object: %s, Function: ClientPrestreamTextures."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPrestreamTextures_OnRPCPayload: Function not found. Object: %s, Function: ClientPrestreamTextures."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7245,7 +7163,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_OnRP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPrepareMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPrepareMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7272,7 +7190,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_OnRP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPrepareMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPrepareMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7283,7 +7201,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPrepareMapChange_OnRP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPrepareMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientPrepareMapChange."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPrepareMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientPrepareMapChange."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7305,7 +7223,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_O
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7342,7 +7260,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_O
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Parameters.Sound %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Parameters.Sound %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7366,7 +7284,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_O
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySoundAtLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySoundAtLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7377,7 +7295,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySoundAtLocation_O
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Function not found. Object: %s, Function: ClientPlaySoundAtLocation."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPlaySoundAtLocation_OnRPCPayload: Function not found. Object: %s, Function: ClientPlaySoundAtLocation."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7399,7 +7317,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayloa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySound_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlaySound_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7436,7 +7354,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayloa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlaySound_OnRPCPayload: Parameters.Sound %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlaySound_OnRPCPayload: Parameters.Sound %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7451,7 +7369,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayloa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySound, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPlaySound, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7462,7 +7380,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlaySound_OnRPCPayloa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlaySound_OnRPCPayload: Function not found. Object: %s, Function: ClientPlaySound."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPlaySound_OnRPCPayload: Function not found. Object: %s, Function: ClientPlaySound."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7484,7 +7402,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnR
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7521,7 +7439,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnR
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Parameters.ForceFeedbackEffect %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7539,7 +7457,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnR
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlayForceFeedback, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPlayForceFeedback, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7550,7 +7468,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayForceFeedback_OnR
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayForceFeedback."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPlayForceFeedback_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayForceFeedback."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7572,7 +7490,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7609,7 +7527,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPC
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Parameters.Shake %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Parameters.Shake %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7633,7 +7551,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPC
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlayCameraShake, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPlayCameraShake, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7644,7 +7562,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraShake_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayCameraShake."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPlayCameraShake_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayCameraShake."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7666,7 +7584,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7703,7 +7621,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCP
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Parameters.AnimToPlay %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Parameters.AnimToPlay %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -7742,7 +7660,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCP
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientPlayCameraAnim, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientPlayCameraAnim, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7753,7 +7671,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientPlayCameraAnim_OnRPCP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayCameraAnim."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientPlayCameraAnim_OnRPCPayload: Function not found. Object: %s, Function: ClientPlayCameraAnim."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7775,7 +7693,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_OnRPCPaylo
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientMutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientMutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7802,7 +7720,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_OnRPCPaylo
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientMutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientMutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7813,7 +7731,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMutePlayer_OnRPCPaylo
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientMutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ClientMutePlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientMutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ClientMutePlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7835,7 +7753,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_OnRPCPayload(
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientMessage_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7862,7 +7780,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_OnRPCPayload(
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientMessage, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientMessage, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7873,7 +7791,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientMessage_OnRPCPayload(
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientMessage."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientMessage_OnRPCPayload: Function not found. Object: %s, Function: ClientMessage."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7895,7 +7813,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientIgnoreMoveInput_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientIgnoreMoveInput_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7916,7 +7834,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_OnRPC
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreMoveInput, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreMoveInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7927,7 +7845,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreMoveInput_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientIgnoreMoveInput_OnRPCPayload: Function not found. Object: %s, Function: ClientIgnoreMoveInput."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientIgnoreMoveInput_OnRPCPayload: Function not found. Object: %s, Function: ClientIgnoreMoveInput."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -7949,7 +7867,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientIgnoreLookInput_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientIgnoreLookInput_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -7970,7 +7888,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_OnRPC
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreLookInput, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientIgnoreLookInput, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -7981,7 +7899,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientIgnoreLookInput_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientIgnoreLookInput_OnRPCPayload: Function not found. Object: %s, Function: ClientIgnoreLookInput."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientIgnoreLookInput_OnRPCPayload: Function not found. Object: %s, Function: ClientIgnoreLookInput."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8003,7 +7921,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_OnRPCPayloa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientGotoState_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientGotoState_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8024,7 +7942,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_OnRPCPayloa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientGotoState, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientGotoState, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8035,7 +7953,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGotoState_OnRPCPayloa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientGotoState_OnRPCPayload: Function not found. Object: %s, Function: ClientGotoState."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientGotoState_OnRPCPayload: Function not found. Object: %s, Function: ClientGotoState."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8057,7 +7975,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayloa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientGameEnded_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientGameEnded_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8094,7 +8012,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayloa
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientGameEnded_OnRPCPayload: Parameters.EndGameFocus %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientGameEnded_OnRPCPayload: Parameters.EndGameFocus %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -8106,7 +8024,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayloa
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientGameEnded, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientGameEnded, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8117,7 +8035,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientGameEnded_OnRPCPayloa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientGameEnded_OnRPCPayload: Function not found. Object: %s, Function: ClientGameEnded."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientGameEnded_OnRPCPayload: Function not found. Object: %s, Function: ClientGameEnded."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8139,7 +8057,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientForceGarbageCollection_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientForceGarbageCollection_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8151,7 +8069,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientForceGarbageCollection, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientForceGarbageCollection, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8162,7 +8080,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientForceGarbageCollectio
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientForceGarbageCollection_OnRPCPayload: Function not found. Object: %s, Function: ClientForceGarbageCollection."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientForceGarbageCollection_OnRPCPayload: Function not found. Object: %s, Function: ClientForceGarbageCollection."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8184,7 +8102,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_O
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientFlushLevelStreaming_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientFlushLevelStreaming_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8196,7 +8114,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_O
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientFlushLevelStreaming, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientFlushLevelStreaming, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8207,7 +8125,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientFlushLevelStreaming_O
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientFlushLevelStreaming_OnRPCPayload: Function not found. Object: %s, Function: ClientFlushLevelStreaming."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientFlushLevelStreaming_OnRPCPayload: Function not found. Object: %s, Function: ClientFlushLevelStreaming."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8229,7 +8147,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_OnRP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientEndOnlineSession_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientEndOnlineSession_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8241,7 +8159,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_OnRP
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientEndOnlineSession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientEndOnlineSession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8252,7 +8170,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEndOnlineSession_OnRP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientEndOnlineSession_OnRPCPayload: Function not found. Object: %s, Function: ClientEndOnlineSession."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientEndOnlineSession_OnRPCPayload: Function not found. Object: %s, Function: ClientEndOnlineSession."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8274,7 +8192,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_On
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientEnableNetworkVoice_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientEnableNetworkVoice_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8295,7 +8213,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_On
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientEnableNetworkVoice, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientEnableNetworkVoice, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8306,7 +8224,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientEnableNetworkVoice_On
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientEnableNetworkVoice_OnRPCPayload: Function not found. Object: %s, Function: ClientEnableNetworkVoice."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientEnableNetworkVoice_OnRPCPayload: Function not found. Object: %s, Function: ClientEnableNetworkVoice."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8328,7 +8246,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientCommitMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientCommitMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8340,7 +8258,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_OnRPC
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCommitMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientCommitMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8351,7 +8269,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCommitMapChange_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCommitMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientCommitMapChange."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientCommitMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientCommitMapChange."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8373,7 +8291,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientClearCameraLensEffects_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientClearCameraLensEffects_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8385,7 +8303,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientClearCameraLensEffects, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientClearCameraLensEffects, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8396,7 +8314,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientClearCameraLensEffect
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientClearCameraLensEffects_OnRPCPayload: Function not found. Object: %s, Function: ClientClearCameraLensEffects."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientClearCameraLensEffects_OnRPCPayload: Function not found. Object: %s, Function: ClientClearCameraLensEffects."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8418,7 +8336,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_OnRPCPay
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientCapBandwidth_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientCapBandwidth_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8439,7 +8357,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_OnRPCPay
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCapBandwidth, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientCapBandwidth, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8450,7 +8368,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCapBandwidth_OnRPCPay
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCapBandwidth_OnRPCPayload: Function not found. Object: %s, Function: ClientCapBandwidth."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientCapBandwidth_OnRPCPayload: Function not found. Object: %s, Function: ClientCapBandwidth."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8472,7 +8390,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientCancelPendingMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientCancelPendingMapChange_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8484,7 +8402,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientCancelPendingMapChange, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientCancelPendingMapChange, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8495,7 +8413,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientCancelPendingMapChang
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientCancelPendingMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientCancelPendingMapChange."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientCancelPendingMapChange_OnRPCPayload: Function not found. Object: %s, Function: ClientCancelPendingMapChange."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8517,7 +8435,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientAddTextureStreamingLoc_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientAddTextureStreamingLoc_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8550,7 +8468,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientAddTextureStreamingLoc, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientAddTextureStreamingLoc, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8561,7 +8479,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientAddTextureStreamingLo
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientAddTextureStreamingLoc_OnRPCPayload: Function not found. Object: %s, Function: ClientAddTextureStreamingLoc."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientAddTextureStreamingLoc_OnRPCPayload: Function not found. Object: %s, Function: ClientAddTextureStreamingLoc."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8583,7 +8501,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_OnRPCPayl
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetRotation_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetRotation_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8613,7 +8531,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_OnRPCPayl
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetRotation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetRotation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8624,7 +8542,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetRotation_OnRPCPayl
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetRotation_OnRPCPayload: Function not found. Object: %s, Function: ClientSetRotation."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetRotation_OnRPCPayload: Function not found. Object: %s, Function: ClientSetRotation."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8646,7 +8564,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_OnRPCPayl
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ClientSetLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ClientSetLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8682,7 +8600,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_OnRPCPayl
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ClientSetLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ClientSetLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8693,7 +8611,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ClientSetLocation_OnRPCPayl
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ClientSetLocation_OnRPCPayload: Function not found. Object: %s, Function: ClientSetLocation."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ClientSetLocation_OnRPCPayload: Function not found. Object: %s, Function: ClientSetLocation."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8715,7 +8633,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_OnRPCPayl
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerTryJoinGame_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerTryJoinGame_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8739,7 +8657,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_OnRPCPayl
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerTryJoinGame, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerTryJoinGame, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8750,7 +8668,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerTryJoinGame_OnRPCPayl
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerTryJoinGame_OnRPCPayload: Function not found. Object: %s, Function: ServerTryJoinGame."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerTryJoinGame_OnRPCPayload: Function not found. Object: %s, Function: ServerTryJoinGame."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8772,7 +8690,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_OnRPCPayload
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerViewSelf_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerViewSelf_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8802,7 +8720,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_OnRPCPayload
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewSelf, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerViewSelf, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8813,7 +8731,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewSelf_OnRPCPayload
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewSelf_OnRPCPayload: Function not found. Object: %s, Function: ServerViewSelf."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerViewSelf_OnRPCPayload: Function not found. Object: %s, Function: ServerViewSelf."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8835,7 +8753,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_OnRPCP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerViewPrevPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerViewPrevPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8847,7 +8765,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_OnRPCP
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewPrevPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerViewPrevPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8858,7 +8776,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewPrevPlayer_OnRPCP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewPrevPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerViewPrevPlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerViewPrevPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerViewPrevPlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8880,7 +8798,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_OnRPCP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerViewNextPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerViewNextPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8892,7 +8810,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_OnRPCP
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerViewNextPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerViewNextPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8903,7 +8821,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerViewNextPlayer_OnRPCP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerViewNextPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerViewNextPlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerViewNextPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerViewNextPlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8925,7 +8843,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_OnRP
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerVerifyViewTarget_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerVerifyViewTarget_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -8937,7 +8855,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_OnRP
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerVerifyViewTarget, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerVerifyViewTarget, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -8948,7 +8866,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerVerifyViewTarget_OnRP
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerVerifyViewTarget_OnRPCPayload: Function not found. Object: %s, Function: ServerVerifyViewTarget."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerVerifyViewTarget_OnRPCPayload: Function not found. Object: %s, Function: ServerVerifyViewTarget."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -8970,7 +8888,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9000,7 +8918,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateMultipleLevelsVisibility, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateMultipleLevelsVisibility, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9011,7 +8929,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateMultipleLevelsV
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateMultipleLevelsVisibility."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerUpdateMultipleLevelsVisibility_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateMultipleLevelsVisibility."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9033,7 +8951,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerUpdateLevelVisibility_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerUpdateLevelVisibility_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9057,7 +8975,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateLevelVisibility, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateLevelVisibility, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9068,7 +8986,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateLevelVisibility
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateLevelVisibility_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateLevelVisibility."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerUpdateLevelVisibility_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateLevelVisibility."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9090,7 +9008,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_OnRPCPay
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerUpdateCamera_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerUpdateCamera_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9120,7 +9038,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_OnRPCPay
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateCamera, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerUpdateCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9131,7 +9049,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUpdateCamera_OnRPCPay
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUpdateCamera_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateCamera."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerUpdateCamera_OnRPCPayload: Function not found. Object: %s, Function: ServerUpdateCamera."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9153,7 +9071,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_OnRPCPay
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerUnmutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerUnmutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9180,7 +9098,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_OnRPCPay
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerUnmutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerUnmutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9191,7 +9109,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerUnmutePlayer_OnRPCPay
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerUnmutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerUnmutePlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerUnmutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerUnmutePlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9213,7 +9131,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_OnRPC
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerToggleAILogging_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerToggleAILogging_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9225,7 +9143,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_OnRPC
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerToggleAILogging, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerToggleAILogging, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9236,7 +9154,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerToggleAILogging_OnRPC
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerToggleAILogging_OnRPCPayload: Function not found. Object: %s, Function: ServerToggleAILogging."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerToggleAILogging_OnRPCPayload: Function not found. Object: %s, Function: ServerToggleAILogging."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9258,7 +9176,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_OnRPCPay
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerShortTimeout_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerShortTimeout_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9270,7 +9188,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_OnRPCPay
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerShortTimeout, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerShortTimeout, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9281,7 +9199,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerShortTimeout_OnRPCPay
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerShortTimeout_OnRPCPayload: Function not found. Object: %s, Function: ServerShortTimeout."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerShortTimeout_OnRPCPayload: Function not found. Object: %s, Function: ServerShortTimeout."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9303,7 +9221,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_O
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerSetSpectatorWaiting_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerSetSpectatorWaiting_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9324,7 +9242,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_O
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerSetSpectatorWaiting, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerSetSpectatorWaiting, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9335,7 +9253,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorWaiting_O
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerSetSpectatorWaiting_OnRPCPayload: Function not found. Object: %s, Function: ServerSetSpectatorWaiting."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerSetSpectatorWaiting_OnRPCPayload: Function not found. Object: %s, Function: ServerSetSpectatorWaiting."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9357,7 +9275,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerSetSpectatorLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerSetSpectatorLocation_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9393,7 +9311,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerSetSpectatorLocation, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerSetSpectatorLocation, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9404,7 +9322,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerSetSpectatorLocation_
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerSetSpectatorLocation_OnRPCPayload: Function not found. Object: %s, Function: ServerSetSpectatorLocation."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerSetSpectatorLocation_OnRPCPayload: Function not found. Object: %s, Function: ServerSetSpectatorLocation."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9426,7 +9344,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_OnRPCPa
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerRestartPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerRestartPlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9438,7 +9356,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_OnRPCPa
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerRestartPlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerRestartPlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9449,7 +9367,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerRestartPlayer_OnRPCPa
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerRestartPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerRestartPlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerRestartPlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerRestartPlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9471,7 +9389,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_OnRPCPayload(co
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerPause_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerPause_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9483,7 +9401,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_OnRPCPayload(co
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerPause, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerPause, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9494,7 +9412,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerPause_OnRPCPayload(co
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerPause_OnRPCPayload: Function not found. Object: %s, Function: ServerPause."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerPause_OnRPCPayload: Function not found. Object: %s, Function: ServerPause."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9516,7 +9434,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_OnR
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerNotifyLoadedWorld_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerNotifyLoadedWorld_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9537,7 +9455,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_OnR
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerNotifyLoadedWorld, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerNotifyLoadedWorld, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9548,7 +9466,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerNotifyLoadedWorld_OnR
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerNotifyLoadedWorld_OnRPCPayload: Function not found. Object: %s, Function: ServerNotifyLoadedWorld."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerNotifyLoadedWorld_OnRPCPayload: Function not found. Object: %s, Function: ServerNotifyLoadedWorld."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9570,7 +9488,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_OnRPCPaylo
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerMutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerMutePlayer_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9597,7 +9515,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_OnRPCPaylo
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerMutePlayer, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerMutePlayer, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9608,7 +9526,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerMutePlayer_OnRPCPaylo
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerMutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerMutePlayer."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerMutePlayer_OnRPCPayload: Function not found. Object: %s, Function: ServerMutePlayer."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9630,7 +9548,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerCheckClientPossessionReliable_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerCheckClientPossessionReliable_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9642,7 +9560,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossessionReliable, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossessionReliable, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9653,7 +9571,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCheckClientPossessionReliable_OnRPCPayload: Function not found. Object: %s, Function: ServerCheckClientPossessionReliable."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerCheckClientPossessionReliable_OnRPCPayload: Function not found. Object: %s, Function: ServerCheckClientPossessionReliable."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9675,7 +9593,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerCheckClientPossession_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerCheckClientPossession_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9687,7 +9605,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 			*TargetNetGUID.ToString());
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerCheckClientPossession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9698,7 +9616,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCheckClientPossession
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCheckClientPossession_OnRPCPayload: Function not found. Object: %s, Function: ServerCheckClientPossession."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerCheckClientPossession_OnRPCPayload: Function not found. Object: %s, Function: ServerCheckClientPossession."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9720,7 +9638,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_OnRPCPaylo
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerChangeName_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerChangeName_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9741,7 +9659,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_OnRPCPaylo
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerChangeName, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerChangeName, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9752,7 +9670,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerChangeName_OnRPCPaylo
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerChangeName_OnRPCPayload: Function not found. Object: %s, Function: ServerChangeName."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerChangeName_OnRPCPayload: Function not found. Object: %s, Function: ServerChangeName."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9774,7 +9692,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_OnRPCPayload(c
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerCamera_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerCamera_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9795,7 +9713,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_OnRPCPayload(c
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerCamera, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerCamera, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9806,7 +9724,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerCamera_OnRPCPayload(c
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerCamera_OnRPCPayload: Function not found. Object: %s, Function: ServerCamera."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerCamera_OnRPCPayload: Function not found. Object: %s, Function: ServerCamera."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}
@@ -9828,7 +9746,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		{
 			// A legal static object reference should never be unresolved.
 			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Target object %s is not resolved on this worker."),
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Target object %s is not resolved on this worker."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ObjectRefToString(TargetObjectRef));
 			return {TargetObjectRef};
@@ -9865,7 +9783,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 				{
 					// A legal static object reference should never be unresolved.
 					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Parameters.P %s is not resolved on this worker."),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Parameters.P %s is not resolved on this worker."),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef));
 					return {ObjectRef};
@@ -9874,7 +9792,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		}
 
 		// Call implementation.
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received RPC: ServerAcknowledgePossession, target: %s %s"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerAcknowledgePossession, target: %s %s"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*TargetObject->GetName(),
 			*ObjectRefToString(TargetObjectRef));
@@ -9885,7 +9803,7 @@ void USpatialTypeBinding_SampleGamePlayerController::ServerAcknowledgePossession
 		}
 		else
 		{
-			UE_LOG(LogSpatialOSInterop, Error, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Function not found. Object: %s, Function: ServerAcknowledgePossession."),
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerAcknowledgePossession_OnRPCPayload: Function not found. Object: %s, Function: ServerAcknowledgePossession."),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*TargetObject->GetFullName());
 		}

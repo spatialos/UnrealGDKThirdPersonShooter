@@ -63,7 +63,11 @@ void USpatialTypeBinding_SGGameState::Init(USpatialInterop* InInterop, USpatialP
 	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, {0}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"GameModeClass"}, {0}, COND_InitialOnly, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"SpectatorClass"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"bReplicatedHasBegunPlay"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"ReplicatedWorldTimeSeconds"}, {0}, COND_None, REPNOTIFY_OnChanged));
+	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
 }
 
 void USpatialTypeBinding_SGGameState::BindToView(bool bIsClient)
@@ -140,19 +144,21 @@ worker::Entity USpatialTypeBinding_SGGameState::CreateActorEntity(const FString&
 	}
 
 	// Setup initial data.
-	improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Data SingleClientData;
-	improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update SingleClientUpdate;
-	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Data MultiClientData;
-	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update MultiClientUpdate;
-	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Data MigratableData;
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update MigratableDataUpdate;
-	bool bMigratableDataUpdateChanged = false;
-	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
-	SingleClientUpdate.ApplyTo(SingleClientData);
-	MultiClientUpdate.ApplyTo(MultiClientData);
-	MigratableDataUpdate.ApplyTo(MigratableData);
+
+	improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Data SingleClientSGGameStateData;
+	improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update SingleClientSGGameStateUpdate;
+	bool bSingleClientSGGameStateUpdateChanged = false;
+	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Data MultiClientSGGameStateData;
+	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update MultiClientSGGameStateUpdate;
+	bool bMultiClientSGGameStateUpdateChanged = false;
+	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Data SGGameStateMigratableData;
+	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update SGGameStateMigratableDataUpdate;
+	bool bSGGameStateMigratableDataUpdateChanged = false;
+
+	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientSGGameStateUpdate, bSingleClientSGGameStateUpdateChanged, MultiClientSGGameStateUpdate, bMultiClientSGGameStateUpdateChanged, SGGameStateMigratableDataUpdate, bSGGameStateMigratableDataUpdateChanged);
+	SingleClientSGGameStateUpdate.ApplyTo(SingleClientSGGameStateData);
+	MultiClientSGGameStateUpdate.ApplyTo(MultiClientSGGameStateData);
+	SGGameStateMigratableDataUpdate.ApplyTo(SGGameStateMigratableData);
 
 	// Create entity.
 	std::string ClientWorkerIdString = TCHAR_TO_UTF8(*ClientWorkerId);
@@ -199,9 +205,9 @@ worker::Entity USpatialTypeBinding_SGGameState::CreateActorEntity(const FString&
 		.SetPersistence(true)
 		.SetReadAcl(AnyUnrealWorkerOrClient)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData>(SingleClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData>(MultiClientData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>(MigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData>(SingleClientSGGameStateData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData>(MultiClientSGGameStateData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>(SGGameStateMigratableData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateClientRPCs>(improbable::unreal::generated::sggamestate::SGGameStateClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateServerRPCs>(improbable::unreal::generated::sggamestate::SGGameStateServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateNetMulticastRPCs>(improbable::unreal::generated::sggamestate::SGGameStateNetMulticastRPCs::Data{}, WorkersOnly)
@@ -241,7 +247,7 @@ void USpatialTypeBinding_SGGameState::SendRPCCommand(UObject* TargetObject, cons
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
 	if (SenderFuncIterator == nullptr)
 	{
-		UE_LOG(LogSpatialOSInterop, Error, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
+		UE_LOG(LogSpatialGDKInterop, Error, TEXT("Sender for %s has not been registered with RPCToSenderMap."), *Function->GetFName().ToString());
 		return;
 	}
 	checkf(*SenderFuncIterator, TEXT("Sender for %s has been registered as null."), *Function->GetFName().ToString());
@@ -255,18 +261,21 @@ void USpatialTypeBinding_SGGameState::ReceiveAddComponent(USpatialActorChannel* 
 	{
 		auto Update = improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
 		ReceiveUpdate_SingleClient(Channel, Update);
+		return;
 	}
 	auto* MultiClientAddOp = Cast<USGGameStateMultiClientRepDataAddComponentOp>(AddComponentOp);
 	if (MultiClientAddOp)
 	{
 		auto Update = improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
 		ReceiveUpdate_MultiClient(Channel, Update);
+		return;
 	}
 	auto* MigratableDataAddOp = Cast<USGGameStateMigratableDataAddComponentOp>(AddComponentOp);
 	if (MigratableDataAddOp)
 	{
 		auto Update = improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
 		ReceiveUpdate_Migratable(Channel, Update);
+		return;
 	}
 }
 
@@ -306,7 +315,7 @@ void USpatialTypeBinding_SGGameState::BuildSpatialComponentUpdate(
 			const FRepLayoutCmd& Cmd = Changes.RepCmds[HandleIterator.CmdIndex];
 			const FRepHandleData& PropertyMapData = RepPropertyMap[HandleIterator.Handle];
 			const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData) + HandleIterator.ArrayOffset;
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*Channel->Actor->GetName(),
 				Channel->GetEntityId().ToSpatialEntityId(),
@@ -338,7 +347,7 @@ void USpatialTypeBinding_SGGameState::BuildSpatialComponentUpdate(
 	{
 		const FMigratableHandleData& PropertyMapData = MigPropertyMap[ChangedHandle];
 		const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData);
-		UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*Channel->Actor->GetName(),
 			Channel->GetEntityId().ToSpatialEntityId(),
@@ -622,11 +631,89 @@ void USpatialTypeBinding_SGGameState::ServerSendUpdate_MultiClient(const uint8* 
 			}
 			break;
 		}
-		case 16: // field_teamscores0
+		case 16: // field_gamemodeclass0
+		{
+			UClass* Value = *(reinterpret_cast<UClass* const*>(Data));
+
+			if (Value != nullptr)
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
+				if (!NetGUID.IsValid())
+				{
+					if (Value->IsFullNameStableForNetworking())
+					{
+						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
+					}
+				}
+				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
+				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+				{
+					// A legal static object reference should never be unresolved.
+					check(!Value->IsFullNameStableForNetworking())
+					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 16);
+				}
+				else
+				{
+					OutUpdate.set_field_gamemodeclass0(ObjectRef);
+				}
+			}
+			else
+			{
+				OutUpdate.set_field_gamemodeclass0(SpatialConstants::NULL_OBJECT_REF);
+			}
+			break;
+		}
+		case 17: // field_spectatorclass0
+		{
+			UClass* Value = *(reinterpret_cast<UClass* const*>(Data));
+
+			if (Value != nullptr)
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
+				if (!NetGUID.IsValid())
+				{
+					if (Value->IsFullNameStableForNetworking())
+					{
+						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
+					}
+				}
+				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
+				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+				{
+					// A legal static object reference should never be unresolved.
+					check(!Value->IsFullNameStableForNetworking())
+					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 17);
+				}
+				else
+				{
+					OutUpdate.set_field_spectatorclass0(ObjectRef);
+				}
+			}
+			else
+			{
+				OutUpdate.set_field_spectatorclass0(SpatialConstants::NULL_OBJECT_REF);
+			}
+			break;
+		}
+		case 18: // field_breplicatedhasbegunplay0
+		{
+			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
+
+			OutUpdate.set_field_breplicatedhasbegunplay0(Value);
+			break;
+		}
+		case 19: // field_replicatedworldtimeseconds0
+		{
+			float Value = *(reinterpret_cast<float const*>(Data));
+
+			OutUpdate.set_field_replicatedworldtimeseconds0(Value);
+			break;
+		}
+		case 20: // field_teamscores0
 		{
 			const TArray<FTeamScore>& Value = *(reinterpret_cast<TArray<FTeamScore> const*>(Data));
 
-			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 16);
+			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 20);
 			TSet<const UObject*> UnresolvedObjects;
 			::worker::List<std::string> List;
 			for(int i = 0; i < Value.Num(); i++)
@@ -643,7 +730,7 @@ void USpatialTypeBinding_SGGameState::ServerSendUpdate_MultiClient(const uint8* 
 			}
 			else
 			{
-				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 16);
+				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 20);
 			}
 			break;
 		}
@@ -659,14 +746,16 @@ void USpatialTypeBinding_SGGameState::ServerSendUpdate_Migratable(const uint8* R
 
 void USpatialTypeBinding_SGGameState::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update& Update) const
 {
-	Interop->PreReceiveSpatialUpdate(ActorChannel);
+	AActor* TargetObject = ActorChannel->Actor;
+	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
 	TArray<UProperty*> RepNotifies;
-	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies);
+	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies);
 }
 
 void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update& Update) const
 {
-	Interop->PreReceiveSpatialUpdate(ActorChannel);
+	AActor* TargetObject = ActorChannel->Actor;
+	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
@@ -681,14 +770,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_bhidden0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -703,14 +792,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_breplicatemovement0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -725,14 +814,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_btearoff0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -747,14 +836,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
 
 			Value = (*Update.field_bcanbedamaged0().data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -776,7 +865,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
 			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_remoterole0().data())));
@@ -788,9 +877,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				Value = ROLE_SimulatedProxy;
 			}
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -805,7 +894,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FRepMovement Value = *(reinterpret_cast<FRepMovement const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_replicatedmovement0().data());
@@ -816,9 +905,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FRepMovement failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -834,7 +923,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachparent0().data());
@@ -855,7 +944,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -871,9 +960,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -889,7 +978,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_locationoffset0().data());
@@ -900,9 +989,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -917,7 +1006,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FVector_NetQuantize100 Value = *(reinterpret_cast<FVector_NetQuantize100 const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_relativescale3d0().data());
@@ -928,9 +1017,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FVector_NetQuantize100 failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -945,7 +1034,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FRotator Value = *(reinterpret_cast<FRotator const*>(PropertyData));
 
 			auto& ValueDataStr = (*Update.field_attachmentreplication0_rotationoffset0().data());
@@ -956,9 +1045,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
 			checkf(bSuccess, TEXT("NetSerialize on FRotator failed."));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -973,14 +1062,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			FName Value = *(reinterpret_cast<FName const*>(PropertyData));
 
 			Value = FName(((*Update.field_attachmentreplication0_attachsocket0().data())).data());
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -996,7 +1085,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			USceneComponent* Value = *(reinterpret_cast<USceneComponent* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_attachmentreplication0_attachcomponent0().data());
@@ -1017,7 +1106,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1033,9 +1122,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1052,7 +1141,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_owner0().data());
@@ -1073,7 +1162,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1089,9 +1178,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1114,14 +1203,14 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				RepData = &HandleToPropertyMap[Handle];
 			}
 
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			TEnumAsByte<ENetRole> Value = *(reinterpret_cast<TEnumAsByte<ENetRole> const*>(PropertyData));
 
 			Value = TEnumAsByte<ENetRole>(uint8((*Update.field_role0().data())));
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1137,7 +1226,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
 			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			APawn* Value = *(reinterpret_cast<APawn* const*>(PropertyData));
 
 			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_instigator0().data());
@@ -1158,7 +1247,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				}
 				else
 				{
-					UE_LOG(LogSpatialOSInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
 						*Interop->GetSpatialOS()->GetWorkerId(),
 						*ObjectRefToString(ObjectRef),
 						*ActorChannel->Actor->GetName(),
@@ -1174,9 +1263,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 
 			if (bWriteObjectProperty)
 			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-				UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 					*Interop->GetSpatialOS()->GetWorkerId(),
 					*ActorChannel->Actor->GetName(),
 					ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1185,14 +1274,170 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 			}
 		}
 	}
-	if (!Update.field_teamscores0().empty())
+	if (!Update.field_gamemodeclass0().empty())
 	{
-		// field_teamscores0
+		// field_gamemodeclass0
 		uint16 Handle = 16;
 		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
 		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
 		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+			bool bWriteObjectProperty = true;
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
+			UClass* Value = *(reinterpret_cast<UClass* const*>(PropertyData));
+
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_gamemodeclass0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+			{
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
+				{
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<UClass>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<UClass>(Object_Raw);
+				}
+				else
+				{
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+				}
+			}
+
+			if (bWriteObjectProperty)
+			{
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
+
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+					*Interop->GetSpatialOS()->GetWorkerId(),
+					*ActorChannel->Actor->GetName(),
+					ActorChannel->GetEntityId().ToSpatialEntityId(),
+					*RepData->Property->GetName(),
+					Handle);
+			}
+		}
+	}
+	if (!Update.field_spectatorclass0().empty())
+	{
+		// field_spectatorclass0
+		uint16 Handle = 17;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			bool bWriteObjectProperty = true;
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
+			UClass* Value = *(reinterpret_cast<UClass* const*>(PropertyData));
+
+			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_spectatorclass0().data());
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+			{
+				Value = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
+				{
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<UClass>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Value = Cast<UClass>(Object_Raw);
+				}
+				else
+				{
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef),
+						*ActorChannel->Actor->GetName(),
+						ActorChannel->GetEntityId().ToSpatialEntityId(),
+						*RepData->Property->GetName(),
+						Handle);
+					// A legal static object reference should never be unresolved.
+					check(ObjectRef.path().empty());
+					bWriteObjectProperty = false;
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+				}
+			}
+
+			if (bWriteObjectProperty)
+			{
+				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
+
+				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+					*Interop->GetSpatialOS()->GetWorkerId(),
+					*ActorChannel->Actor->GetName(),
+					ActorChannel->GetEntityId().ToSpatialEntityId(),
+					*RepData->Property->GetName(),
+					Handle);
+			}
+		}
+	}
+	if (!Update.field_breplicatedhasbegunplay0().empty())
+	{
+		// field_breplicatedhasbegunplay0
+		uint16 Handle = 18;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
+			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
+
+			Value = (*Update.field_breplicatedhasbegunplay0().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
+	if (!Update.field_replicatedworldtimeseconds0().empty())
+	{
+		// field_replicatedworldtimeseconds0
+		uint16 Handle = 19;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
+			float Value = *(reinterpret_cast<float const*>(PropertyData));
+
+			Value = (*Update.field_replicatedworldtimeseconds0().data());
+
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
+
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ActorChannel->Actor->GetName(),
+				ActorChannel->GetEntityId().ToSpatialEntityId(),
+				*RepData->Property->GetName(),
+				Handle);
+		}
+	}
+	if (!Update.field_teamscores0().empty())
+	{
+		// field_teamscores0
+		uint16 Handle = 20;
+		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
+		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
+		{
+			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
 			TArray<FTeamScore> Value = *(reinterpret_cast<TArray<FTeamScore> *>(PropertyData));
 
 			auto& List = (*Update.field_teamscores0().data());
@@ -1206,9 +1451,9 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				FTeamScore::StaticStruct()->SerializeBin(ValueDataReader, reinterpret_cast<void*>(&Value[i]));
 			}
 
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, ActorChannel->Actor, static_cast<const void*>(&Value), RepNotifies);
+			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
 
-			UE_LOG(LogSpatialOSInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
+			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
 				*Interop->GetSpatialOS()->GetWorkerId(),
 				*ActorChannel->Actor->GetName(),
 				ActorChannel->GetEntityId().ToSpatialEntityId(),
@@ -1216,7 +1461,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 				Handle);
 		}
 	}
-	Interop->PostReceiveSpatialUpdate(ActorChannel, RepNotifies.Array());
+	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
 void USpatialTypeBinding_SGGameState::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& Update) const

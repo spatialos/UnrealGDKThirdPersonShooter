@@ -24,7 +24,11 @@ component SGGameStateMultiClientRepData {
 	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
 	uint32 field_role0 = 14; // COND_None // ::Actor
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
-	list<bytes> field_teamscores0 = 16; // COND_None // ::SGGameState
+	UnrealObjectRef field_gamemodeclass0 = 16; // COND_InitialOnly // ::GameStateBase
+	UnrealObjectRef field_spectatorclass0 = 17; // COND_None // ::GameStateBase
+	bool field_breplicatedhasbegunplay0 = 18; // COND_None // ::GameStateBase
+	float field_replicatedworldtimeseconds0 = 19; // COND_None // ::GameStateBase
+	list<bytes> field_teamscores0 = 20; // COND_None // ::SGGameState
 }
 component SGGameStateMigratableData {
 	id = 100012;

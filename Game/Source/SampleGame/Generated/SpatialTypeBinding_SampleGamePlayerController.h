@@ -33,6 +33,16 @@ public:
 	void ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const override;
 	worker::Map<worker::ComponentId, worker::InterestOverride> GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const override;
 
+	void BuildSpatialComponentUpdate(
+		const FPropertyChangeState& Changes,
+		USpatialActorChannel* Channel,
+		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update& SingleClientUpdate,
+		bool& bSingleClientUpdateChanged,
+		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update& MultiClientUpdate,
+		bool& bMultiClientUpdateChanged,
+		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update& MigratableDataUpdate,
+		bool& bMigratableDataUpdateChanged) const;
+
 private:
 	improbable::unreal::callbacks::FScopedViewCallbacks ViewCallbacks;
 
@@ -43,16 +53,6 @@ private:
 	FRepHandlePropertyMap RepHandleToPropertyMap;
 	FMigratableHandlePropertyMap MigratableHandleToPropertyMap;
 
-	// Component update helper functions.
-	void BuildSpatialComponentUpdate(
-		const FPropertyChangeState& Changes,
-		USpatialActorChannel* Channel,
-		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update& SingleClientUpdate,
-		bool& bSingleClientUpdateChanged,
-		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update& MultiClientUpdate,
-		bool& bMultiClientUpdateChanged,
-		improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update& MigratableDataUpdate,
-		bool& bMigratableDataUpdateChanged) const;
 	void ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerSingleClientRepData::Update& OutUpdate) const;
 	void ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMultiClientRepData::Update& OutUpdate) const;
 	void ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::samplegameplayercontroller::SampleGamePlayerControllerMigratableData::Update& OutUpdate) const;

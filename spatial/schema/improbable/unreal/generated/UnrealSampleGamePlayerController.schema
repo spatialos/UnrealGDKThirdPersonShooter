@@ -28,7 +28,6 @@ component SampleGamePlayerControllerMultiClientRepData {
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
 	UnrealObjectRef field_playerstate0 = 16; // COND_None // ::Controller
 	UnrealObjectRef field_pawn0 = 17; // COND_None // ::Controller
-	UnrealObjectRef field_customgamestate0 = 18; // COND_None // ::SampleGamePlayerController
 }
 component SampleGamePlayerControllerMigratableData {
 	id = 100024;
