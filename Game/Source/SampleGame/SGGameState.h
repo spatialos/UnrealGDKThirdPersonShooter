@@ -28,7 +28,7 @@ public:
 
 	// TODO: this needs to be a reliable worker-to-worker RPC
 	// Adds a kill to the game's score data.
-	void AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, FString& Victim);
+	void AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, const FString& Victim);
 
 	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);

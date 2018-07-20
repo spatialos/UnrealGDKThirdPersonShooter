@@ -42,7 +42,7 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 	}
 }
 
-void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, FString& Victim)
+void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, const FString& Victim)
 {
 	if (KillerTeam == ESampleGameTeam::Team_None || KillerTeam >= ESampleGameTeam::Team_MAX)
 	{

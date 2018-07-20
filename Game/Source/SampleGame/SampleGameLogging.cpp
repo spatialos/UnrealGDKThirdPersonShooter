@@ -11,15 +11,15 @@
 
 DEFINE_LOG_CATEGORY(LogSampleGame);
 
-FString SampleGameLogging::LogPrefix(AActor* Actor, UNetDriver* NetDriver)
+FString SampleGameLogging::LogPrefix(AActor* Actor)
 {
 	FString WorkerId("UNKNOWN");
 	int32 EntityId = -1;
-	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(NetDriver))
+	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(Actor->GetNetDriver()))
 	{
 		WorkerId = SpatialNetDriver->GetSpatialOS()->GetWorkerId();
 		EntityId = SpatialNetDriver->GetEntityRegistry()->GetEntityIdFromActor(Actor).ToSpatialEntityId();
 	}
 
-	return FString::Printf(TEXT("%s (%d)"), *WorkerId, EntityId);
+	return FString::Printf(TEXT("%s %s (%d)"), *WorkerId, *Actor->GetName(), EntityId);
 }

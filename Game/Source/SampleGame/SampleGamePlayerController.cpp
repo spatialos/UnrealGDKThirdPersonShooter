@@ -225,7 +225,7 @@ void ASampleGamePlayerController::InitScoreboard()
 	else
 	{
 		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to initialize scoreboard because GameState didn't exist"),
-			*SampleGameLogging::LogPrefix(this, GetNetDriver()));
+			*SampleGameLogging::LogPrefix(this));
 	}
 }
 
@@ -331,14 +331,14 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 		RespawnCharacter();
 
 		// Add the player to the game's scoreboard.
-		if (ASGGameState* GS = GetWorld()->GetGameState<ASGGameState>())
+		if (ASampleGameGameMode* GM = GetWorld()->GetAuthGameMode<ASampleGameGameMode>())
 		{
-			GS->AddPlayer(NewPlayerTeam, NewPlayerName);
+			GM->NotifyPlayerJoined(NewPlayerName, NewPlayerTeam);
 		}
 		else
 		{
-			UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
-				*SampleGameLogging::LogPrefix(this, GetNetDriver()));
+			UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player because GameMode didn't exist"),
+				*SampleGameLogging::LogPrefix(this));
 		}
 	}
 

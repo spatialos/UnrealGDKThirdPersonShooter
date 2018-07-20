@@ -27,7 +27,7 @@ public:
 	// or calls ChoosePlayerStart to select a startactor matching Player's team affiliation.
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
 
-	// TODO: mark this as a W2W RPC?
-	void NotifyPlayerKilled(FString PlayerName, ESampleGameTeam PlayerTeam, FString KillerName, ESampleGameTeam KillerTeam);
+	void NotifyPlayerJoined(const FString& PlayerName, ESampleGameTeam PlayerTeam);
+	void NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam);
 
 };

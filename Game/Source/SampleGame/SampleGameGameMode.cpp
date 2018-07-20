@@ -150,10 +150,23 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 	return Super::FindPlayerStart_Implementation(Player, IncomingName);
 }
 
-void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, ESampleGameTeam PlayerTeam, FString KillerName, ESampleGameTeam KillerTeam)
+void ASampleGameGameMode::NotifyPlayerJoined(const FString& PlayerName, ESampleGameTeam PlayerTeam)
+{
+	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
+	{
+		GS->AddPlayer(PlayerTeam, PlayerName);
+	}
+}
+
+void ASampleGameGameMode::NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam)
 {
 	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
 	{
 		GS->AddKill(KillerTeam, KillerName, PlayerTeam, PlayerName);
+	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this));
 	}
 }
