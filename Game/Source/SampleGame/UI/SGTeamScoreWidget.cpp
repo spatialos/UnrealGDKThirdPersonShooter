@@ -2,7 +2,9 @@
 
 #include "SGTeamScoreWidget.h"
 
+#include "Components/Image.h"
 #include "Components/TextBlock.h"
+#include "Engine/Texture2D.h"
 #include "Teams/SampleGameTeams.h"
 
 
@@ -16,9 +18,15 @@ USGTeamScoreWidget::USGTeamScoreWidget(const FObjectInitializer& ObjectInitializ
 void USGTeamScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 {
 	Team = NewTeam;
+
 	if (TeamNameText)
 	{
 		TeamNameText->SetText(FText::FromString(SampleGameTeamName(Team)));
+	}
+
+	if (TeamLogo && TeamLogos.Contains(NewTeam))
+	{
+		TeamLogo->SetBrushFromTexture(TeamLogos[NewTeam]);
 	}
 }
 

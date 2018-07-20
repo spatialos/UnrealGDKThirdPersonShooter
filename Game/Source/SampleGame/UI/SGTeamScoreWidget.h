@@ -33,5 +33,11 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TeamKillsText;
+
+	UPROPERTY(meta = (BindWidget))
+	class UImage* TeamLogo;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Teams")
+	TMap<ESampleGameTeam, class UTexture2D*> TeamLogos;
 	
 };
