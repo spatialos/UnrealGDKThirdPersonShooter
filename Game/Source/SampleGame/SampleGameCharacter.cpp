@@ -11,11 +11,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
-#include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
 #include "SampleGamePlayerState.h"
 #include "SGCharacterMovementComponent.h"
+#include "SGGameState.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
 #include "Weapons/InstantWeapon.h"
@@ -33,9 +33,9 @@ ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectIniti
 	UWorld* World = GetWorld();
 	if (World && World->GetGameState() == nullptr)
 	{
-		AGameStateBase* GameState = World->SpawnActor<AGameStateBase>(ASampleGameGameStateBase::StaticClass());
+		AGameStateBase* GameState = World->SpawnActor<AGameStateBase>(ASGGameState::StaticClass());
 		World->SetGameState(GameState);
-		Cast<ASampleGameGameStateBase>(GameState)->FakeServerHasBegunPlay();
+		Cast<ASGGameState>(GameState)->FakeServerHasBegunPlay();
 	}
 
 	// Set size for collision capsule

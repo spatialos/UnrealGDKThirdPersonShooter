@@ -16,7 +16,6 @@
 #include "GameFramework/Controller.h"
 #include "SampleGameCharacter.h"
 #include "SpatialNetDriver.h"
-#include "SampleGameGameStateBase.h"
 
 const FName AVehicleCppPawn::LookUpBinding("LookUp");
 const FName AVehicleCppPawn::LookRightBinding("LookRight");

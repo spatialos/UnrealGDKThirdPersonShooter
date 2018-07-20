@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GameFramework/GameStateBase.h"
 #include "Teams/SampleGameTeams.h"
 #include "Teams/SGTeamScores.h"
 #include "SGGameState.generated.h"
@@ -11,14 +12,15 @@
 
 DECLARE_DELEGATE_OneParam(FSGTeamScoresUpdatedDelegate, const TArray<FTeamScore>&);
 
-// TODO: make this a subclass of GameState once its replication is properly handled by the Unreal GDK
 UCLASS()
-class SAMPLEGAME_API ASGGameState : public AActor
+class SAMPLEGAME_API ASGGameState : public AGameStateBase
 {
 	GENERATED_BODY()
 	
 public:	
 	ASGGameState();
+
+	void FakeServerHasBegunPlay();
 
 	// TODO: this needs to be a reliable worker-to-worker RPC
 	// Adds a player to the game's score data with empty stats.

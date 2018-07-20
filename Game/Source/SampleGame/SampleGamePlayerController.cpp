@@ -154,13 +154,6 @@ void ASampleGamePlayerController::SetupInputComponent()
 	InputComponent->BindAction("ShowScoreboard", IE_Released, this, &ASampleGamePlayerController::HideScoreboard);
 }
 
-void ASampleGamePlayerController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(ASampleGamePlayerController, CustomGameState);
-}
-
 void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 {
 	// Lazy instantiate the Login UI
@@ -223,9 +216,17 @@ void ASampleGamePlayerController::InitScoreboard()
 		return;
 	}
 
-	FSGTeamScoresUpdatedDelegate UpdateScoreboardCallback;
-	UpdateScoreboardCallback.BindUObject(Scoreboard, &USampleGameScoreboard::UpdateTeamScores);
-	CustomGameState->RegisterScoreChangeListener(UpdateScoreboardCallback);
+	if (ASGGameState* GS = GetWorld()->GetGameState<ASGGameState>())
+	{
+		FSGTeamScoresUpdatedDelegate UpdateScoreboardCallback;
+		UpdateScoreboardCallback.BindUObject(Scoreboard, &USampleGameScoreboard::UpdateTeamScores);
+		GS->RegisterScoreChangeListener(UpdateScoreboardCallback);
+	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to initialize scoreboard because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this, GetNetDriver()));
+	}
 }
 
 void ASampleGamePlayerController::ShowScoreboard()
@@ -330,7 +331,15 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 		RespawnCharacter();
 
 		// Add the player to the game's scoreboard.
-		CustomGameState->AddPlayer(NewPlayerTeam, NewPlayerName);
+		if (ASGGameState* GS = GetWorld()->GetGameState<ASGGameState>())
+		{
+			GS->AddPlayer(NewPlayerTeam, NewPlayerName);
+		}
+		else
+		{
+			UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+				*SampleGameLogging::LogPrefix(this, GetNetDriver()));
+		}
 	}
 
 }
@@ -399,14 +408,5 @@ void ASampleGamePlayerController::Tick(float DeltaSeconds)
 	{
 		bHasShownLoginHud = true;
 		SetLoginUIVisible(true);
-	}
-
-	// TODO: remove this
-	if (CustomGameState == nullptr && HasAuthority())
-	{
-		if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			CustomGameState = GM->GetCustomGameState();
-		}
 	}
 }

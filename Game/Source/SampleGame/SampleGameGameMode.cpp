@@ -38,8 +38,8 @@ ASampleGameGameMode::ASampleGameGameMode()
 		UE_LOG(LogSampleGame, Error, TEXT("[SampleGameGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
 	}
 
-	// Use our custom PlayerState child for additional game-specific player data
 	PlayerStateClass = ASampleGamePlayerState::StaticClass();
+	GameStateClass = ASGGameState::StaticClass();
 
 	// Start in Spectator Mode - The PlayerController will spawn the Characters after login, instead of on connect
 	bStartPlayersAsSpectators = true;
@@ -152,16 +152,8 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 
 void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, ESampleGameTeam PlayerTeam, FString KillerName, ESampleGameTeam KillerTeam)
 {
-	if (CustomGameState)
+	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
 	{
-		CustomGameState->AddKill(KillerTeam, KillerName, PlayerTeam, PlayerName);
-	}
-}
-
-void ASampleGameGameMode::BeginPlay()
-{
-	if (HasAuthority())
-	{
-		CustomGameState = GetWorld()->SpawnActor<ASGGameState>(FVector::ZeroVector, FRotator::ZeroRotator);
+		GS->AddKill(KillerTeam, KillerName, PlayerTeam, PlayerName);
 	}
 }

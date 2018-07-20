@@ -55,7 +55,6 @@ public:
 
 protected:
 	virtual void SetupInputComponent() override;
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty> & OutLifetimeProps) const;
 
 private:
 	// [client] Informs the invoking client whether the join request suceeded or failed
@@ -112,10 +111,6 @@ private:
 	// Time for which to keep the character's body around before deleting it.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
 	float DeleteCharacterDelay;
-
-	// TODO: remove this
-	UPROPERTY(Replicated)
-	class ASGGameState* CustomGameState;
 
 	// Pawn to be deleted when the DeletePawn timer expires.
 	class APawn* PawnToDelete;
