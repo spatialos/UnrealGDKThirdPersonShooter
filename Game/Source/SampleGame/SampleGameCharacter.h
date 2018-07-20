@@ -66,6 +66,7 @@ public:
 	// Returns the direction in which to perform a line trace so it lines up with the center of the crosshair.
 	FVector GetLineTraceDirection() const;
 
+	// Returns the player's name, as specified on login.
 	FString GetPlayerName() const;
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;

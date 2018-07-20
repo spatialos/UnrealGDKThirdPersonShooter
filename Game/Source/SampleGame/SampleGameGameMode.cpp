@@ -156,17 +156,22 @@ void ASampleGameGameMode::NotifyPlayerJoined(const FString& PlayerName, ESampleG
 	{
 		GS->AddPlayer(PlayerTeam, PlayerName);
 	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this));
+	}
 }
 
 void ASampleGameGameMode::NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam)
 {
 	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
 	{
-		GS->AddKill(KillerTeam, KillerName, PlayerTeam, PlayerName);
+		GS->AddKill(KillerName, KillerTeam, PlayerName, PlayerTeam);
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to register kill because GameState didn't exist"),
 			*SampleGameLogging::LogPrefix(this));
 	}
 }

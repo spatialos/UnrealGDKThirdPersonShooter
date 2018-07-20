@@ -90,12 +90,10 @@ void ASampleGamePlayerController::KillCharacter(const ASampleGameCharacter* Kill
 
 	if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
 	{
-		FString MyName;
 		if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
 		{
-			MyName = PS->GetPlayerName();
+			GM->NotifyPlayerKilled(PS->GetPlayerName(), MyTeam, KillerName, KillerTeam);
 		}
-		GM->NotifyPlayerKilled(MyName, MyTeam, KillerName, KillerTeam);
 	}
 
 	PawnToDelete = GetPawn();
@@ -212,12 +210,13 @@ void ASampleGamePlayerController::InitScoreboard()
 
 	if (Scoreboard == nullptr)
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("Failed to create scoreboard widget for %s"), *this->GetName());
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to create scoreboard widget"), *SampleGameLogging::LogPrefix(this));
 		return;
 	}
 
 	if (ASGGameState* GS = GetWorld()->GetGameState<ASGGameState>())
 	{
+		// Register a listener between the GameState's score list and the scoreboard's update function.
 		FSGTeamScoresUpdatedDelegate UpdateScoreboardCallback;
 		UpdateScoreboardCallback.BindUObject(Scoreboard, &USampleGameScoreboard::UpdateTeamScores);
 		GS->RegisterScoreChangeListener(UpdateScoreboardCallback);

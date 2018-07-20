@@ -22,13 +22,11 @@ public:
 
 	void FakeServerHasBegunPlay();
 
-	// TODO: this needs to be a reliable worker-to-worker RPC
 	// Adds a player to the game's score data with empty stats.
 	void AddPlayer(ESampleGameTeam Team, const FString& Player);
 
-	// TODO: this needs to be a reliable worker-to-worker RPC
 	// Adds a kill to the game's score data.
-	void AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, const FString& Victim);
+	void AddKill(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam);
 
 	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);

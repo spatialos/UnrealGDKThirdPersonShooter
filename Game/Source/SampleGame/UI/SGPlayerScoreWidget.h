@@ -7,9 +7,7 @@
 #include "Teams/SGTeamScores.h"
 #include "SGPlayerScoreWidget.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SAMPLEGAME_API USGPlayerScoreWidget : public UUserWidget
 {

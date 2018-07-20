@@ -73,7 +73,10 @@ private:
 	// [client] Initializes the scoreboard UI.
 	void InitScoreboard();
 
+	// [client] Shows the scoreboard UI.
 	void ShowScoreboard();
+
+	// [client] Hides the scoreboard UI.
 	void HideScoreboard();
 
 	// If true, action input should be ignored.

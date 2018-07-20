@@ -28,6 +28,7 @@ public:
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
 
 	void NotifyPlayerJoined(const FString& PlayerName, ESampleGameTeam PlayerTeam);
+
 	void NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam);
 
 };

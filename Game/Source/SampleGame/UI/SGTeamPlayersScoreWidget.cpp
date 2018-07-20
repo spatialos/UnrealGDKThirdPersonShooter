@@ -9,18 +9,11 @@
 #include "UI/SGPlayerScoreWidget.h"
 
 
-USGTeamPlayersScoreWidget::USGTeamPlayersScoreWidget(const FObjectInitializer& ObjectInitializer)
-	: UUserWidget(ObjectInitializer)
-	, Team(ESampleGameTeam::Team_None)
-{
-}
-
 void USGTeamPlayersScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 {
-	Team = NewTeam;
 	if (TeamNameText)
 	{
-		TeamNameText->SetText(FText::FromString(SampleGameTeamName(Team)));
+		TeamNameText->SetText(FText::FromString(SampleGameTeamName(NewTeam)));
 	}
 }
 

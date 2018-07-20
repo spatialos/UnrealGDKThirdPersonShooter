@@ -8,24 +8,17 @@
 #include "Teams/SGTeamScores.h"
 #include "SGTeamPlayersScoreWidget.generated.h"
 
-/**
- * 
- */
+
 UCLASS()
 class SAMPLEGAME_API USGTeamPlayersScoreWidget : public UUserWidget
 {
 	GENERATED_BODY()
 	
 public:
-	USGTeamPlayersScoreWidget(const FObjectInitializer& ObjectInitializer);
-
 	void SetTeam(ESampleGameTeam NewTeam);
 	void SetPlayerScores(const TArray<FPlayerScore>& PlayerScores);
 	
 private:
-	UPROPERTY(VisibleAnywhere, Category = "Score")
-	ESampleGameTeam Team;
-
 	UPROPERTY(meta = (BindWidget))
 	class UTextBlock* TeamNameText;
 

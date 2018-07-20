@@ -8,20 +8,11 @@
 #include "Teams/SampleGameTeams.h"
 
 
-USGTeamScoreWidget::USGTeamScoreWidget(const FObjectInitializer& ObjectInitializer)
-	: UUserWidget(ObjectInitializer)
-	, Team(ESampleGameTeam::Team_None)
-	, Kills(0)
-{
-}
-
 void USGTeamScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 {
-	Team = NewTeam;
-
 	if (TeamNameText)
 	{
-		TeamNameText->SetText(FText::FromString(SampleGameTeamName(Team)));
+		TeamNameText->SetText(FText::FromString(SampleGameTeamName(NewTeam)));
 	}
 
 	if (TeamLogo && TeamLogos.Contains(NewTeam))
@@ -32,9 +23,8 @@ void USGTeamScoreWidget::SetTeam(ESampleGameTeam NewTeam)
 
 void USGTeamScoreWidget::SetKills(int32 NewKills)
 {
-	Kills = NewKills;
 	if (TeamKillsText)
 	{
-		TeamKillsText->SetText(FText::AsNumber(Kills));
+		TeamKillsText->SetText(FText::AsNumber(NewKills));
 	}
 }

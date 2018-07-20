@@ -7,13 +7,9 @@
 #include "UnrealNetwork.h"
 
 
-// Sets default values
 ASGGameState::ASGGameState()
 {
 	PrimaryActorTick.bCanEverTick = false;
-
-	// TODO: not sure if we'll need this once we use AGameStateBase as a parent
-	SetReplicates(true);
 }
 
 void ASGGameState::FakeServerHasBegunPlay()
@@ -42,27 +38,33 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 	}
 }
 
-void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, const FString& Victim)
+void ASGGameState::AddKill(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam)
 {
+	if (VictimTeam == ESampleGameTeam::Team_None || VictimTeam >= ESampleGameTeam::Team_MAX)
+	{
+		// Ignore invalid teams.
+		return;
+	}
+
+	FName VictimKey(*VictimName);
+	if (!PlayerScores.Contains(VictimKey))
+	{
+		AddPlayerImpl(VictimTeam, VictimName);
+	}
+	++PlayerScores[VictimKey]->Deaths;
+
 	if (KillerTeam == ESampleGameTeam::Team_None || KillerTeam >= ESampleGameTeam::Team_MAX)
 	{
 		// Ignore invalid teams.
 		return;
 	}
 
-	FName KillerKey(*Killer);
+	FName KillerKey(*KillerName);
 	if (!PlayerScores.Contains(KillerKey))
 	{
-		AddPlayerImpl(KillerTeam, Killer);
+		AddPlayerImpl(KillerTeam, KillerName);
 	}
 	++PlayerScores[KillerKey]->Kills;
-
-	FName VictimKey(*Victim);
-	if (!PlayerScores.Contains(VictimKey))
-	{
-		AddPlayerImpl(VictimTeam, Victim);
-	}
-	++PlayerScores[VictimKey]->Deaths;
 
 	if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
 	{
@@ -137,7 +139,7 @@ void ASGGameState::AddPlayerImpl(ESampleGameTeam Team, const FString& Player)
 	FTeamScore* TeamScore = GetScoreForTeam(Team);
 	if (TeamScore == nullptr)
 	{
-		UE_LOG(LogSampleGame, Warning, TEXT("[GameState] Tried to add a player (%s) to the score list with an invalid team (%d)"),
+		UE_LOG(LogSampleGame, Error, TEXT("[GameState] Tried to add a player (%s) to the score list with an invalid team (%d)"),
 			*Player, static_cast<uint8>(Team));
 		return;
 	}

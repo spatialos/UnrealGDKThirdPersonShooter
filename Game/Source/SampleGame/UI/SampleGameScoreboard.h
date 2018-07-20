@@ -8,6 +8,7 @@
 #include "Teams/SGTeamScores.h"
 #include "SampleGameScoreboard.generated.h"
 
+
 UCLASS()
 class SAMPLEGAME_API USampleGameScoreboard : public UUserWidget
 {
