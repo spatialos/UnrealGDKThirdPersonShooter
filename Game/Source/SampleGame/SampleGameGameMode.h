@@ -28,7 +28,7 @@ public:
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
 
 	// TODO: mark this as a W2W RPC
-	void NotifyPlayerKilled(FString PlayerName, FString KillerName, ESampleGameTeam KillerTeam);
+	void NotifyPlayerKilled(FString PlayerName, ESampleGameTeam PlayerTeam, FString KillerName, ESampleGameTeam KillerTeam);
 
 	// TODO: remove this
 	class ASGGameState* GetCustomGameState()

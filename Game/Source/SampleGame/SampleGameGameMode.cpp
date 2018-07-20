@@ -150,11 +150,11 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 	return Super::FindPlayerStart_Implementation(Player, IncomingName);
 }
 
-void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, FString KillerName, ESampleGameTeam KillerTeam)
+void ASampleGameGameMode::NotifyPlayerKilled(FString PlayerName, ESampleGameTeam PlayerTeam, FString KillerName, ESampleGameTeam KillerTeam)
 {
 	if (CustomGameState)
 	{
-		CustomGameState->AddKill(KillerTeam, KillerName, PlayerName);
+		CustomGameState->AddKill(KillerTeam, KillerName, PlayerTeam, PlayerName);
 	}
 }
 

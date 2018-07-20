@@ -20,11 +20,6 @@ struct FPlayerScore {
 	int32 Deaths;
 };
 
-inline bool operator<(const FPlayerScore& lhs, const FPlayerScore& rhs)
-{
-	return lhs.Kills < rhs.Kills;
-}
-
 USTRUCT()
 struct FTeamScore {
 	GENERATED_BODY()
@@ -38,8 +33,3 @@ struct FTeamScore {
 	UPROPERTY()
 	TArray<FPlayerScore> TopPlayers;
 };
-
-inline bool operator<(const FTeamScore& lhs, const FTeamScore& rhs)
-{
-	return lhs.TeamKills < rhs.TeamKills;
-}

@@ -23,7 +23,7 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 
 		if (!TeamScoreWidgets.Contains(TeamScore.Team))
 		{
-			// TODO: validate all necessary pointers used below
+			check(TeamScoreWidgetTemplate);
 
 			USGTeamScoreWidget* NewWidget = CreateWidget<USGTeamScoreWidget>(GetOwningPlayer(), TeamScoreWidgetTemplate);
 			NewWidget->SetTeam(TeamScore.Team);
@@ -36,7 +36,7 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 
 		if (!PlayersScoreWidgets.Contains(TeamScore.Team))
 		{
-			// TODO: validate all necessary pointers used below
+			check(PlayersScoreWidgetTemplate);
 
 			USGTeamPlayersScoreWidget* NewWidget = CreateWidget<USGTeamPlayersScoreWidget>(GetOwningPlayer(), PlayersScoreWidgetTemplate);
 			NewWidget->SetTeam(TeamScore.Team);
@@ -47,6 +47,4 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 		TeamPlayersWidget->SetPlayerScores(TeamScore.TopPlayers);
 		PlayerScoresContainerWidget->AddChild(TeamPlayersWidget);
 	}
-
-	// TODO: sort the team score widgets by score in the UI
 }

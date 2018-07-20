@@ -30,7 +30,7 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 	}
 }
 
-void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, const FString& Victim)
+void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, FString& Victim)
 {
 	if (KillerTeam == ESampleGameTeam::Team_None || KillerTeam >= ESampleGameTeam::Team_MAX)
 	{
@@ -41,7 +41,6 @@ void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, co
 	FName KillerKey(*Killer);
 	if (!PlayerScores.Contains(KillerKey))
 	{
-		// TODO: do I need this? Can I just throw an error?
 		AddPlayerImpl(KillerTeam, Killer);
 	}
 	++PlayerScores[KillerKey]->Kills;
@@ -49,8 +48,7 @@ void ASGGameState::AddKill(ESampleGameTeam KillerTeam, const FString& Killer, co
 	FName VictimKey(*Victim);
 	if (!PlayerScores.Contains(VictimKey))
 	{
-		// TODO: do I need this? Can I just throw an error?
-		//AddPlayerImpl(KillerTeam, Killer);
+		AddPlayerImpl(VictimTeam, Victim);
 	}
 	++PlayerScores[VictimKey]->Deaths;
 
@@ -106,20 +104,6 @@ void ASGGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLife
 
 void ASGGameState::OnRep_TeamScores()
 {
-	// TODO: delete or disable debug printing of scores
-	const uint32 TeamMax = static_cast<uint32>(ESampleGameTeam::Team_MAX);
-	for (uint32 i = 0; i < TeamMax; ++i)
-	{
-		UEnum* pEnum = FindObject<UEnum>(ANY_PACKAGE, TEXT("ESampleGameTeam"), true);
-		FString TeamName = pEnum ? pEnum->GetNameStringByIndex(static_cast<uint8>(i)) : "null";
-		int32 Kills = -1;
-		if (FTeamScore* TeamScore = GetScoreForTeam(static_cast<ESampleGameTeam>(i)))
-		{
-			Kills = TeamScore->TeamKills;
-		}
-		UE_LOG(LogTemp, Log, TEXT("%s team score: %d"), *TeamName, Kills);
-	}
-
 	TeamScoresUpdatedCallback.ExecuteIfBound(TeamScores);
 }
 

@@ -25,7 +25,8 @@ public:
 	void AddPlayer(ESampleGameTeam Team, const FString& Player);
 
 	// TODO: this needs to be a reliable worker-to-worker RPC
-	void AddKill(ESampleGameTeam KillerTeam, const FString& Killer, const FString& Victim);
+	// Adds a kill to the game's score data.
+	void AddKill(ESampleGameTeam KillerTeam, const FString& Killer, ESampleGameTeam VictimTeam, FString& Victim);
 
 	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);
@@ -39,11 +40,13 @@ private:
 	UFUNCTION()
 	void OnRep_TeamScores();
 
+	// Retrieves the FTeamScore value for a given team, or nullptr if the team is invalid (or the scores haven't been initialized yet).
 	FTeamScore* GetScoreForTeam(ESampleGameTeam Team);
 
 	// Actually adds the player.
 	void AddPlayerImpl(ESampleGameTeam Team, const FString& Player);
 
+	// List of teams' scores, including top player lists.
 	UPROPERTY(ReplicatedUsing = OnRep_TeamScores)
 	TArray<FTeamScore> TeamScores;
 

@@ -82,12 +82,20 @@ void ASampleGamePlayerController::KillCharacter(const ASampleGameCharacter* Kill
 		KillerTeam = Killer->GetTeam();
 	}
 
+	ESampleGameTeam MyTeam = ESampleGameTeam::Team_None;
+	if (ASampleGameCharacter* Me = Cast<ASampleGameCharacter>(GetCharacter()))
+	{
+		MyTeam = Me->GetTeam();
+	}
+
 	if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
 	{
+		FString MyName;
 		if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
 		{
-			GM->NotifyPlayerKilled(PS->GetPlayerName(), KillerName, KillerTeam);
+			PS->GetPlayerName();
 		}
+		GM->NotifyPlayerKilled(MyName, MyTeam, KillerName, KillerTeam);
 	}
 
 	PawnToDelete = GetPawn();

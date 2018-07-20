@@ -34,7 +34,7 @@ void USGTeamPlayersScoreWidget::SetPlayerScores(const TArray<FPlayerScore>& Play
 		FName PlayerName(*PlayerScore.PlayerName);
 		if (!PlayerScoreWidgets.Contains(PlayerName))
 		{
-			// TODO: validate all things below
+			check(PlayerScoreWidgetTemplate);
 
 			USGPlayerScoreWidget* NewWidget = CreateWidget<USGPlayerScoreWidget>(GetOwningPlayer(), PlayerScoreWidgetTemplate);
 			NewWidget->SetPlayerName(PlayerScore.PlayerName);
@@ -45,6 +45,4 @@ void USGTeamPlayersScoreWidget::SetPlayerScores(const TArray<FPlayerScore>& Play
 		PlayerScoreWidget->SetScores(PlayerScore);
 		PlayerScoresContainer->AddChild(PlayerScoreWidget);
 	}
-
-	// TODO: sort players by kills
 }
