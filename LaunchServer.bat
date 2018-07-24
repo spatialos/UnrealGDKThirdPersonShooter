@@ -1,0 +1,1 @@
+"%UNREAL_HOME%\Engine\Binaries\Win64\UE4Editor.exe" "%~dp0Game\SampleGame.uproject" ThirdPersonExampleMap -server -log -workerType UnrealWorker -stdout -nowrite -unattended -nologtimes -nopause -noin -messaging -SaveToUserDir -NoVerifyGC -windowed -resX=400 -resY=300

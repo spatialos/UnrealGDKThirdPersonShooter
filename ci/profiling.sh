@@ -10,11 +10,3 @@ function markStartOfBlock {
 function markEndOfBlock {
   echo -e "\x23\x23teamcity[blockClosed name='$1']"
 }
-
-function markTestStarted {
-  echo -e "\x23\x23teamcity[testStarted name='$1']"
-}
-
-function markTestFinished {
-  echo -e "\x23\x23teamcity[testFinished name='$1']"
-}
