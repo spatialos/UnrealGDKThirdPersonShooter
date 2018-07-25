@@ -23,15 +23,9 @@ struct FInstantHitInfo
 	UPROPERTY()
 	AActor* HitActor;
 
-	// Used to ensure that the struct gets replicated even if the above properties don't change.
-	// Also used to make sure that only recent shots get visualized.
-	UPROPERTY()
-	FDateTime Timestamp;
-
 	FInstantHitInfo() :
 		Location(FVector{ 0,0,0 }),
-		HitActor(nullptr),
-		Timestamp(0)
+		HitActor(nullptr)
 	{}
 };
 
@@ -70,8 +64,6 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-
 	// [client] Runs a line trace and triggers the server RPC for hits.
 	virtual void DoFire();
 
@@ -92,15 +84,15 @@ private:
 	// [server] Actually deals damage to the actor we hit.
 	void DealDamage(const FInstantHitInfo& HitInfo);
 
-	// [client] Responds to a change in the HitNotify property, used as a broadcast event for displaying hit effects.
-	UFUNCTION()
-	virtual void OnRep_HitNotify();
-
 	// [client] Clears the NextShotTimer if it's running.
 	void ClearTimerIfRunning();
 
 	// [client] Actually stops the weapon firing.
 	void StopFiring();
+
+	// Notifies all clients that a shot hit something. Used for visualizing shots on the client.
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastNotifyHit(FInstantHitInfo HitInfo);
 
 	// Returns true if the weapon is a burst-fire weapon.
 	FORCEINLINE bool IsBurstFire()
@@ -113,10 +105,6 @@ private:
 	{
 		return BurstCount < 1;
 	}
-
-	// Replicated property used to notify clients of a shot, for visualization.
-	UPROPERTY(ReplicatedUsing = OnRep_HitNotify)
-	FInstantHitInfo HitNotify;
 
 	// Minimum time between bursts (or shots, if in single-shot or automatic mode), in seconds.
 	// 0 = as fast as you can pull the trigger

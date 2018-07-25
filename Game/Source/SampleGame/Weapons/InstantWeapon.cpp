@@ -86,13 +86,6 @@ void AInstantWeapon::BeginPlay()
 	GetWorld()->DebugDrawTraceTag = kTraceTag;
 }
 
-void AInstantWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME_CONDITION(AInstantWeapon, HitNotify, COND_SkipOwner);
-}
-
 void AInstantWeapon::DoFire()
 {
 	check(GetNetMode() == NM_Client);
@@ -171,9 +164,7 @@ void AInstantWeapon::NotifyClientsOfHit(const FInstantHitInfo& HitInfo)
 {
 	check(GetNetMode() < NM_Client);
 
-	HitNotify.HitActor = HitInfo.HitActor;
-	HitNotify.Location = HitInfo.Location;
-	HitNotify.Timestamp = FDateTime::UtcNow();
+	MulticastNotifyHit(HitInfo);
 }
 
 void AInstantWeapon::SpawnHitFX(const FInstantHitInfo& HitInfo)
@@ -275,15 +266,6 @@ void AInstantWeapon::ServerDidMiss_Implementation(const FInstantHitInfo& HitInfo
 	UE_LOG(LogSampleGame, Verbose, TEXT("Shot missed"));
 }
 
-void AInstantWeapon::OnRep_HitNotify()
-{
-	// This check is in place to ignore when this method gets called on initial checkout of the actor.
-	if (FDateTime::UtcNow() < HitNotify.Timestamp + ShotVisualizationDelayTolerance)
-	{
-		SpawnHitFX(HitNotify);
-	}
-}
-
 void AInstantWeapon::ClearTimerIfRunning()
 {
 	check(GetNetMode() == NM_Client);
@@ -300,4 +282,14 @@ void AInstantWeapon::StopFiring()
 
 	SetWeaponState(EWeaponState::Idle);
 	ClearTimerIfRunning();
+}
+
+void AInstantWeapon::MulticastNotifyHit_Implementation(FInstantHitInfo HitInfo)
+{
+	// Make sure we're a client, and we're not the client that owns this gun (they will have already played the effect locally).
+	if (GetNetMode() != NM_DedicatedServer &&
+		(GetOwningCharacter() == nullptr || !GetOwningCharacter()->IsLocallyControlled()))
+	{
+		SpawnHitFX(HitInfo);
+	}
 }

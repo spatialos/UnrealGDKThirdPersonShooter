@@ -25,9 +25,6 @@ component InstantWeaponMultiClientRepData {
 	uint32 field_role0 = 14; // COND_None // ::Actor
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
 	UnrealObjectRef field_owningcharacter0 = 16; // COND_None // ::Weapon
-	bytes field_hitnotify0_location0 = 17; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
-	UnrealObjectRef field_hitnotify0_hitactor0 = 18; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
-	bytes field_hitnotify0_timestamp0 = 19; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 }
 component InstantWeaponHandoverData {
 	id = 100018;
@@ -44,4 +41,5 @@ component InstantWeaponServerRPCs {
 }
 component InstantWeaponNetMulticastRPCs {
 	id = 100021;
+	event instantweapon.MulticastNotifyHitRequest multicastnotifyhit;
 }

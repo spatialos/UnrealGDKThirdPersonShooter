@@ -46,6 +46,7 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 
 	RPCToSenderMap.Emplace("ServerDidMiss", &USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC);
 	RPCToSenderMap.Emplace("ServerDidHit", &USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC);
+	RPCToSenderMap.Emplace("MulticastNotifyHit", &USpatialTypeBinding_InstantWeapon::MulticastNotifyHit_SendRPC);
 
 	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("InstantWeapon"));
 
@@ -66,9 +67,6 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"OwningCharacter"}, {0}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"HitNotify", "Location"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"HitNotify", "HitActor"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"HitNotify", "Timestamp"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
 
 	bIsSingleton = false;
 }
@@ -672,82 +670,6 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 			}
 			break;
 		}
-		case 17: // field_hitnotify0_location0
-		{
-			const FVector& Value = *(reinterpret_cast<FVector const*>(Data));
-
-			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 17);
-			TSet<const UObject*> UnresolvedObjects;
-			TArray<uint8> ValueData;
-			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
-			bool bSuccess = true;
-			(const_cast<FVector&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
-			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
-			if (UnresolvedObjects.Num() == 0)
-			{
-				OutUpdate.set_field_hitnotify0_location0(Result);
-			}
-			else
-			{
-				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 17);
-			}
-			break;
-		}
-		case 18: // field_hitnotify0_hitactor0
-		{
-			AActor* Value = *(reinterpret_cast<AActor* const*>(Data));
-
-			if (Value != nullptr)
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(Value);
-				if (!NetGUID.IsValid())
-				{
-					if (Value->IsFullNameStableForNetworking())
-					{
-						NetGUID = PackageMap->ResolveStablyNamedObject(Value);
-					}
-				}
-				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
-				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
-				{
-					// A legal static object reference should never be unresolved.
-					check(!Value->IsFullNameStableForNetworking())
-					Interop->QueueOutgoingObjectRepUpdate_Internal(Value, Channel, 18);
-				}
-				else
-				{
-					OutUpdate.set_field_hitnotify0_hitactor0(ObjectRef);
-				}
-			}
-			else
-			{
-				OutUpdate.set_field_hitnotify0_hitactor0(SpatialConstants::NULL_OBJECT_REF);
-			}
-			break;
-		}
-		case 19: // field_hitnotify0_timestamp0
-		{
-			const FDateTime& Value = *(reinterpret_cast<FDateTime const*>(Data));
-
-			Interop->ResetOutgoingArrayRepUpdate_Internal(Channel, 19);
-			TSet<const UObject*> UnresolvedObjects;
-			TArray<uint8> ValueData;
-			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
-			bool bSuccess = true;
-			(const_cast<FDateTime&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
-			const std::string& Result = (std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
-			if (UnresolvedObjects.Num() == 0)
-			{
-				OutUpdate.set_field_hitnotify0_timestamp0(Result);
-			}
-			else
-			{
-				Interop->QueueOutgoingArrayRepUpdate_Internal(UnresolvedObjects, Channel, 19);
-			}
-			break;
-		}
 	default:
 		checkf(false, TEXT("Unknown replication handle %d encountered when creating a SpatialOS update."));
 		break;
@@ -1344,118 +1266,6 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 			}
 		}
 	}
-	if (!Update.field_hitnotify0_location0().empty())
-	{
-		// field_hitnotify0_location0
-		uint16 Handle = 17;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
-			FVector Value = *(reinterpret_cast<FVector const*>(PropertyData));
-
-			auto& ValueDataStr = (*Update.field_hitnotify0_location0().data());
-			TArray<uint8> ValueData;
-			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
-			bool bSuccess = true;
-			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
-	if (!Update.field_hitnotify0_hitactor0().empty())
-	{
-		// field_hitnotify0_hitactor0
-		uint16 Handle = 18;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			bool bWriteObjectProperty = true;
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
-			AActor* Value = *(reinterpret_cast<AActor* const*>(PropertyData));
-
-			improbable::unreal::UnrealObjectRef ObjectRef = (*Update.field_hitnotify0_hitactor0().data());
-			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
-			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
-			{
-				Value = nullptr;
-			}
-			else
-			{
-				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
-				if (NetGUID.IsValid())
-				{
-					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
-					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
-					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
-					Value = Cast<AActor>(Object_Raw);
-				}
-				else
-				{
-					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: Received unresolved object property. Value: %s. actor %s (%lld), property %s (handle %d)"),
-						*Interop->GetSpatialOS()->GetWorkerId(),
-						*ObjectRefToString(ObjectRef),
-						*ActorChannel->Actor->GetName(),
-						ActorChannel->GetEntityId().ToSpatialEntityId(),
-						*RepData->Property->GetName(),
-						Handle);
-					// A legal static object reference should never be unresolved.
-					check(ObjectRef.path().empty());
-					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
-				}
-			}
-
-			if (bWriteObjectProperty)
-			{
-				ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
-
-				UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-					*Interop->GetSpatialOS()->GetWorkerId(),
-					*ActorChannel->Actor->GetName(),
-					ActorChannel->GetEntityId().ToSpatialEntityId(),
-					*RepData->Property->GetName(),
-					Handle);
-			}
-		}
-	}
-	if (!Update.field_hitnotify0_timestamp0().empty())
-	{
-		// field_hitnotify0_timestamp0
-		uint16 Handle = 19;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
-			FDateTime Value = *(reinterpret_cast<FDateTime const*>(PropertyData));
-
-			auto& ValueDataStr = (*Update.field_hitnotify0_timestamp0().data());
-			TArray<uint8> ValueData;
-			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
-			bool bSuccess = true;
-			Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
 	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
@@ -1465,6 +1275,11 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_Handover(USpatialActorChan
 
 void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Update& Update)
 {
+	for (auto& event : Update.multicastnotifyhit())
+	{
+		MulticastNotifyHit_OnRPCPayload(EntityId, event);
+	}
+
 }
 void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
 {
@@ -1518,15 +1333,6 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_SendRPC(worker::Connection
 			{
 				RPCPayload.set_field_hitinfo0_hitactor0(SpatialConstants::NULL_OBJECT_REF);
 			}
-		}
-		{
-			TSet<const UObject*> UnresolvedObjects;
-			TArray<uint8> ValueData;
-			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
-			bool bSuccess = true;
-			(const_cast<FDateTime&>(StructuredParams.HitInfo.Timestamp)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
-			RPCPayload.set_field_hitinfo0_timestamp0(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
 		}
 
 		// Send RPC
@@ -1594,15 +1400,6 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC(worker::Connection*
 				RPCPayload.set_field_hitinfo0_hitactor0(SpatialConstants::NULL_OBJECT_REF);
 			}
 		}
-		{
-			TSet<const UObject*> UnresolvedObjects;
-			TArray<uint8> ValueData;
-			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
-			bool bSuccess = true;
-			(const_cast<FDateTime&>(StructuredParams.HitInfo.Timestamp)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
-			RPCPayload.set_field_hitinfo0_timestamp0(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
-		}
 
 		// Send RPC
 		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
@@ -1615,6 +1412,75 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_SendRPC(worker::Connection*
 			return {RequestId.Id};
 	};
 	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
+}
+void USpatialTypeBinding_InstantWeapon::MulticastNotifyHit_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
+{
+	// This struct is declared in InstantWeapon.generated.h (in a macro that is then put in InstantWeapon.h UCLASS macro)
+	InstantWeapon_eventMulticastNotifyHit_Parms StructuredParams = *static_cast<InstantWeapon_eventMulticastNotifyHit_Parms*>(Parameters);
+
+	auto Sender = [this, Connection, TargetObject, StructuredParams]() mutable -> FRPCCommandRequestResult
+	{
+		// Resolve TargetObject.
+		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
+		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+		{
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC MulticastNotifyHit queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+			return {TargetObject};
+		}
+
+		// Build RPC Payload.
+		improbable::unreal::generated::instantweapon::MulticastNotifyHitRequest RPCPayload;
+		{
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FVector&>(StructuredParams.HitInfo.Location)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+			RPCPayload.set_field_hitinfo0_location0(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+		}
+		{
+			if (StructuredParams.HitInfo.HitActor != nullptr)
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromObject(StructuredParams.HitInfo.HitActor);
+				if (!NetGUID.IsValid())
+				{
+					if (StructuredParams.HitInfo.HitActor->IsFullNameStableForNetworking())
+					{
+						NetGUID = PackageMap->ResolveStablyNamedObject(StructuredParams.HitInfo.HitActor);
+					}
+				}
+				improbable::unreal::UnrealObjectRef ObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(NetGUID);
+				if (ObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
+				{
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC MulticastNotifyHit queued. StructuredParams.HitInfo.HitActor is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
+					return {Cast<UObject>(StructuredParams.HitInfo.HitActor)};
+				}
+				else
+				{
+					RPCPayload.set_field_hitinfo0_hitactor0(ObjectRef);
+				}
+			}
+			else
+			{
+				RPCPayload.set_field_hitinfo0_hitactor0(SpatialConstants::NULL_OBJECT_REF);
+			}
+		}
+
+		// Send RPC
+		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: MulticastNotifyHit, target: %s %s"),
+			*Interop->GetSpatialOS()->GetWorkerId(),
+			*TargetObject->GetName(),
+			*ObjectRefToString(TargetObjectRef));
+
+			improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Update Update;
+			Update.add_multicastnotifyhit(RPCPayload);
+			checkf(Update.multicastnotifyhit().size() == 1, TEXT("MulticastNotifyHit_SendCommand: More than one event being sent"));
+			Connection->SendComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>(TargetObjectRef.entity(), Update);
+			return {};
+	};
+	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ false);
 }
 void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidmiss>& Op)
 {
@@ -1678,15 +1544,6 @@ void USpatialTypeBinding_InstantWeapon::ServerDidMiss_OnRPCPayload(const worker:
 					return {ObjectRef};
 				}
 			}
-		}
-		{
-			auto& ValueDataStr = Op.Request.field_hitinfo0_timestamp0();
-			TArray<uint8> ValueData;
-			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
-			bool bSuccess = true;
-			Parameters.HitInfo.Timestamp.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
 		}
 
 		// Call implementation.
@@ -1776,15 +1633,6 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload(const worker::
 				}
 			}
 		}
-		{
-			auto& ValueDataStr = Op.Request.field_hitinfo0_timestamp0();
-			TArray<uint8> ValueData;
-			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
-			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
-			bool bSuccess = true;
-			Parameters.HitInfo.Timestamp.NetSerialize(ValueDataReader, PackageMap, bSuccess);
-			checkf(bSuccess, TEXT("NetSerialize on FDateTime failed."));
-		}
 
 		// Call implementation.
 		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerDidHit, target: %s %s"),
@@ -1806,6 +1654,91 @@ void USpatialTypeBinding_InstantWeapon::ServerDidHit_OnRPCPayload(const worker::
 		// Send command response.
 		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 		Connection->SendCommandResponse<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidhit>(Op.RequestId, {});
+		return {};
+	};
+	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
+}
+void USpatialTypeBinding_InstantWeapon::MulticastNotifyHit_OnRPCPayload(const worker::EntityId EntityId, const improbable::unreal::generated::instantweapon::MulticastNotifyHitRequest& EventData)
+{
+	auto Receiver = [this, EntityId, EventData]() mutable -> FRPCCommandResponseResult
+	{
+		improbable::unreal::UnrealObjectRef TargetObjectRef{EntityId, EventData.target_subobject_offset(), {}, {}};
+		FNetworkGUID TargetNetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(TargetObjectRef);
+		if (!TargetNetGUID.IsValid())
+		{
+			// A legal static object reference should never be unresolved.
+			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
+			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: MulticastNotifyHit_OnRPCPayload: Target object %s is not resolved on this worker."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*ObjectRefToString(TargetObjectRef));
+			return {TargetObjectRef};
+		}
+		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
+		checkf(TargetObject, TEXT("%s: MulticastNotifyHit_OnRPCPayload: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
+			*Interop->GetSpatialOS()->GetWorkerId(),
+			*ObjectRefToString(TargetObjectRef),
+			*TargetNetGUID.ToString());
+
+		// Declare parameters.
+		// This struct is declared in InstantWeapon.generated.h (in a macro that is then put in InstantWeapon.h UCLASS macro)
+		InstantWeapon_eventMulticastNotifyHit_Parms Parameters;
+
+		// Extract from request data.
+		{
+			auto& ValueDataStr = EventData.field_hitinfo0_location0();
+			TArray<uint8> ValueData;
+			ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+			FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+			bool bSuccess = true;
+			Parameters.HitInfo.Location.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+		}
+		{
+			improbable::unreal::UnrealObjectRef ObjectRef = EventData.field_hitinfo0_hitactor0();
+			check(ObjectRef != SpatialConstants::UNRESOLVED_OBJECT_REF);
+			if (ObjectRef == SpatialConstants::NULL_OBJECT_REF)
+			{
+				Parameters.HitInfo.HitActor = nullptr;
+			}
+			else
+			{
+				FNetworkGUID NetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(ObjectRef);
+				if (NetGUID.IsValid())
+				{
+					UObject* Object_Raw = PackageMap->GetObjectFromNetGUID(NetGUID, true);
+					checkf(Object_Raw, TEXT("An object ref %s should map to a valid object."), *ObjectRefToString(ObjectRef));
+					checkf(Cast<AActor>(Object_Raw), TEXT("Object ref %s maps to object %s with the wrong class."), *ObjectRefToString(ObjectRef), *Object_Raw->GetFullName());
+					Parameters.HitInfo.HitActor = Cast<AActor>(Object_Raw);
+				}
+				else
+				{
+					// A legal static object reference should never be unresolved.
+					checkf(ObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
+					UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: MulticastNotifyHit_OnRPCPayload: Parameters.HitInfo.HitActor %s is not resolved on this worker."),
+						*Interop->GetSpatialOS()->GetWorkerId(),
+						*ObjectRefToString(ObjectRef));
+					return {ObjectRef};
+				}
+			}
+		}
+
+		// Call implementation.
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: MulticastNotifyHit, target: %s %s"),
+			*Interop->GetSpatialOS()->GetWorkerId(),
+			*TargetObject->GetName(),
+			*ObjectRefToString(TargetObjectRef));
+
+		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("MulticastNotifyHit"))))
+		{
+			TargetObject->ProcessEvent(Function, &Parameters);
+		}
+		else
+		{
+			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: MulticastNotifyHit_OnRPCPayload: Function not found. Object: %s, Function: MulticastNotifyHit."),
+				*Interop->GetSpatialOS()->GetWorkerId(),
+				*TargetObject->GetFullName());
+		}
+
 		return {};
 	};
 	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
