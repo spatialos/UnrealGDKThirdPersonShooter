@@ -39,21 +39,23 @@ if %REPO_PREPARED% == false (
 	exit /b 1
 )
 
+call "%~dp0ProjectPaths.bat"
+
 rem Cleanup old symlinks
-rd "%~dp0Game\Plugins\SpatialGDK" 2>nul
-rd "%~dp0Game\Source\SpatialGDK" 2>nul
-rd "%~dp0Game\Scripts" 2>nul
-rd "%~dp0Game\Binaries\ThirdParty\Improbable" 2>nul
+rd "%~dp0%PROJECT_PATH%\Plugins\SpatialGDK" 2>nul
+rd "%~dp0%PROJECT_PATH%\Source\SpatialGDK" 2>nul
+rd "%~dp0%PROJECT_PATH%\Scripts" 2>nul
+rd "%~dp0%PROJECT_PATH%\Binaries\ThirdParty\Improbable" 2>nul
 rd "%~dp0spatial\schema\improbable\unreal\gdk" 2>nul
 
 rem Ensure plugins folder exists, mklink doesn't recursively create
-if not exist "%~dp0Game\Plugins\" (
-	md "%~dp0Game\Plugins\"
+if not exist "%~dp0%PROJECT_PATH%\Plugins\" (
+	md "%~dp0%PROJECT_PATH%\Plugins\"
 )
 
 rem Ensure codegen folder exists, mklink doesn't recursively create
-if not exist "%~dp0Game\Binaries\ThirdParty\" (
-	md "%~dp0Game\Binaries\ThirdParty\"
+if not exist "%~dp0%PROJECT_PATH%\Binaries\ThirdParty\" (
+	md "%~dp0%PROJECT_PATH%\Binaries\ThirdParty\"
 )
 
 rem Ensure schema folder exists, mklink doesn't recursively create
@@ -62,10 +64,10 @@ if not exist "%~dp0spatial\schema\improbable\unreal\" (
 )
 
 rem Make new symlinks
-mklink /J "%~dp0Game\Plugins\SpatialGDK" %UNREALGDK_PLUGINSPATH%
-mklink /J "%~dp0Game\Source\SpatialGDK" %UNREALGDK_MODULEPATH%
-mklink /J "%~dp0Game\Scripts" %UNREALGDK_SCRIPTSPATH%
-mklink /J "%~dp0Game\Binaries\ThirdParty\Improbable" %UNREALGDK_BINARIESPATH%
+mklink /J "%~dp0%PROJECT_PATH%\Plugins\SpatialGDK" %UNREALGDK_PLUGINSPATH%
+mklink /J "%~dp0%PROJECT_PATH%\Source\SpatialGDK" %UNREALGDK_MODULEPATH%
+mklink /J "%~dp0%PROJECT_PATH%\Scripts" %UNREALGDK_SCRIPTSPATH%
+mklink /J "%~dp0%PROJECT_PATH%\Binaries\ThirdParty\Improbable" %UNREALGDK_BINARIESPATH%
 mklink /J "%~dp0spatial\schema\improbable\unreal\gdk" %UNREALGDK_SCHEMAPATH%
 
 echo Successfully created symlinks to "%UNREALGDK_PATH%"

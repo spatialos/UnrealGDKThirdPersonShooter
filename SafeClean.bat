@@ -1,10 +1,11 @@
 @echo off
 
-rem Users should configure these to match their setup.
-set SPATIALGDK_PLUGINSPATH="%~dp0Game\Plugins\SpatialGDK"
-set SPATIALGDK_MODULEPATH="%~dp0Game\Source\SpatialGDK"
-set SPATIALGDK_SCRIPTSPATH="%~dp0Game\Scripts"
-set SPATIALGDK_BINARIESPATH="%~dp0Game\Binaries\ThirdParty\Improbable"
+call "%~dp0ProjectPaths.bat"
+
+set SPATIALGDK_PLUGINSPATH="%~dp0%PROJECT_PATH%\Plugins\SpatialGDK"
+set SPATIALGDK_MODULEPATH="%~dp0%PROJECT_PATH%\Source\SpatialGDK"
+set SPATIALGDK_SCRIPTSPATH="%~dp0%PROJECT_PATH%\Scripts"
+set SPATIALGDK_BINARIESPATH="%~dp0%PROJECT_PATH%\Binaries\ThirdParty\Improbable"
 set SPATIALGDK_SCHEMAPATH="%~dp0spatial\schema\improbable\unreal\gdk"
 rem This var is only used for the automated process which is run with the '-a' command line argument. Users should change this accordingly.
 set SPATIALGDK_UNREALGDKPATH="%~dp0..\unreal-gdk" 
@@ -22,7 +23,7 @@ exit /b 0
 
 rem First section is for cleaning known UnrealGDK symlinks and running git clean.
 :Main
-set /p NUKE=Would you like to clean all symlinks, uncommited changes and all built files (git clean -xdf)?[Y/N]: 
+set /p NUKE=Would you like to clean all symlinks, uncommitted changes and all built files (git clean -xdf)?[Y/N]: 
 if /I "%NUKE%" == "Y" (
     call :CleanAllSymlinks
     call :GitClean
