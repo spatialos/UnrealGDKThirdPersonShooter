@@ -29,7 +29,7 @@ component InstantWeaponMultiClientRepData {
 	UnrealObjectRef field_hitnotify0_hitactor0 = 18; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 	bytes field_hitnotify0_timestamp0 = 19; // COND_SkipOwner // InstantHitInfo::HitNotify::InstantWeapon
 }
-component InstantWeaponMigratableData {
+component InstantWeaponHandoverData {
 	id = 100018;
 }
 import "improbable/unreal/generated/UnrealInstantWeaponTypes.schema";

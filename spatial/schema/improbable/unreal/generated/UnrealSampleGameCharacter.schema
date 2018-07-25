@@ -59,7 +59,7 @@ component SampleGameCharacterMultiClientRepData {
 	float field_aimpitch0 = 47; // COND_SkipOwner // ::SampleGameCharacter
 	uint32 field_team0 = 48; // COND_None // ::SampleGameCharacter
 }
-component SampleGameCharacterMigratableData {
+component SampleGameCharacterHandoverData {
 	id = 100036;
 	uint32 field_charactermovement0_movementmode0 = 1;
 	uint32 field_charactermovement0_custommovementmode0 = 2;

@@ -19,7 +19,7 @@ class USpatialTypeBinding_SGGameState : public USpatialTypeBinding
 
 public:
 	const FRepHandlePropertyMap& GetRepHandlePropertyMap() const override;
-	const FMigratableHandlePropertyMap& GetMigratableHandlePropertyMap() const override;
+	const FHandoverHandlePropertyMap& GetHandoverHandlePropertyMap() const override;
 	UClass* GetBoundClass() const override;
 
 	void Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap) override;
@@ -40,8 +40,8 @@ public:
 		bool& bSingleClientUpdateChanged,
 		improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update& MultiClientUpdate,
 		bool& bMultiClientUpdateChanged,
-		improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& MigratableDataUpdate,
-		bool& bMigratableDataUpdateChanged) const;
+		improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& HandoverDataUpdate,
+		bool& bHandoverDataUpdateChanged) const;
 
 private:
 	improbable::unreal::callbacks::FScopedViewCallbacks ViewCallbacks;
@@ -51,14 +51,14 @@ private:
 	TMap<FName, FRPCSender> RPCToSenderMap;
 
 	FRepHandlePropertyMap RepHandleToPropertyMap;
-	FMigratableHandlePropertyMap MigratableHandleToPropertyMap;
+	FHandoverHandlePropertyMap HandoverHandleToPropertyMap;
 
 	void ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update& OutUpdate) const;
 	void ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update& OutUpdate) const;
-	void ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& OutUpdate) const;
+	void ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& OutUpdate) const;
 	void ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::Update& Update) const;
 	void ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update& Update) const;
-	void ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& Update) const;
+	void ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& Update) const;
 	void ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::sggamestate::SGGameStateNetMulticastRPCs::Update& Update);
 
 	// RPC command sender functions.

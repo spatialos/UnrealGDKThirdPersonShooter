@@ -28,7 +28,7 @@ component WheeledVehicleMultiClientRepData {
 	uint32 field_remoteviewpitch0 = 17; // COND_SkipOwner // ::Pawn
 	UnrealObjectRef field_controller0 = 18; // COND_None // ::Pawn
 }
-component WheeledVehicleMigratableData {
+component WheeledVehicleHandoverData {
 	id = 100048;
 }
 import "improbable/unreal/generated/UnrealWheeledVehicleMovementComponentTypes.schema";

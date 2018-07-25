@@ -23,16 +23,16 @@
 
 #include "SGGameStateSingleClientRepDataAddComponentOp.h"
 #include "SGGameStateMultiClientRepDataAddComponentOp.h"
-#include "SGGameStateMigratableDataAddComponentOp.h"
+#include "SGGameStateHandoverDataAddComponentOp.h"
 
 const FRepHandlePropertyMap& USpatialTypeBinding_SGGameState::GetRepHandlePropertyMap() const
 {
 	return RepHandleToPropertyMap;
 }
 
-const FMigratableHandlePropertyMap& USpatialTypeBinding_SGGameState::GetMigratableHandlePropertyMap() const
+const FHandoverHandlePropertyMap& USpatialTypeBinding_SGGameState::GetHandoverHandlePropertyMap() const
 {
-	return MigratableHandleToPropertyMap;
+	return HandoverHandleToPropertyMap;
 }
 
 UClass* USpatialTypeBinding_SGGameState::GetBoundClass() const
@@ -68,6 +68,8 @@ void USpatialTypeBinding_SGGameState::Init(USpatialInterop* InInterop, USpatialP
 	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"bReplicatedHasBegunPlay"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"ReplicatedWorldTimeSeconds"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
+
+	bIsSingleton = false;
 }
 
 void USpatialTypeBinding_SGGameState::BindToView(bool bIsClient)
@@ -103,17 +105,17 @@ void USpatialTypeBinding_SGGameState::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>& Op)
+			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::sggamestate::SGGameStateHandoverData>([this](
+				const worker::ComponentUpdateOp<improbable::unreal::generated::sggamestate::SGGameStateHandoverData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::sggamestate::SGGameStateMigratableData::ComponentId))
+				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::sggamestate::SGGameStateHandoverData::ComponentId))
 				{
 					return;
 				}
 				USpatialActorChannel* ActorChannel = Interop->GetActorChannelByEntityId(Op.EntityId);
 				check(ActorChannel);
-				ReceiveUpdate_Migratable(ActorChannel, Op.Update);
+				ReceiveUpdate_Handover(ActorChannel, Op.Update);
 			}));
 		}
 	}
@@ -151,14 +153,14 @@ worker::Entity USpatialTypeBinding_SGGameState::CreateActorEntity(const FString&
 	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Data MultiClientSGGameStateData;
 	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update MultiClientSGGameStateUpdate;
 	bool bMultiClientSGGameStateUpdateChanged = false;
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Data SGGameStateMigratableData;
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update SGGameStateMigratableDataUpdate;
-	bool bSGGameStateMigratableDataUpdateChanged = false;
+	improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Data SGGameStateHandoverData;
+	improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update SGGameStateHandoverDataUpdate;
+	bool bSGGameStateHandoverDataUpdateChanged = false;
 
-	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientSGGameStateUpdate, bSingleClientSGGameStateUpdateChanged, MultiClientSGGameStateUpdate, bMultiClientSGGameStateUpdateChanged, SGGameStateMigratableDataUpdate, bSGGameStateMigratableDataUpdateChanged);
+	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientSGGameStateUpdate, bSingleClientSGGameStateUpdateChanged, MultiClientSGGameStateUpdate, bMultiClientSGGameStateUpdateChanged, SGGameStateHandoverDataUpdate, bSGGameStateHandoverDataUpdateChanged);
 	SingleClientSGGameStateUpdate.ApplyTo(SingleClientSGGameStateData);
 	MultiClientSGGameStateUpdate.ApplyTo(MultiClientSGGameStateData);
-	SGGameStateMigratableDataUpdate.ApplyTo(SGGameStateMigratableData);
+	SGGameStateHandoverDataUpdate.ApplyTo(SGGameStateHandoverData);
 
 	// Create entity.
 	std::string ClientWorkerIdString = TCHAR_TO_UTF8(*ClientWorkerId);
@@ -207,7 +209,7 @@ worker::Entity USpatialTypeBinding_SGGameState::CreateActorEntity(const FString&
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData>(SingleClientSGGameStateData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData>(MultiClientSGGameStateData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>(SGGameStateMigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateHandoverData>(SGGameStateHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateClientRPCs>(improbable::unreal::generated::sggamestate::SGGameStateClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateServerRPCs>(improbable::unreal::generated::sggamestate::SGGameStateServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::sggamestate::SGGameStateNetMulticastRPCs>(improbable::unreal::generated::sggamestate::SGGameStateNetMulticastRPCs::Data{}, WorkersOnly)
@@ -221,9 +223,9 @@ void USpatialTypeBinding_SGGameState::SendComponentUpdates(const FPropertyChange
 	bool bSingleClientUpdateChanged = false;
 	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update MigratableDataUpdate;
-	bool bMigratableDataUpdateChanged = false;
-	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
+	improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update HandoverDataUpdate;
+	bool bHandoverDataUpdateChanged = false;
+	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, HandoverDataUpdate, bHandoverDataUpdateChanged);
 
 	// Send SpatialOS updates if anything changed.
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -235,9 +237,9 @@ void USpatialTypeBinding_SGGameState::SendComponentUpdates(const FPropertyChange
 	{
 		Connection->SendComponentUpdate<improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
 	}
-	if (bMigratableDataUpdateChanged)
+	if (bHandoverDataUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::sggamestate::SGGameStateMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::sggamestate::SGGameStateHandoverData>(EntityId.ToSpatialEntityId(), HandoverDataUpdate);
 	}
 }
 
@@ -270,11 +272,11 @@ void USpatialTypeBinding_SGGameState::ReceiveAddComponent(USpatialActorChannel* 
 		ReceiveUpdate_MultiClient(Channel, Update);
 		return;
 	}
-	auto* MigratableDataAddOp = Cast<USGGameStateMigratableDataAddComponentOp>(AddComponentOp);
-	if (MigratableDataAddOp)
+	auto* HandoverDataAddOp = Cast<USGGameStateHandoverDataAddComponentOp>(AddComponentOp);
+	if (HandoverDataAddOp)
 	{
-		auto Update = improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
-		ReceiveUpdate_Migratable(Channel, Update);
+		auto Update = improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update::FromInitialData(*HandoverDataAddOp->Data.data());
+		ReceiveUpdate_Handover(Channel, Update);
 		return;
 	}
 }
@@ -288,7 +290,7 @@ worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_S
 		{
 			Interest.emplace(improbable::unreal::generated::sggamestate::SGGameStateSingleClientRepData::ComponentId, worker::InterestOverride{false});
 		}
-		Interest.emplace(improbable::unreal::generated::sggamestate::SGGameStateMigratableData::ComponentId, worker::InterestOverride{false});
+		Interest.emplace(improbable::unreal::generated::sggamestate::SGGameStateHandoverData::ComponentId, worker::InterestOverride{false});
 	}
 	return Interest;
 }
@@ -300,11 +302,11 @@ void USpatialTypeBinding_SGGameState::BuildSpatialComponentUpdate(
 	bool& bSingleClientUpdateChanged,
 	improbable::unreal::generated::sggamestate::SGGameStateMultiClientRepData::Update& MultiClientUpdate,
 	bool& bMultiClientUpdateChanged,
-	improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& MigratableDataUpdate,
-	bool& bMigratableDataUpdateChanged) const
+	improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& HandoverDataUpdate,
+	bool& bHandoverDataUpdateChanged) const
 {
 	const FRepHandlePropertyMap& RepPropertyMap = GetRepHandlePropertyMap();
-	const FMigratableHandlePropertyMap& MigPropertyMap = GetMigratableHandlePropertyMap();
+	const FHandoverHandlePropertyMap& HandoverPropertyMap = GetHandoverHandlePropertyMap();
 	if (Changes.RepChanged.Num() > 0)
 	{
 		// Populate the replicated data component updates from the replicated property changelist.
@@ -342,19 +344,19 @@ void USpatialTypeBinding_SGGameState::BuildSpatialComponentUpdate(
 		}
 	}
 
-	// Populate the migrated data component update from the migrated property changelist.
-	for (uint16 ChangedHandle : Changes.MigChanged)
+	// Populate the handover data component update from the handover property changelist.
+	for (uint16 ChangedHandle : Changes.HandoverChanged)
 	{
-		const FMigratableHandleData& PropertyMapData = MigPropertyMap[ChangedHandle];
+		const FHandoverHandleData& PropertyMapData = HandoverPropertyMap[ChangedHandle];
 		const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData);
-		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending handover property update. actor %s (%lld), property %s (handle %d)"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*Channel->Actor->GetName(),
 			Channel->GetEntityId().ToSpatialEntityId(),
 			*PropertyMapData.Property->GetName(),
 			ChangedHandle);
-		ServerSendUpdate_Migratable(Data, ChangedHandle, PropertyMapData.Property, Channel, MigratableDataUpdate);
-		bMigratableDataUpdateChanged = true;
+		ServerSendUpdate_Handover(Data, ChangedHandle, PropertyMapData.Property, Channel, HandoverDataUpdate);
+		bHandoverDataUpdateChanged = true;
 	}
 }
 
@@ -740,7 +742,7 @@ void USpatialTypeBinding_SGGameState::ServerSendUpdate_MultiClient(const uint8* 
 	}
 }
 
-void USpatialTypeBinding_SGGameState::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& OutUpdate) const
+void USpatialTypeBinding_SGGameState::ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& OutUpdate) const
 {
 }
 
@@ -1464,7 +1466,7 @@ void USpatialTypeBinding_SGGameState::ReceiveUpdate_MultiClient(USpatialActorCha
 	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
-void USpatialTypeBinding_SGGameState::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateMigratableData::Update& Update) const
+void USpatialTypeBinding_SGGameState::ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::sggamestate::SGGameStateHandoverData::Update& Update) const
 {
 }
 

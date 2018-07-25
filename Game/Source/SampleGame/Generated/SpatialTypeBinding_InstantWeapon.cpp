@@ -23,16 +23,16 @@
 
 #include "InstantWeaponSingleClientRepDataAddComponentOp.h"
 #include "InstantWeaponMultiClientRepDataAddComponentOp.h"
-#include "InstantWeaponMigratableDataAddComponentOp.h"
+#include "InstantWeaponHandoverDataAddComponentOp.h"
 
 const FRepHandlePropertyMap& USpatialTypeBinding_InstantWeapon::GetRepHandlePropertyMap() const
 {
 	return RepHandleToPropertyMap;
 }
 
-const FMigratableHandlePropertyMap& USpatialTypeBinding_InstantWeapon::GetMigratableHandlePropertyMap() const
+const FHandoverHandlePropertyMap& USpatialTypeBinding_InstantWeapon::GetHandoverHandlePropertyMap() const
 {
-	return MigratableHandleToPropertyMap;
+	return HandoverHandleToPropertyMap;
 }
 
 UClass* USpatialTypeBinding_InstantWeapon::GetBoundClass() const
@@ -69,6 +69,8 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"HitNotify", "Location"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"HitNotify", "HitActor"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"HitNotify", "Timestamp"}, {0, 0}, COND_SkipOwner, REPNOTIFY_OnChanged));
+
+	bIsSingleton = false;
 }
 
 void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
@@ -104,17 +106,17 @@ void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>& Op)
+			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponHandoverData>([this](
+				const worker::ComponentUpdateOp<improbable::unreal::generated::instantweapon::InstantWeaponHandoverData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::ComponentId))
+				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::ComponentId))
 				{
 					return;
 				}
 				USpatialActorChannel* ActorChannel = Interop->GetActorChannelByEntityId(Op.EntityId);
 				check(ActorChannel);
-				ReceiveUpdate_Migratable(ActorChannel, Op.Update);
+				ReceiveUpdate_Handover(ActorChannel, Op.Update);
 			}));
 		}
 	}
@@ -158,14 +160,14 @@ worker::Entity USpatialTypeBinding_InstantWeapon::CreateActorEntity(const FStrin
 	improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData::Data MultiClientInstantWeaponData;
 	improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData::Update MultiClientInstantWeaponUpdate;
 	bool bMultiClientInstantWeaponUpdateChanged = false;
-	improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Data InstantWeaponMigratableData;
-	improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update InstantWeaponMigratableDataUpdate;
-	bool bInstantWeaponMigratableDataUpdateChanged = false;
+	improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Data InstantWeaponHandoverData;
+	improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update InstantWeaponHandoverDataUpdate;
+	bool bInstantWeaponHandoverDataUpdateChanged = false;
 
-	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientInstantWeaponUpdate, bSingleClientInstantWeaponUpdateChanged, MultiClientInstantWeaponUpdate, bMultiClientInstantWeaponUpdateChanged, InstantWeaponMigratableDataUpdate, bInstantWeaponMigratableDataUpdateChanged);
+	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientInstantWeaponUpdate, bSingleClientInstantWeaponUpdateChanged, MultiClientInstantWeaponUpdate, bMultiClientInstantWeaponUpdateChanged, InstantWeaponHandoverDataUpdate, bInstantWeaponHandoverDataUpdateChanged);
 	SingleClientInstantWeaponUpdate.ApplyTo(SingleClientInstantWeaponData);
 	MultiClientInstantWeaponUpdate.ApplyTo(MultiClientInstantWeaponData);
-	InstantWeaponMigratableDataUpdate.ApplyTo(InstantWeaponMigratableData);
+	InstantWeaponHandoverDataUpdate.ApplyTo(InstantWeaponHandoverData);
 
 	// Create entity.
 	std::string ClientWorkerIdString = TCHAR_TO_UTF8(*ClientWorkerId);
@@ -214,7 +216,7 @@ worker::Entity USpatialTypeBinding_InstantWeapon::CreateActorEntity(const FStrin
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponSingleClientRepData>(SingleClientInstantWeaponData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData>(MultiClientInstantWeaponData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>(InstantWeaponMigratableData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponHandoverData>(InstantWeaponHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Data{}, WorkersOnly)
@@ -228,9 +230,9 @@ void USpatialTypeBinding_InstantWeapon::SendComponentUpdates(const FPropertyChan
 	bool bSingleClientUpdateChanged = false;
 	improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update MigratableDataUpdate;
-	bool bMigratableDataUpdateChanged = false;
-	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, MigratableDataUpdate, bMigratableDataUpdateChanged);
+	improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update HandoverDataUpdate;
+	bool bHandoverDataUpdateChanged = false;
+	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, HandoverDataUpdate, bHandoverDataUpdateChanged);
 
 	// Send SpatialOS updates if anything changed.
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
@@ -242,9 +244,9 @@ void USpatialTypeBinding_InstantWeapon::SendComponentUpdates(const FPropertyChan
 	{
 		Connection->SendComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
 	}
-	if (bMigratableDataUpdateChanged)
+	if (bHandoverDataUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponMigratableData>(EntityId.ToSpatialEntityId(), MigratableDataUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::instantweapon::InstantWeaponHandoverData>(EntityId.ToSpatialEntityId(), HandoverDataUpdate);
 	}
 }
 
@@ -277,11 +279,11 @@ void USpatialTypeBinding_InstantWeapon::ReceiveAddComponent(USpatialActorChannel
 		ReceiveUpdate_MultiClient(Channel, Update);
 		return;
 	}
-	auto* MigratableDataAddOp = Cast<UInstantWeaponMigratableDataAddComponentOp>(AddComponentOp);
-	if (MigratableDataAddOp)
+	auto* HandoverDataAddOp = Cast<UInstantWeaponHandoverDataAddComponentOp>(AddComponentOp);
+	if (HandoverDataAddOp)
 	{
-		auto Update = improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update::FromInitialData(*MigratableDataAddOp->Data.data());
-		ReceiveUpdate_Migratable(Channel, Update);
+		auto Update = improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update::FromInitialData(*HandoverDataAddOp->Data.data());
+		ReceiveUpdate_Handover(Channel, Update);
 		return;
 	}
 }
@@ -295,7 +297,7 @@ worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_I
 		{
 			Interest.emplace(improbable::unreal::generated::instantweapon::InstantWeaponSingleClientRepData::ComponentId, worker::InterestOverride{false});
 		}
-		Interest.emplace(improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::ComponentId, worker::InterestOverride{false});
+		Interest.emplace(improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::ComponentId, worker::InterestOverride{false});
 	}
 	return Interest;
 }
@@ -307,11 +309,11 @@ void USpatialTypeBinding_InstantWeapon::BuildSpatialComponentUpdate(
 	bool& bSingleClientUpdateChanged,
 	improbable::unreal::generated::instantweapon::InstantWeaponMultiClientRepData::Update& MultiClientUpdate,
 	bool& bMultiClientUpdateChanged,
-	improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update& MigratableDataUpdate,
-	bool& bMigratableDataUpdateChanged) const
+	improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update& HandoverDataUpdate,
+	bool& bHandoverDataUpdateChanged) const
 {
 	const FRepHandlePropertyMap& RepPropertyMap = GetRepHandlePropertyMap();
-	const FMigratableHandlePropertyMap& MigPropertyMap = GetMigratableHandlePropertyMap();
+	const FHandoverHandlePropertyMap& HandoverPropertyMap = GetHandoverHandlePropertyMap();
 	if (Changes.RepChanged.Num() > 0)
 	{
 		// Populate the replicated data component updates from the replicated property changelist.
@@ -349,19 +351,19 @@ void USpatialTypeBinding_InstantWeapon::BuildSpatialComponentUpdate(
 		}
 	}
 
-	// Populate the migrated data component update from the migrated property changelist.
-	for (uint16 ChangedHandle : Changes.MigChanged)
+	// Populate the handover data component update from the handover property changelist.
+	for (uint16 ChangedHandle : Changes.HandoverChanged)
 	{
-		const FMigratableHandleData& PropertyMapData = MigPropertyMap[ChangedHandle];
+		const FHandoverHandleData& PropertyMapData = HandoverPropertyMap[ChangedHandle];
 		const uint8* Data = PropertyMapData.GetPropertyData(Changes.SourceData);
-		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending migratable property update. actor %s (%lld), property %s (handle %d)"),
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending handover property update. actor %s (%lld), property %s (handle %d)"),
 			*Interop->GetSpatialOS()->GetWorkerId(),
 			*Channel->Actor->GetName(),
 			Channel->GetEntityId().ToSpatialEntityId(),
 			*PropertyMapData.Property->GetName(),
 			ChangedHandle);
-		ServerSendUpdate_Migratable(Data, ChangedHandle, PropertyMapData.Property, Channel, MigratableDataUpdate);
-		bMigratableDataUpdateChanged = true;
+		ServerSendUpdate_Handover(Data, ChangedHandle, PropertyMapData.Property, Channel, HandoverDataUpdate);
+		bHandoverDataUpdateChanged = true;
 	}
 }
 
@@ -752,7 +754,7 @@ void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_MultiClient(const uint8
 	}
 }
 
-void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_Migratable(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update& OutUpdate) const
+void USpatialTypeBinding_InstantWeapon::ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update& OutUpdate) const
 {
 }
 
@@ -1457,7 +1459,7 @@ void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_MultiClient(USpatialActorC
 	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
-void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_Migratable(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::instantweapon::InstantWeaponMigratableData::Update& Update) const
+void USpatialTypeBinding_InstantWeapon::ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::instantweapon::InstantWeaponHandoverData::Update& Update) const
 {
 }
 

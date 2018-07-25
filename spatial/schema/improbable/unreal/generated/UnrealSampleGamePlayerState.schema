@@ -37,7 +37,7 @@ component SampleGamePlayerStateMultiClientRepData {
 	string field_playernameprivate0 = 26; // COND_None // ::PlayerState
 	uint32 field_selectedteam0 = 27; // COND_None // ::SampleGamePlayerState
 }
-component SampleGamePlayerStateMigratableData {
+component SampleGamePlayerStateHandoverData {
 	id = 100030;
 }
 

@@ -30,7 +30,7 @@ component SGGameStateMultiClientRepData {
 	float field_replicatedworldtimeseconds0 = 19; // COND_None // ::GameStateBase
 	list<bytes> field_teamscores0 = 20; // COND_None // ::SGGameState
 }
-component SGGameStateMigratableData {
+component SGGameStateHandoverData {
 	id = 100012;
 }
 
