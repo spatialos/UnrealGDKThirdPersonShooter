@@ -1,17 +1,19 @@
 @echo off
 
+call "%~dp0ProjectPaths.bat"
+
 rem When flexible project structure is implemented we can gather this information from the project structure descriptor file.
 set GENERATED_SCHEMA="%~dp0spatial\schema\improbable\unreal\generated"
-set GENERATED_TYPE_BINDINGS="%~dp0Game\Source\SampleGame\Generated"
-set GENERATED_WORKER_FILES="%~dp0Game\Source\SpatialGDK\Generated"
+set GENERATED_TYPE_BINDINGS="%~dp0%PROJECT_PATH%\Source\%GAME_NAME%\Generated"
+set GENERATED_WORKER_FILES="%~dp0%PROJECT_PATH%\Source\SpatialGDK\Generated"
 
 rem If '-a' argument is specified, clean all without prompt
 if /I "%1" == "-a" (
     call :CleanPath %GENERATED_SCHEMA%
     call :CleanPath %GENERATED_TYPE_BINDINGS%
     call :CleanPath %GENERATED_WORKER_FILES%
-    echo Running Game/Scripts/Codegen.bat
-    call "%~dp0Game/Scripts/Codegen.bat"
+    echo Running %PROJECT_PATH%/Scripts/Codegen.bat
+    call "%~dp0%PROJECT_PATH%/Scripts/Codegen.bat"
 ) else (
     goto Main
 )
@@ -19,19 +21,19 @@ exit /b 0
 
 rem If '-a' does not exist, prompt the user
 :Main
-echo This script is intended to clean SampleGame generated files and therefore assumes its project structure.
+echo This script is intended to clean %GAME_NAME% generated files.
 
-set /p CLEAN_SCHEMA=Clean generated schema?[Y/N]:
+set /p CLEAN_SCHEMA=Clean generated schema (%GENERATED_SCHEMA%)?[Y/N]:
 if /I "%CLEAN_SCHEMA%" == "Y" (
     call :CleanPath %GENERATED_SCHEMA%
 )
 
-set /p CLEAN_TYPE_BINDINGS=Clean generated type bindings?[Y/N]:
+set /p CLEAN_TYPE_BINDINGS=Clean generated type bindings (%GENERATED_TYPE_BINDINGS%)?[Y/N]:
 if /I "%CLEAN_TYPE_BINDINGS%" == "Y" (
     call :CleanPath %GENERATED_TYPE_BINDINGS%
 )
 
-set /p CLEAN_WORKER_FILES=Clean generated worker code?[Y/N]:
+set /p CLEAN_WORKER_FILES=Clean generated worker code (%GENERATED_WORKER_FILES%)?[Y/N]:
 if /I "%CLEAN_WORKER_FILES%" == "Y" (
     call :CleanWorkerFiles
 )
@@ -58,6 +60,6 @@ exit /b 0
 :WorkerCodegen
 set /p WORKER_CODEGEN=Run Codegen.bat?[Y/N]:
 if /I "%WORKER_CODEGEN%" == "Y" (
-    call "%~dp0Game/Scripts/Codegen.bat"
+    call "%~dp0%PROJECT_PATH%/Scripts/Codegen.bat"
 )
 exit /b 0
