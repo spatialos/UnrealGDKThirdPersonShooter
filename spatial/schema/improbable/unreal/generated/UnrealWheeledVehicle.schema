@@ -5,10 +5,10 @@ package improbable.unreal.generated.wheeledvehicle;
 import "improbable/unreal/gdk/core_types.schema";
 
 component WheeledVehicleSingleClientRepData {
-	id = 100028;
+	id = 100046;
 }
 component WheeledVehicleMultiClientRepData {
-	id = 100029;
+	id = 100047;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -29,16 +29,16 @@ component WheeledVehicleMultiClientRepData {
 	UnrealObjectRef field_controller0 = 18; // COND_None // ::Pawn
 }
 component WheeledVehicleHandoverData {
-	id = 100030;
+	id = 100048;
 }
 import "improbable/unreal/generated/UnrealWheeledVehicleMovementComponentTypes.schema";
 
 component WheeledVehicleClientRPCs {
-	id = 100031;
+	id = 100049;
 }
 component WheeledVehicleServerRPCs {
-	id = 100032;
+	id = 100050;
 }
 component WheeledVehicleNetMulticastRPCs {
-	id = 100033;
+	id = 100051;
 }

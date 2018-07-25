@@ -5,10 +5,10 @@ package improbable.unreal.generated.testcubebpc;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TestCubeBPCSingleClientRepData {
-	id = 100034;
+	id = 100040;
 }
 component TestCubeBPCMultiClientRepData {
-	id = 100035;
+	id = 100041;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -28,17 +28,17 @@ component TestCubeBPCMultiClientRepData {
 	int32 field_currenthealth0 = 17; // COND_None // ::TestCube_BP_C
 }
 component TestCubeBPCHandoverData {
-	id = 100036;
+	id = 100042;
 }
 import "improbable/unreal/generated/UnrealTestCubeBPCTypes.schema";
 
 component TestCubeBPCClientRPCs {
-	id = 100037;
+	id = 100043;
 }
 component TestCubeBPCServerRPCs {
-	id = 100038;
+	id = 100044;
 	command UnrealRPCCommandResponse serverinteract(testcubebpc.ServerInteractRequest);
 }
 component TestCubeBPCNetMulticastRPCs {
-	id = 100039;
+	id = 100045;
 }

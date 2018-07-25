@@ -5,11 +5,11 @@ package improbable.unreal.generated.samplegamecharacter;
 import "improbable/unreal/gdk/core_types.schema";
 
 component SampleGameCharacterSingleClientRepData {
-	id = 100022;
+	id = 100034;
 	int32 field_currenthealth0 = 1; // COND_AutonomousOnly // ::SampleGameCharacter
 }
 component SampleGameCharacterMultiClientRepData {
-	id = 100023;
+	id = 100035;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -60,7 +60,7 @@ component SampleGameCharacterMultiClientRepData {
 	uint32 field_team0 = 48; // COND_None // ::SampleGameCharacter
 }
 component SampleGameCharacterHandoverData {
-	id = 100024;
+	id = 100036;
 	uint32 field_charactermovement0_movementmode0 = 1;
 	uint32 field_charactermovement0_custommovementmode0 = 2;
 	uint32 field_charactermovement0_groundmovementmode0 = 3;
@@ -69,7 +69,7 @@ import "improbable/unreal/generated/UnrealSampleGameCharacterTypes.schema";
 import "improbable/unreal/generated/UnrealCharacterTypes.schema";
 
 component SampleGameCharacterClientRPCs {
-	id = 100025;
+	id = 100037;
 	command UnrealRPCCommandResponse rootmotiondebugclientprintonscreen(character.RootMotionDebugClientPrintOnScreenRequest);
 	command UnrealRPCCommandResponse clientveryshortadjustposition(character.ClientVeryShortAdjustPositionRequest);
 	command UnrealRPCCommandResponse clientcheatwalk(character.ClientCheatWalkRequest);
@@ -81,7 +81,7 @@ component SampleGameCharacterClientRPCs {
 	command UnrealRPCCommandResponse clientackgoodmove(character.ClientAckGoodMoveRequest);
 }
 component SampleGameCharacterServerRPCs {
-	id = 100026;
+	id = 100038;
 	command UnrealRPCCommandResponse serverspawncube(samplegamecharacter.ServerSpawnCubeRequest);
 	command UnrealRPCCommandResponse debugresetcharacter(samplegamecharacter.DebugResetCharacterRequest);
 	command UnrealRPCCommandResponse servermoveold(character.ServerMoveOldRequest);
@@ -92,5 +92,5 @@ component SampleGameCharacterServerRPCs {
 	command UnrealRPCCommandResponse servermove(character.ServerMoveRequest);
 }
 component SampleGameCharacterNetMulticastRPCs {
-	id = 100027;
+	id = 100039;
 }
