@@ -31,9 +31,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Widgets")
 	void OnJoinGameButtonClicked() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Debug")
-	void SetAutomaticName();
-
 	UFUNCTION(BlueprintPure, Category = "Debug")
 	bool IsAutoJoinReady() const { return (PlayerController != nullptr); }
 

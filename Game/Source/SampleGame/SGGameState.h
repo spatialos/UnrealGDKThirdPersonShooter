@@ -25,8 +25,8 @@ public:
 	// Adds a player to the game's score data with empty stats.
 	void AddPlayer(ESampleGameTeam Team, const FString& Player);
 
-	// Adds a kill to the game's score data.
-	void AddKill(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam);
+	// Adds a death (and a corresponding kill, if necessary) to the game's score data.
+	void AddDeath(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam);
 
 	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);
@@ -44,7 +44,7 @@ private:
 	FTeamScore* GetScoreForTeam(ESampleGameTeam Team);
 
 	// Actually adds the player.
-	void AddPlayerImpl(ESampleGameTeam Team, const FString& Player);
+	void AddPlayerInternal(ESampleGameTeam Team, const FString& Player);
 
 	// List of teams' scores, including top player lists.
 	UPROPERTY(ReplicatedUsing = OnRep_TeamScores)

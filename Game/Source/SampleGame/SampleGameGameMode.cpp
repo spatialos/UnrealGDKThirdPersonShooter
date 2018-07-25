@@ -167,7 +167,7 @@ void ASampleGameGameMode::NotifyPlayerKilled(const FString& PlayerName, ESampleG
 {
 	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
 	{
-		GS->AddKill(KillerName, KillerTeam, PlayerName, PlayerTeam);
+		GS->AddDeath(KillerName, KillerTeam, PlayerName, PlayerTeam);
 	}
 	else
 	{

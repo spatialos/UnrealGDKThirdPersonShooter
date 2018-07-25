@@ -26,7 +26,7 @@ void ASGGameState::FakeServerHasBegunPlay()
 
 void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 {
-	if (Team == ESampleGameTeam::Team_None || Team >= ESampleGameTeam::Team_MAX)
+	if (Team == ESampleGameTeam::Team_None || Team > ESampleGameTeam::Team_MAX)
 	{
 		// Ignore invalid teams.
 		return;
@@ -34,13 +34,13 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 
 	if (!PlayerScores.Contains(FName(*Player)))
 	{
-		AddPlayerImpl(Team, Player);
+		AddPlayerInternal(Team, Player);
 	}
 }
 
-void ASGGameState::AddKill(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam)
+void ASGGameState::AddDeath(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam)
 {
-	if (VictimTeam == ESampleGameTeam::Team_None || VictimTeam >= ESampleGameTeam::Team_MAX)
+	if (VictimTeam == ESampleGameTeam::Team_None || VictimTeam > ESampleGameTeam::Team_MAX)
 	{
 		// Ignore invalid teams.
 		return;
@@ -49,40 +49,38 @@ void ASGGameState::AddKill(const FString& KillerName, ESampleGameTeam KillerTeam
 	FName VictimKey(*VictimName);
 	if (!PlayerScores.Contains(VictimKey))
 	{
-		AddPlayerImpl(VictimTeam, VictimName);
+		AddPlayerInternal(VictimTeam, VictimName);
 	}
 	++PlayerScores[VictimKey]->Deaths;
 
-	if (KillerTeam == ESampleGameTeam::Team_None || KillerTeam >= ESampleGameTeam::Team_MAX)
+	// Ignore invalid teams.
+	if (KillerTeam >= ESampleGameTeam::Team_MIN && KillerTeam <= ESampleGameTeam::Team_MAX)
 	{
-		// Ignore invalid teams.
-		return;
-	}
+		FName KillerKey(*KillerName);
+		if (!PlayerScores.Contains(KillerKey))
+		{
+			AddPlayerInternal(KillerTeam, KillerName);
+		}
+		++PlayerScores[KillerKey]->Kills;
 
-	FName KillerKey(*KillerName);
-	if (!PlayerScores.Contains(KillerKey))
-	{
-		AddPlayerImpl(KillerTeam, KillerName);
-	}
-	++PlayerScores[KillerKey]->Kills;
+		if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
+		{
+			++TeamScore->TeamKills;
 
-	if (FTeamScore* TeamScore = GetScoreForTeam(KillerTeam))
-	{
-		++TeamScore->TeamKills;
-
-		// The player score has already been updated, so re-sort the team's top player array here.
-		TeamScore->TopPlayers.Sort([](const FPlayerScore& lhs, const FPlayerScore& rhs)
+			// The player score has already been updated, so re-sort the team's top player array here.
+			TeamScore->TopPlayers.Sort([](const FPlayerScore& lhs, const FPlayerScore& rhs)
+			{
+				// Sort in reverse order.
+				return lhs.Kills > rhs.Kills;
+			});
+		}
+		// Re-sort team scores after updating the killer's team score.
+		TeamScores.Sort([](const FTeamScore& lhs, const FTeamScore& rhs)
 		{
 			// Sort in reverse order.
-			return lhs.Kills > rhs.Kills;
+			return lhs.TeamKills > rhs.TeamKills;
 		});
 	}
-	// Re-sort team scores after updating the killer's team score.
-	TeamScores.Sort([](const FTeamScore& lhs, const FTeamScore& rhs)
-	{
-		// Sort in reverse order.
-		return lhs.TeamKills > rhs.TeamKills;
-	});
 }
 
 void ASGGameState::RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback)
@@ -98,8 +96,9 @@ void ASGGameState::BeginPlay()
 	if (HasAuthority() && TeamScores.Num() == 0)
 	{
 		// Initialize team scores for all possible teams.
+		const uint32 TeamMin = static_cast<uint32>(ESampleGameTeam::Team_MIN);
 		const uint32 TeamMax = static_cast<uint32>(ESampleGameTeam::Team_MAX);
-		for (uint32 i = 0; i < TeamMax; ++i)
+		for (uint32 i = TeamMin; i <= TeamMax; ++i)
 		{
 			FTeamScore TeamScore;
 			TeamScore.Team = static_cast<ESampleGameTeam>(i);
@@ -134,7 +133,7 @@ FTeamScore* ASGGameState::GetScoreForTeam(ESampleGameTeam Team)
 	return nullptr;
 }
 
-void ASGGameState::AddPlayerImpl(ESampleGameTeam Team, const FString& Player)
+void ASGGameState::AddPlayerInternal(ESampleGameTeam Team, const FString& Player)
 {
 	FTeamScore* TeamScore = GetScoreForTeam(Team);
 	if (TeamScore == nullptr)

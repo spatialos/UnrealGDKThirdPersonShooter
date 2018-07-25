@@ -15,7 +15,7 @@ void USampleGameScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScore
 
 	for (const FTeamScore& TeamScore : TeamScores)
 	{
-		if (TeamScore.Team == ESampleGameTeam::Team_None || TeamScore.Team >= ESampleGameTeam::Team_MAX)
+		if (TeamScore.Team == ESampleGameTeam::Team_None || TeamScore.Team > ESampleGameTeam::Team_MAX)
 		{
 			// Skip invalid teams.
 			continue;

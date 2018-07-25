@@ -49,14 +49,18 @@ public:
 	// which handles user input.
 	bool IgnoreActionInput() const { return bIgnoreActionInput; }
 
-	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
+	// [client] Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play.
+	// Will populate "NewPlayerName" with a default value if empty.
+	void TryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
 protected:
 	virtual void SetupInputComponent() override;
 
 private:
+	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
+
 	// [client] Informs the invoking client whether the join request suceeded or failed
 	UFUNCTION(Client, Reliable)
 	void ClientJoinResults(const bool bJoinSucceeded);
@@ -78,6 +82,10 @@ private:
 
 	// [client] Hides the scoreboard UI.
 	void HideScoreboard();
+
+	// Gets a default player name based upon the worker's ID.
+	// Generates a GUID if we're not running on a SpatialOS worker.
+	FString GetDefaultPlayerName();
 
 	// If true, action input should be ignored.
 	// Default value is false.

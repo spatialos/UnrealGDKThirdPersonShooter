@@ -16,7 +16,7 @@ static const TCHAR* kTeamNames[]{
 
 FString SampleGameTeamName(ESampleGameTeam Team)
 {
-	if (Team >= ESampleGameTeam::Team_MAX)
+	if (Team > ESampleGameTeam::Team_MAX)
 	{
 		return "UNKNOWN TEAM";
 	}

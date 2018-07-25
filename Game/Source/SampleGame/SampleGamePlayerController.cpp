@@ -247,6 +247,15 @@ void ASampleGamePlayerController::HideScoreboard()
 	SetScoreboardIsVisible(false);
 }
 
+FString ASampleGamePlayerController::GetDefaultPlayerName()
+{
+	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver()))
+	{
+		return SpatialNetDriver->GetSpatialOS()->GetWorkerId();
+	}
+	return "Player" + FGuid::NewGuid().ToString();
+}
+
 void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
 {
 	if (Scoreboard == nullptr || Scoreboard->IsInViewport() == bIsVisible)
@@ -282,10 +291,25 @@ void ASampleGamePlayerController::SetUIMode(bool bIsUIMode, bool bAllowMovement)
 	}
 }
 
+void ASampleGamePlayerController::TryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	ServerTryJoinGame(
+		NewPlayerName.IsEmpty() ? GetDefaultPlayerName() : NewPlayerName,
+		NewPlayerTeam);
+}
+
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
-	const FString CorrectedNewPlayerName = (NewPlayerName.IsEmpty() ? GetName() : NewPlayerName);
 	bool bJoinWasSuccessful = true;
+
+	// Validate player name
+	if (NewPlayerName.IsEmpty())
+	{
+		bJoinWasSuccessful = false;
+
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Player attempted to join with empty name."), *this->GetName());
+	}
 
 	// Validate PlayerState
 	if (PlayerState == nullptr

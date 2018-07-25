@@ -15,19 +15,7 @@ void USampleGameLoginUI::OnJoinGameButtonClicked() const
 	check(PlayerController != nullptr)
 
 	// Inform PlayerController, update PlayerState, etc
-	PlayerController->ServerTryJoinGame(PlayerName.ToString(), TeamId);
-}
-
-void USampleGameLoginUI::SetAutomaticName()
-{
-	if (USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetOwningPlayer()->GetNetDriver()))
-	{
-		PlayerName = FText::FromString(NetDriver->GetSpatialOS()->GetWorkerId());
-	}
-	else
-	{
-		PlayerName = FText::FromString("Player" + FGuid::NewGuid().ToString());
-	}
+	PlayerController->TryJoinGame(PlayerName.ToString(), TeamId);
 }
 
 void USampleGameLoginUI::JoinGameWasRejected()
