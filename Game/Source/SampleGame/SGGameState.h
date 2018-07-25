@@ -20,8 +20,6 @@ class SAMPLEGAME_API ASGGameState : public AGameStateBase
 public:	
 	ASGGameState();
 
-	void FakeServerHasBegunPlay();
-
 	// Adds a player to the game's score data with empty stats.
 	void AddPlayer(ESampleGameTeam Team, const FString& Player);
 
