@@ -40,18 +40,16 @@ void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 
 void ASGGameState::AddDeath(const FString& KillerName, ESampleGameTeam KillerTeam, const FString& VictimName, ESampleGameTeam VictimTeam)
 {
-	if (VictimTeam == ESampleGameTeam::Team_None || VictimTeam > ESampleGameTeam::Team_MAX)
+	// Ignore invalid teams.
+	if (VictimTeam >= ESampleGameTeam::Team_MIN || VictimTeam <= ESampleGameTeam::Team_MAX)
 	{
-		// Ignore invalid teams.
-		return;
+		FName VictimKey(*VictimName);
+		if (!PlayerScores.Contains(VictimKey))
+		{
+			AddPlayerInternal(VictimTeam, VictimName);
+		}
+		++PlayerScores[VictimKey]->Deaths;
 	}
-
-	FName VictimKey(*VictimName);
-	if (!PlayerScores.Contains(VictimKey))
-	{
-		AddPlayerInternal(VictimTeam, VictimName);
-	}
-	++PlayerScores[VictimKey]->Deaths;
 
 	// Ignore invalid teams.
 	if (KillerTeam >= ESampleGameTeam::Team_MIN && KillerTeam <= ESampleGameTeam::Team_MAX)
