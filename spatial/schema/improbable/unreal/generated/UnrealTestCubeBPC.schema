@@ -27,7 +27,7 @@ component TestCubeBPCMultiClientRepData {
 	bool field_iscolor10 = 16; // COND_None // ::TestCube_BP_C
 	int32 field_currenthealth0 = 17; // COND_None // ::TestCube_BP_C
 }
-component TestCubeBPCMigratableData {
+component TestCubeBPCHandoverData {
 	id = 100036;
 }
 import "improbable/unreal/generated/UnrealTestCubeBPCTypes.schema";
