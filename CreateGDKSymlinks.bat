@@ -34,7 +34,7 @@ set REPO_PREPARED=true
 if not exist %UNREALGDK_BINARIESPATH% set REPO_PREPARED=false
 
 if %REPO_PREPARED% == false (
-	echo Error: The specified UnrealGDK directory has not been prepared. Please run Build.bat in that directory.
+	echo Error: The specified UnrealGDK directory has not been prepared. Please run BuildGDK.bat in that directory.
 	if not defined TEAMCITY_CAPTURE_ENV pause
 	exit /b 1
 )
