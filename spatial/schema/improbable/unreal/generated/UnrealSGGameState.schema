@@ -1,14 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated.samplegameplayerstate;
+package improbable.unreal.generated.sggamestate;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-component SampleGamePlayerStateSingleClientRepData {
-	id = 100028;
+component SGGameStateSingleClientRepData {
+	id = 100010;
 }
-component SampleGamePlayerStateMultiClientRepData {
-	id = 100029;
+component SGGameStateMultiClientRepData {
+	id = 100011;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -24,29 +24,22 @@ component SampleGamePlayerStateMultiClientRepData {
 	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
 	uint32 field_role0 = 14; // COND_None // ::Actor
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
-	float field_score0 = 16; // COND_None // ::PlayerState
-	uint32 field_ping0 = 17; // COND_SkipOwner // ::PlayerState
-	int32 field_playerid0 = 18; // COND_InitialOnly // ::PlayerState
-	bool field_bfrompreviouslevel0 = 19; // COND_None // ::PlayerState
-	bool field_bisabot0 = 20; // COND_InitialOnly // ::PlayerState
-	bool field_bisinactive0 = 21; // COND_InitialOnly // ::PlayerState
-	bool field_bisspectator0 = 22; // COND_None // ::PlayerState
-	bool field_bonlyspectator0 = 23; // COND_None // ::PlayerState
-	int32 field_starttime0 = 24; // COND_None // ::PlayerState
-	bytes field_uniqueid0 = 25; // COND_InitialOnly // ::PlayerState
-	string field_playernameprivate0 = 26; // COND_None // ::PlayerState
-	uint32 field_selectedteam0 = 27; // COND_None // ::SampleGamePlayerState
+	UnrealObjectRef field_gamemodeclass0 = 16; // COND_InitialOnly // ::GameStateBase
+	UnrealObjectRef field_spectatorclass0 = 17; // COND_None // ::GameStateBase
+	bool field_breplicatedhasbegunplay0 = 18; // COND_None // ::GameStateBase
+	float field_replicatedworldtimeseconds0 = 19; // COND_None // ::GameStateBase
+	list<bytes> field_teamscores0 = 20; // COND_None // ::SGGameState
 }
-component SampleGamePlayerStateHandoverData {
-	id = 100030;
+component SGGameStateHandoverData {
+	id = 100012;
 }
 
-component SampleGamePlayerStateClientRPCs {
-	id = 100031;
+component SGGameStateClientRPCs {
+	id = 100013;
 }
-component SampleGamePlayerStateServerRPCs {
-	id = 100032;
+component SGGameStateServerRPCs {
+	id = 100014;
 }
-component SampleGamePlayerStateNetMulticastRPCs {
-	id = 100033;
+component SGGameStateNetMulticastRPCs {
+	id = 100015;
 }

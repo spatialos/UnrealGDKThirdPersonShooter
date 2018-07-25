@@ -66,6 +66,9 @@ public:
 	// Returns the direction in which to perform a line trace so it lines up with the center of the crosshair.
 	FVector GetLineTraceDirection() const;
 
+	// Returns the player's name, as specified on login.
+	FString GetPlayerName() const;
+
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	FORCEINLINE float GetCurrentHealth() const
@@ -91,6 +94,12 @@ public:
 	// [server + client] Returns true if the character is able to shoot at the given moment.
 	bool CanFire();
 
+	// [client] Triggers the equipped weapon to start firing.
+	void StartFire();
+
+	// [client] Triggers the equipped weapon to stop firing.
+	void StopFire();
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -99,6 +108,9 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	// [client] If true, the character should ignore all action inputs.
+	bool IgnoreActionInput() const;
+
 	// [client] Checks if the crosshair is pointing at an interactable object, and if so, calls Interact() on it.
 	void Interact();
 
@@ -108,14 +120,9 @@ private:
 	// [server] Spawns a starter weapon and attaches it to the character.
 	void SpawnStarterWeapon();
 
-	// [client] Triggers the equipped weapon to start firing.
-	void StartFire();
-
-	// [client] Triggers the equipped weapon to stop firing.
-	void StopFire();
-
 	// [server] Tells this player that it's time to die.
-	void Die();
+	// @param Killer  The player who killed me. Can be null if it wasn't a player who dealt the damage that killed me.
+	void Die(const class ASampleGameCharacter* Killer);
 
 	// [client + server] Puts the player in ragdoll mode.
 	void StartRagdoll();

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Teams/SampleGameTeams.h"
 #include "SampleGameGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -25,4 +26,9 @@ public:
 	// This will either use a specified startactor, if it matches Player's team affiliation,
 	// or calls ChoosePlayerStart to select a startactor matching Player's team affiliation.
 	virtual AActor* FindPlayerStart_Implementation(AController* Player, const FString& IncomingName = TEXT("")) override;
+
+	void NotifyPlayerJoined(const FString& PlayerName, ESampleGameTeam PlayerTeam);
+
+	void NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam);
+
 };

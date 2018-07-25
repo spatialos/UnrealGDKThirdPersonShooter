@@ -6,6 +6,7 @@
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
 #include "SampleGamePlayerState.h"
+#include "SGGameState.h"
 #include "Teams/SampleGameTeamPlayerStart.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UI/SampleGameHUD.h"
@@ -37,8 +38,8 @@ ASampleGameGameMode::ASampleGameGameMode()
 		UE_LOG(LogSampleGame, Error, TEXT("[SampleGameGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
 	}
 
-	// Use our custom PlayerState child for additional game-specific player data
 	PlayerStateClass = ASampleGamePlayerState::StaticClass();
+	GameStateClass = ASGGameState::StaticClass();
 
 	// Start in Spectator Mode - The PlayerController will spawn the Characters after login, instead of on connect
 	bStartPlayersAsSpectators = true;
@@ -147,4 +148,30 @@ AActor* ASampleGameGameMode::FindPlayerStart_Implementation(AController* Player,
 
 	// Default behavior, if no starts found otherwise
 	return Super::FindPlayerStart_Implementation(Player, IncomingName);
+}
+
+void ASampleGameGameMode::NotifyPlayerJoined(const FString& PlayerName, ESampleGameTeam PlayerTeam)
+{
+	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
+	{
+		GS->AddPlayer(PlayerTeam, PlayerName);
+	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this));
+	}
+}
+
+void ASampleGameGameMode::NotifyPlayerKilled(const FString& PlayerName, ESampleGameTeam PlayerTeam, const FString& KillerName, ESampleGameTeam KillerTeam)
+{
+	if (ASGGameState* GS = Cast<ASGGameState>(GameState))
+	{
+		GS->AddDeath(KillerName, KillerTeam, PlayerName, PlayerTeam);
+	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to register kill because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this));
+	}
 }

@@ -16,4 +16,9 @@ enum class ESampleGameTeam : uint8
 	Team_Purple		UMETA(DisplayName = "Purple Team"),
 	Team_Black		UMETA(DisplayName = "Black Team"),
 	Team_White		UMETA(DisplayName = "White Team"),
+	Team_MIN = Team_Red,
+	Team_MAX = Team_White
 };
+
+// Returns the display name for a given team.
+FString SampleGameTeamName(ESampleGameTeam Team);

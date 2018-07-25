@@ -1,5 +1,7 @@
 
 #include "SampleGameLoginUI.h"
+
+#include "SpatialNetDriver.h"
 #include "SampleGamePlayerController.h"
 
 
@@ -13,7 +15,7 @@ void USampleGameLoginUI::OnJoinGameButtonClicked() const
 	check(PlayerController != nullptr)
 
 	// Inform PlayerController, update PlayerState, etc
-	PlayerController->ServerTryJoinGame(PlayerName.ToString(), TeamId);
+	PlayerController->TryJoinGame(PlayerName.ToString(), TeamId);
 }
 
 void USampleGameLoginUI::JoinGameWasRejected()

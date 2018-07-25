@@ -4,16 +4,23 @@
 
 #include "SampleGamePlayerState.h"
 #include "SampleGameCharacter.h"
+#include "SampleGameGameMode.h"
+#include "SGGameState.h"
 #include "SampleGameLogging.h"
 #include "UI/SampleGameHUD.h"
 #include "UI/SampleGameLoginUI.h"
+#include "UI/SampleGameScoreboard.h"
 #include "UI/SampleGameUI.h"
+#include "UnrealNetwork.h"
 
 #include "SpatialNetDriver.h"
 
 
 ASampleGamePlayerController::ASampleGamePlayerController()
-	: SampleGameUI(nullptr)
+	: bIgnoreActionInput(false)
+	, SampleGameUI(nullptr)
+	, Scoreboard(nullptr)
+	, SampleGameLoginUI(nullptr)
 	, RespawnCharacterDelay(5.0f)
 	, DeleteCharacterDelay(15.0f)
 	, PawnToDelete(nullptr)
@@ -58,13 +65,35 @@ void ASampleGamePlayerController::SetPawn(APawn* InPawn)
 	}
 }
 
-void ASampleGamePlayerController::KillCharacter()
+void ASampleGamePlayerController::KillCharacter(const ASampleGameCharacter* Killer)
 {
 	check(GetNetMode() == NM_DedicatedServer);
 
 	if (!HasAuthority())
 	{
 		return;
+	}
+
+	FString KillerName;
+	ESampleGameTeam KillerTeam = ESampleGameTeam::Team_None;
+	if (Killer)
+	{
+		KillerName = Killer->GetPlayerName();
+		KillerTeam = Killer->GetTeam();
+	}
+
+	ESampleGameTeam MyTeam = ESampleGameTeam::Team_None;
+	if (ASampleGameCharacter* Me = Cast<ASampleGameCharacter>(GetCharacter()))
+	{
+		MyTeam = Me->GetTeam();
+	}
+
+	if (ASampleGameGameMode* GM = Cast<ASampleGameGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
+		{
+			GM->NotifyPlayerKilled(PS->GetPlayerName(), MyTeam, KillerName, KillerTeam);
+		}
 	}
 
 	PawnToDelete = GetPawn();
@@ -115,6 +144,14 @@ void ASampleGamePlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+void ASampleGamePlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	InputComponent->BindAction("ShowScoreboard", IE_Pressed, this, &ASampleGamePlayerController::ShowScoreboard);
+	InputComponent->BindAction("ShowScoreboard", IE_Released, this, &ASampleGamePlayerController::HideScoreboard);
+}
+
 void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 {
 	// Lazy instantiate the Login UI
@@ -148,25 +185,131 @@ void ASampleGamePlayerController::SetLoginUIVisible(bool bIsVisible)
 		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
 		SampleGameLoginUI->SetOwnerPlayerController(this);
 		// Set Mouse Cursor to SHOW, and only interact with the UI
-		bShowMouseCursor = true;
-		SetIgnoreLookInput(true);
-		SetIgnoreMoveInput(true);
+		SetUIMode(true);
 	}
 	else
 	{
 		// Hide the Login UI
 		SampleGameLoginUI->RemoveFromViewport();
 		// Hide the Mouse Cursor, restore Look and Move control
-		bShowMouseCursor = false;
-		SetIgnoreLookInput(false);
-		SetIgnoreMoveInput(false);
+		SetUIMode(false);
 	}
+}
+
+void ASampleGamePlayerController::InitScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (Scoreboard)
+	{
+		return;
+	}
+
+	check(ScoreboardTemplate != nullptr);
+	Scoreboard = CreateWidget<USampleGameScoreboard>(this, ScoreboardTemplate);
+
+	if (Scoreboard == nullptr)
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to create scoreboard widget"), *SampleGameLogging::LogPrefix(this));
+		return;
+	}
+
+	if (ASGGameState* GS = GetWorld()->GetGameState<ASGGameState>())
+	{
+		// Register a listener between the GameState's score list and the scoreboard's update function.
+		FSGTeamScoresUpdatedDelegate UpdateScoreboardCallback;
+		UpdateScoreboardCallback.BindUObject(Scoreboard, &USampleGameScoreboard::UpdateTeamScores);
+		GS->RegisterScoreChangeListener(UpdateScoreboardCallback);
+	}
+	else
+	{
+		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to initialize scoreboard because GameState didn't exist"),
+			*SampleGameLogging::LogPrefix(this));
+	}
+}
+
+void ASampleGamePlayerController::ShowScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	// Make sure we stop firing when the user pulls up the scoreboard.
+	if (ASampleGameCharacter* SGCharacter = Cast<ASampleGameCharacter>(GetCharacter()))
+	{
+		SGCharacter->StopFire();
+	}
+
+	SetScoreboardIsVisible(true);
+}
+
+void ASampleGamePlayerController::HideScoreboard()
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	SetScoreboardIsVisible(false);
+}
+
+FString ASampleGamePlayerController::GetDefaultPlayerName()
+{
+	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver()))
+	{
+		return SpatialNetDriver->GetSpatialOS()->GetWorkerId();
+	}
+	return "Player" + FGuid::NewGuid().ToString();
+}
+
+void ASampleGamePlayerController::SetScoreboardIsVisible(bool bIsVisible)
+{
+	if (Scoreboard == nullptr || Scoreboard->IsInViewport() == bIsVisible)
+	{
+		return;
+	}
+
+	if (bIsVisible)
+	{
+		Scoreboard->AddToViewport();
+		SetUIMode(true, true);
+	}
+	else
+	{
+		Scoreboard->RemoveFromViewport();
+		SetUIMode(false, true);
+	}
+}
+
+void ASampleGamePlayerController::SetUIMode(bool bIsUIMode, bool bAllowMovement)
+{
+	bShowMouseCursor = bIsUIMode;
+	SetIgnoreLookInput(bIsUIMode);
+	SetIgnoreMoveInput(bIsUIMode && !bAllowMovement);
+	SetIgnoreActionInput(bIsUIMode);
+	if (bIsUIMode)
+	{
+		SetInputMode(FInputModeGameAndUI());
+	}
+	else
+	{
+		SetInputMode(FInputModeGameOnly());
+	}
+}
+
+void ASampleGamePlayerController::TryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
+{
+	check(GetNetMode() != NM_DedicatedServer);
+	ServerTryJoinGame(
+		NewPlayerName.IsEmpty() ? GetDefaultPlayerName() : NewPlayerName,
+		NewPlayerTeam);
 }
 
 void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam)
 {
-	const FString CorrectedNewPlayerName = (NewPlayerName.IsEmpty() ? GetName() : NewPlayerName);
 	bool bJoinWasSuccessful = true;
+
+	// Validate player name
+	if (NewPlayerName.IsEmpty())
+	{
+		bJoinWasSuccessful = false;
+
+		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Player attempted to join with empty name."), *this->GetName());
+	}
 
 	// Validate PlayerState
 	if (PlayerState == nullptr
@@ -209,6 +352,17 @@ void ASampleGamePlayerController::ServerTryJoinGame_Implementation(const FString
 
 		// Spawn the Pawn
 		RespawnCharacter();
+
+		// Add the player to the game's scoreboard.
+		if (ASampleGameGameMode* GM = GetWorld()->GetAuthGameMode<ASampleGameGameMode>())
+		{
+			GM->NotifyPlayerJoined(NewPlayerName, NewPlayerTeam);
+		}
+		else
+		{
+			UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player because GameMode didn't exist"),
+				*SampleGameLogging::LogPrefix(this));
+		}
 	}
 
 }
@@ -231,6 +385,8 @@ void ASampleGamePlayerController::ClientJoinResults_Implementation(const bool bJ
 	{
 		SampleGameLoginUI->JoinGameWasRejected();
 	}
+
+	InitScoreboard();
 }
 
 void ASampleGamePlayerController::RespawnCharacter()

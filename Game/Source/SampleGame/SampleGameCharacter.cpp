@@ -11,11 +11,11 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
-#include "SampleGameGameStateBase.h"
 #include "SampleGameLogging.h"
 #include "SampleGamePlayerController.h"
 #include "SampleGamePlayerState.h"
 #include "SGCharacterMovementComponent.h"
+#include "SGGameState.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
 #include "Weapons/InstantWeapon.h"
@@ -33,9 +33,9 @@ ASampleGameCharacter::ASampleGameCharacter(const FObjectInitializer& ObjectIniti
 	UWorld* World = GetWorld();
 	if (World && World->GetGameState() == nullptr)
 	{
-		AGameStateBase* GameState = World->SpawnActor<AGameStateBase>(ASampleGameGameStateBase::StaticClass());
+		AGameStateBase* GameState = World->SpawnActor<AGameStateBase>(ASGGameState::StaticClass());
 		World->SetGameState(GameState);
-		Cast<ASampleGameGameStateBase>(GameState)->FakeServerHasBegunPlay();
+		Cast<ASGGameState>(GameState)->FakeServerHasBegunPlay();
 	}
 
 	// Set size for collision capsule
@@ -205,9 +205,25 @@ void ASampleGameCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>&
 	DOREPLIFETIME_CONDITION(ASampleGameCharacter, CurrentHealth, COND_AutonomousOnly);
 }
 
+bool ASampleGameCharacter::IgnoreActionInput() const
+{
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController()))
+	{
+		return PC->IgnoreActionInput();
+	}
+	return false;
+}
+
 void ASampleGameCharacter::Interact()
 {
 	check(GetNetMode() == NM_Client);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
 
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("SampleGame_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
@@ -245,6 +261,11 @@ void ASampleGameCharacter::Interact()
 
 void ASampleGameCharacter::SpawnCube()
 {
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	ServerSpawnCube();
 }
 
@@ -273,6 +294,13 @@ void ASampleGameCharacter::SpawnStarterWeapon()
 
 void ASampleGameCharacter::StartFire()
 {
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
@@ -285,6 +313,13 @@ void ASampleGameCharacter::StartFire()
 
 void ASampleGameCharacter::StopFire()
 {
+	check(GetNetMode() != NM_DedicatedServer);
+
+	if (IgnoreActionInput())
+	{
+		return;
+	}
+
 	AWeapon* Weapon = GetEquippedWeapon();
 	if (Weapon != nullptr)
 	{
@@ -292,14 +327,14 @@ void ASampleGameCharacter::StopFire()
 	}
 }
 
-void ASampleGameCharacter::Die()
+void ASampleGameCharacter::Die(const ASampleGameCharacter* Killer)
 {
 	if (GetNetMode() == NM_DedicatedServer && HasAuthority())
 	{
 		ASampleGamePlayerController* PC = Cast<ASampleGamePlayerController>(GetController());
 		if (PC)
 		{
-			PC->KillCharacter();
+			PC->KillCharacter(Killer);
 		}
 
 		// Destroy weapon actor if there is one.
@@ -482,6 +517,15 @@ FVector ASampleGameCharacter::GetLineTraceDirection() const
 	return GetFollowCamera()->GetForwardVector();
 }
 
+FString ASampleGameCharacter::GetPlayerName() const
+{
+	if (ASampleGamePlayerState* PS = Cast<ASampleGamePlayerState>(PlayerState))
+	{
+		return PS->GetPlayerName();
+	}
+	return FString("UNKNOWN");
+}
+
 float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (!HasAuthority())
@@ -489,16 +533,21 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 		return 0;
 	}
 
+	const ASampleGameCharacter* Killer = nullptr;
+
 	// Ignore friendly fire
 	const AInstantWeapon* DamageSourceWeapon = Cast<AInstantWeapon>(DamageCauser);
 	if (DamageSourceWeapon != nullptr)
 	{
 		const ASampleGameCharacter* DamageDealer = Cast<ASampleGameCharacter>(DamageSourceWeapon->GetWeilder());
-		if (DamageDealer != nullptr
-			&& Team != ESampleGameTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
-			&& DamageDealer->GetTeam() == Team)
+		if (DamageDealer != nullptr)
 		{
-			return 0;
+			if (Team != ESampleGameTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
+				&& DamageDealer->GetTeam() == Team)
+			{
+				return 0;
+			}
+			Killer = DamageDealer;
 		}
 	}
 
@@ -507,7 +556,7 @@ float ASampleGameCharacter::TakeDamage(float Damage, struct FDamageEvent const& 
 
 	if (CurrentHealth <= 0)
 	{
-		Die();
+		Die(Killer);
 	}
 
 	return DamageDealt;

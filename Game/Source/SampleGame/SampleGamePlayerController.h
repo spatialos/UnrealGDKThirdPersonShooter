@@ -28,16 +28,39 @@ public:
 	virtual void SetPawn(APawn* InPawn) override;
 
 	// [server] Tells the controller that it's time for the player to die, and sets up conditions for respawn.
-	void KillCharacter();
+	// @param Killer  The player who killed me. Can be null if it wasn't a player who dealt the damage that killed me.
+	void KillCharacter(const class ASampleGameCharacter* Killer);
 
 	// [client] Sets whether the player UI should be visible.
 	void SetPlayerUIVisible(bool bIsVisible);
 
+	// [client] Sets whether the scoreboard should be visible.
+	void SetScoreboardIsVisible(bool bIsVisible);
+
+	// [client] Sets whether the cursor is in "UI mode", meaning it is visible and can be moved around the screen,
+	// instead of locked, invisible, and used for aiming.
+	void SetUIMode(bool bIsUIMode, bool bAllowMovement = false);
+
+	// [client] Sets whether we should ignore action input. For this to work properly, the character
+	// must check the result of IgnoreActionInput before applying any action inputs.
+	void SetIgnoreActionInput(bool bIgnoreInput) { bIgnoreActionInput = bIgnoreInput; }
+
+	// [client] If true, action input should be ignored. This should be called from the character, or any other object
+	// which handles user input.
+	bool IgnoreActionInput() const { return bIgnoreActionInput; }
+
+	// [client] Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play.
+	// Will populate "NewPlayerName" with a default value if empty.
+	void TryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
+
+protected:
+	virtual void SetupInputComponent() override;
+
+private:
 	// Sets the player-choice data (name, team, etc) and requests to spawn player pawn and join play
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerTryJoinGame(const FString& NewPlayerName, const ESampleGameTeam NewPlayerTeam);
 
-private:
 	// [client] Informs the invoking client whether the join request suceeded or failed
 	UFUNCTION(Client, Reliable)
 	void ClientJoinResults(const bool bJoinSucceeded);
@@ -51,6 +74,23 @@ private:
 	// [client] Sets whether or not the login UI should be visible.
 	void SetLoginUIVisible(bool bIsVisible);
 
+	// [client] Initializes the scoreboard UI.
+	void InitScoreboard();
+
+	// [client] Shows the scoreboard UI.
+	void ShowScoreboard();
+
+	// [client] Hides the scoreboard UI.
+	void HideScoreboard();
+
+	// Gets a default player name based upon the worker's ID.
+	// Generates a GUID if we're not running on a SpatialOS worker.
+	FString GetDefaultPlayerName();
+
+	// If true, action input should be ignored.
+	// Default value is false.
+	bool bIgnoreActionInput;
+
 	// UI class to draw in-game.
 	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
 	TSubclassOf<class USampleGameUI> UITemplate;
@@ -58,6 +98,14 @@ private:
 	// The current game UI.
 	UPROPERTY(Transient)
 	class USampleGameUI* SampleGameUI;
+
+	// Scoreboard UI class to use in-game.
+	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	TSubclassOf<class USampleGameScoreboard> ScoreboardTemplate;
+
+	// The current scoreboard UI widget instance.
+	UPROPERTY(Transient)
+	class USampleGameScoreboard* Scoreboard;
 
 	// Login UI class template to load at player join.
 	UPROPERTY(EditDefaultsOnly, Category = "SampleGameUI")

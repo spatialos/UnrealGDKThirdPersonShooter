@@ -24,6 +24,7 @@
 #include "GameFramework/HUD.h"
 #include "GameFramework/LocalMessage.h"
 #include "Particles/EmitterCameraLensEffectBase.h"
+#include "SGGameState.h"
 
 #include "SampleGamePlayerControllerSingleClientRepDataAddComponentOp.h"
 #include "SampleGamePlayerControllerMultiClientRepDataAddComponentOp.h"
