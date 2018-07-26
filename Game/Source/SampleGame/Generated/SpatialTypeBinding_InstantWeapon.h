@@ -64,10 +64,12 @@ private:
 	// RPC command sender functions.
 	void ServerDidMiss_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 	void ServerDidHit_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
+	void MulticastNotifyHit_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject);
 
 	// RPC command request handler functions.
 	void ServerDidMiss_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidmiss>& Op);
 	void ServerDidHit_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidhit>& Op);
+	void MulticastNotifyHit_OnRPCPayload(const worker::EntityId EntityId, const improbable::unreal::generated::instantweapon::MulticastNotifyHitRequest& EventData);
 
 	// RPC command response handler functions.
 	void ServerDidMiss_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Commands::Serverdidmiss>& Op);

@@ -8,11 +8,14 @@ type ServerDidMissRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_hitinfo0_location0 = 2;
 	UnrealObjectRef field_hitinfo0_hitactor0 = 3;
-	bytes field_hitinfo0_timestamp0 = 4;
 }
 type ServerDidHitRequest {
 	uint32 target_subobject_offset = 1;
 	bytes field_hitinfo0_location0 = 2;
 	UnrealObjectRef field_hitinfo0_hitactor0 = 3;
-	bytes field_hitinfo0_timestamp0 = 4;
+}
+type MulticastNotifyHitRequest {
+	uint32 target_subobject_offset = 1;
+	bytes field_hitinfo0_location0 = 2;
+	UnrealObjectRef field_hitinfo0_hitactor0 = 3;
 }
