@@ -12,18 +12,6 @@ ASGGameState::ASGGameState()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ASGGameState::FakeServerHasBegunPlay()
-{
-	if (!GetWorld()) 
-	{
-		return;
-	}
-	Role = ROLE_SimulatedProxy;
-	
-	bReplicatedHasBegunPlay = true;
-	OnRep_ReplicatedHasBegunPlay();
-}
-
 void ASGGameState::AddPlayer(ESampleGameTeam Team, const FString& Player)
 {
 	if (Team == ESampleGameTeam::Team_None || Team > ESampleGameTeam::Team_MAX)
