@@ -27,7 +27,7 @@ ASampleGameGameMode::ASampleGameGameMode()
 
 	HUDClass = ASampleGameHUD::StaticClass();
 
-	const TCHAR* DefaultPlayerControllerBPPath = TEXT("/Game/ThirdPersonCPP/Blueprints/SampleGamePlayerController_BP");
+	const TCHAR* DefaultPlayerControllerBPPath = TEXT("/Game/Characters/SampleGamePlayerController_BP");
 	const ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(DefaultPlayerControllerBPPath);
 	if (PlayerControllerBPClass.Class != nullptr)
 	{
