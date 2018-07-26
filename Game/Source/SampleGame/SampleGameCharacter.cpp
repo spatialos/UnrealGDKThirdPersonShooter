@@ -237,12 +237,6 @@ void ASampleGameCharacter::Interact()
 		return;
 	}
 
-	if (GEngine != nullptr)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.0f, FColor::Cyan,
-			FString::Printf(TEXT("Interact with actor: %s"), *HitResult.GetActor()->GetName()));
-	}
-
 	// Do the interface check this way so it catches both C++ and Blueprint implementations (cast will only catch C++).
 	if (HitResult.GetActor()->GetClass()->ImplementsInterface(UInteractable::StaticClass()))
 	{
@@ -348,6 +342,7 @@ void ASampleGameCharacter::StartRagdoll()
 		UE_LOG(LogSampleGame, Error, TEXT("Invalid capsule component on character %s"), *this->GetName());
 		return;
 	}
+	CapsuleComponent->SetSimulatePhysics(false);
 	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->DisableMovement();
 
