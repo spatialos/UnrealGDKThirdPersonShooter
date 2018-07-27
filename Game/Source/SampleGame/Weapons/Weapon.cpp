@@ -2,8 +2,8 @@
 
 #include "Weapon.h"
 
+#include "Characters/SampleGameCharacter.h"
 #include "Engine/World.h"
-#include "SampleGameCharacter.h"
 #include "UnrealNetwork.h"
 
 

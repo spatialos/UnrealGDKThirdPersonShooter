@@ -18,7 +18,7 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
-#include "SGGameState.h"
+#include "Game/SGGameState.h"
 #include "Teams/SampleGameTeams.h"
 
 #include "SGGameStateSingleClientRepDataAddComponentOp.h"

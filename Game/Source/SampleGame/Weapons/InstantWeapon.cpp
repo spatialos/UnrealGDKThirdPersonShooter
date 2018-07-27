@@ -2,10 +2,10 @@
 
 #include "InstantWeapon.h"
 
+#include "Characters/SampleGameCharacter.h"
 #include "CollisionQueryParams.h"
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
-#include "SampleGameCharacter.h"
 #include "SampleGameLogging.h"
 #include "UnrealNetwork.h"
 

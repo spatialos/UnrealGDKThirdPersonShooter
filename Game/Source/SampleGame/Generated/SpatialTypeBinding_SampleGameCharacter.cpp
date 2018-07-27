@@ -18,7 +18,7 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
-#include "SampleGameCharacter.h"
+#include "Characters/SampleGameCharacter.h"
 #include "Teams/SampleGameTeams.h"
 #include "Weapons/Weapon.h"
 

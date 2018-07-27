@@ -1,8 +1,8 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "SampleGamePlayerState.h"
+#include "Characters/SampleGamePlayerState.h"
 
-#include "SampleGameCharacter.h"
+#include "Characters/SampleGameCharacter.h"
 #include "Net/UnrealNetwork.h"
 #include "SpatialNetDriver.h"
 

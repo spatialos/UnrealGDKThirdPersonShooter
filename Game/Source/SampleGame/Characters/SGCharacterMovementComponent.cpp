@@ -1,9 +1,9 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "SGCharacterMovementComponent.h"
+#include "Characters/SGCharacterMovementComponent.h"
 
+#include "Characters/SampleGameCharacter.h"
 #include "GameFramework/Character.h"
-#include "SampleGameCharacter.h"
 
 // Use the first custom movement flag slot in the character for sprinting.
 static const FSavedMove_Character::CompressedFlags FLAG_WantsToSprint = FSavedMove_SGMovement::FLAG_Custom_0;

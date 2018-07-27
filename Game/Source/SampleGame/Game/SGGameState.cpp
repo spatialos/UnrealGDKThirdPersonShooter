@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "SGGameState.h"
+#include "Game/SGGameState.h"
 
 #include "SampleGameLogging.h"
 #include "Teams/SampleGameTeams.h"

@@ -1,12 +1,12 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "SampleGameGameMode.h"
+#include "Game/SampleGameGameMode.h"
 
+#include "Characters/SampleGamePlayerController.h"
+#include "Characters/SampleGamePlayerState.h"
 #include "EngineUtils.h"
+#include "Game/SGGameState.h"
 #include "SampleGameLogging.h"
-#include "SampleGamePlayerController.h"
-#include "SampleGamePlayerState.h"
-#include "SGGameState.h"
 #include "Teams/SampleGameTeamPlayerStart.h"
 #include "UObject/ConstructorHelpers.h"
 #include "UI/SampleGameHUD.h"
