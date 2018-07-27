@@ -1,0 +1,23 @@
+{
+	"FileVersion": 3,
+	"EngineAssociation": "{E7EDB5D0-4DFB-B0F3-7595-6087D4EC6018}",
+	"Category": "",
+	"Description": "",
+	"Modules": [
+		{
+			"Name": "ThirdPersonShooter",
+			"Type": "Runtime",
+			"LoadingPhase": "Default",
+			"AdditionalDependencies": [
+				"Engine",
+				"SpatialGDK",
+				"UMG"
+			]
+		},
+		{
+			"Name": "SpatialGDK",
+			"Type": "Runtime",
+			"LoadingPhase": "Default"
+		}
+	]
+}
