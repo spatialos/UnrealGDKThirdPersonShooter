@@ -22,7 +22,7 @@ ATPSGameMode::ATPSGameMode()
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("[TPSGameMode]: Couldn't find default Pawn blueprint class: %s"), DefaultPawnBPPath);
+		UE_LOG(LogTPS, Error, TEXT("[TPSGameMode]: Couldn't find default Pawn blueprint class: %s"), DefaultPawnBPPath);
 	}
 
 	HUDClass = ATPSHUD::StaticClass();
@@ -35,7 +35,7 @@ ATPSGameMode::ATPSGameMode()
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("[TPSGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
+		UE_LOG(LogTPS, Error, TEXT("[TPSGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
 	}
 
 	PlayerStateClass = ATPSPlayerState::StaticClass();
@@ -47,14 +47,14 @@ ATPSGameMode::ATPSGameMode()
 
 AActor* ATPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
-	// If for some reason we aren't using a SampleGame PlayerController, use default ChoosePlayerStart behavior
-	ATPSPlayerController* SGPlayerController = Cast<ATPSPlayerController>(Player);
-	if (SGPlayerController != nullptr)
+	// If for some reason we aren't using an ATPSPlayerController, use default ChoosePlayerStart behavior
+	ATPSPlayerController* TPSPlayerController = Cast<ATPSPlayerController>(Player);
+	if (TPSPlayerController != nullptr)
 	{
 		ETPSTeam SelectedTeam = ETPSTeam::Team_None;
-		if (ATPSPlayerState* SGPlayerState = Cast<ATPSPlayerState>(SGPlayerController->PlayerState))
+		if (ATPSPlayerState* TPSPlayerState = Cast<ATPSPlayerState>(TPSPlayerController->PlayerState))
 		{
-			SelectedTeam = SGPlayerState->GetSelectedTeam();
+			SelectedTeam = TPSPlayerState->GetSelectedTeam();
 		}
 		
 		TArray<ATPSTeamPlayerStart*> UnoccupiedStartPoints;
@@ -106,15 +106,15 @@ bool IsPlayerStartAMatchForTeam(const ATPSTeamPlayerStart* PlayerStart, const ET
 
 AActor* ATPSGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
 {
-	// If for some reason we aren't using a SampleGame PlayerController, use default FindPlayerStart behavior
-	ATPSPlayerController* SGPlayerController = Cast<ATPSPlayerController>(Player);
-	if (SGPlayerController != nullptr)
+	// If for some reason we aren't using an ATPSPlayerController, use default FindPlayerStart behavior
+	ATPSPlayerController* TPSPlayerController = Cast<ATPSPlayerController>(Player);
+	if (TPSPlayerController != nullptr)
 	{
 		ETPSTeam SelectedTeam = ETPSTeam::Team_None;
-		ATPSPlayerState* SGPlayerState = Cast<ATPSPlayerState>(SGPlayerController->PlayerState);
-		if (SGPlayerState != nullptr)
+		ATPSPlayerState* TPSPlayerState = Cast<ATPSPlayerState>(TPSPlayerController->PlayerState);
+		if (TPSPlayerState != nullptr)
 		{
-			SelectedTeam = SGPlayerState->GetSelectedTeam();
+			SelectedTeam = TPSPlayerState->GetSelectedTeam();
 		}
 	
 		UWorld* World = GetWorld();
@@ -158,7 +158,7 @@ void ATPSGameMode::NotifyPlayerJoined(const FString& PlayerName, ETPSTeam Player
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
+		UE_LOG(LogTPS, Error, TEXT("%s: failed to add player to scoreboard because GameState didn't exist"),
 			*TPSLogging::LogPrefix(this));
 	}
 }
@@ -171,7 +171,7 @@ void ATPSGameMode::NotifyPlayerKilled(const FString& PlayerName, ETPSTeam Player
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to register kill because GameState didn't exist"),
+		UE_LOG(LogTPS, Error, TEXT("%s: failed to register kill because GameState didn't exist"),
 			*TPSLogging::LogPrefix(this));
 	}
 }

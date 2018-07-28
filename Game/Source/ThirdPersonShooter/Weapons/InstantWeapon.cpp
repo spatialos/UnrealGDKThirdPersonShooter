@@ -122,7 +122,7 @@ bool AInstantWeapon::DoLineTrace(FInstantHitInfo& OutHitInfo)
 	ATPSCharacter* Character = GetOwningCharacter();
 	if (Character == nullptr)
 	{
-		UE_LOG(LogSampleGame, Verbose, TEXT("Weapon %s does not have an owning character"), *this->GetName());
+		UE_LOG(LogTPS, Verbose, TEXT("Weapon %s does not have an owning character"), *this->GetName());
 		return false;
 	}
 
@@ -227,7 +227,7 @@ void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 {
 	if (!GetOwningCharacter()->CanFire())
 	{
-		UE_LOG(LogSampleGame, Verbose, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
+		UE_LOG(LogTPS, Verbose, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
 		return;
 	}
 
@@ -246,7 +246,7 @@ void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 		}
 		else
 		{
-			UE_LOG(LogSampleGame, Verbose, TEXT("%s server: rejected hit of actor %s"), *this->GetName(), *HitInfo.HitActor->GetName());
+			UE_LOG(LogTPS, Verbose, TEXT("%s server: rejected hit of actor %s"), *this->GetName(), *HitInfo.HitActor->GetName());
 		}
 	}
 
@@ -263,7 +263,7 @@ bool AInstantWeapon::ServerDidMiss_Validate(const FInstantHitInfo& HitInfo)
 
 void AInstantWeapon::ServerDidMiss_Implementation(const FInstantHitInfo& HitInfo)
 {
-	UE_LOG(LogSampleGame, Verbose, TEXT("Shot missed"));
+	UE_LOG(LogTPS, Verbose, TEXT("Shot missed"));
 }
 
 void AInstantWeapon::ClearTimerIfRunning()

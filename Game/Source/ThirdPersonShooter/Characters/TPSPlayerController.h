@@ -92,15 +92,15 @@ private:
 	bool bIgnoreActionInput;
 
 	// UI class to draw in-game.
-	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	UPROPERTY(EditAnywhere, Category = "TPS UI")
 	TSubclassOf<class UTPSUI> UITemplate;
 
 	// The current game UI.
 	UPROPERTY(Transient)
-	class UTPSUI* SampleGameUI;
+	class UTPSUI* TPSUI;
 
 	// Scoreboard UI class to use in-game.
-	UPROPERTY(EditAnywhere, Category = "SampleGameUI")
+	UPROPERTY(EditAnywhere, Category = "TPS UI")
 	TSubclassOf<class UTPSScoreboard> ScoreboardTemplate;
 
 	// The current scoreboard UI widget instance.
@@ -108,12 +108,12 @@ private:
 	class UTPSScoreboard* Scoreboard;
 
 	// Login UI class template to load at player join.
-	UPROPERTY(EditDefaultsOnly, Category = "SampleGameUI")
+	UPROPERTY(EditDefaultsOnly, Category = "TPS UI")
 	TSubclassOf<class UTPSLoginUI> LoginUIWidgetTemplate;
 
 	// The instance of the Login UI class to allow player choice interaction.
 	UPROPERTY(Transient)
-	class UTPSLoginUI* SampleGameLoginUI;
+	class UTPSLoginUI* TPSLoginUI;
 
 	// Character respawn delay, in seconds.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")

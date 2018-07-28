@@ -18,9 +18,9 @@
 
 ATPSPlayerController::ATPSPlayerController()
 	: bIgnoreActionInput(false)
-	, SampleGameUI(nullptr)
+	, TPSUI(nullptr)
 	, Scoreboard(nullptr)
-	, SampleGameLoginUI(nullptr)
+	, TPSLoginUI(nullptr)
 	, RespawnCharacterDelay(5.0f)
 	, DeleteCharacterDelay(15.0f)
 	, PawnToDelete(nullptr)
@@ -36,13 +36,13 @@ void ATPSPlayerController::EndPlay(const EEndPlayReason::Type Reason)
 
 void ATPSPlayerController::UpdateHealthUI(int32 NewHealth, int32 MaxHealth)
 {
-	if (SampleGameUI != nullptr)
+	if (TPSUI != nullptr)
 	{
-		SampleGameUI->UpdateHealth(NewHealth, MaxHealth);
+		TPSUI->UpdateHealth(NewHealth, MaxHealth);
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Log, TEXT("Couldn't find SampleGameUI for controller: %s"), *this->GetName());
+		UE_LOG(LogTPS, Log, TEXT("Couldn't find TPSUI for controller: %s"), *this->GetName());
 	}
 }
 
@@ -116,30 +116,30 @@ void ATPSPlayerController::SetPlayerUIVisible(bool bIsVisible)
 
 	if (bIsVisible)
 	{
-		if (SampleGameUI == nullptr)
+		if (TPSUI == nullptr)
 		{
 			check(UITemplate != nullptr);
-			SampleGameUI = CreateWidget<UTPSUI>(this, UITemplate);
-			if (SampleGameUI == nullptr)
+			TPSUI = CreateWidget<UTPSUI>(this, UITemplate);
+			if (TPSUI == nullptr)
 			{
 				USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
-				UE_LOG(LogSampleGame, Error, TEXT("Failed to create UI for controller %s on worker %s"),
+				UE_LOG(LogTPS, Error, TEXT("Failed to create UI for controller %s on worker %s"),
 					*this->GetName(),
 					SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 				return;
 			}
 		}
 
-		if (!SampleGameUI->IsVisible())
+		if (!TPSUI->IsVisible())
 		{
-			SampleGameUI->AddToViewport();
+			TPSUI->AddToViewport();
 		}
 	}
 	else
 	{
-		if (SampleGameUI != nullptr && SampleGameUI->IsVisible())
+		if (TPSUI != nullptr && TPSUI->IsVisible())
 		{
-			SampleGameUI->RemoveFromViewport();
+			TPSUI->RemoveFromViewport();
 		}
 	}
 }
@@ -155,16 +155,16 @@ void ATPSPlayerController::SetupInputComponent()
 void ATPSPlayerController::SetLoginUIVisible(bool bIsVisible)
 {
 	// Lazy instantiate the Login UI
-	if (SampleGameLoginUI == nullptr)
+	if (TPSLoginUI == nullptr)
 	{
 		check(LoginUIWidgetTemplate != nullptr);
-		SampleGameLoginUI = CreateWidget<UTPSLoginUI>(this, LoginUIWidgetTemplate);
+		TPSLoginUI = CreateWidget<UTPSLoginUI>(this, LoginUIWidgetTemplate);
 		
 		// Early out - Error case
-		if (SampleGameLoginUI == nullptr)
+		if (TPSLoginUI == nullptr)
 		{
 			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
-			UE_LOG(LogSampleGame, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
+			UE_LOG(LogTPS, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
 				*this->GetName(),
 				SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 
@@ -173,7 +173,7 @@ void ATPSPlayerController::SetLoginUIVisible(bool bIsVisible)
 	}
 
 	// Early out - If our visibility state is already set to the requested value, do nothing
-	if (SampleGameLoginUI->IsVisible() == bIsVisible)
+	if (TPSLoginUI->IsVisible() == bIsVisible)
 	{
 		return;
 	}
@@ -181,16 +181,16 @@ void ATPSPlayerController::SetLoginUIVisible(bool bIsVisible)
 	if (bIsVisible)
 	{
 		// Show the Login UI
-		SampleGameLoginUI->AddToViewport();
+		TPSLoginUI->AddToViewport();
 		// The UI Widget needs to know who its owner is, so it knows who to respond to when user submits final selections
-		SampleGameLoginUI->SetOwnerPlayerController(this);
+		TPSLoginUI->SetOwnerPlayerController(this);
 		// Set Mouse Cursor to SHOW, and only interact with the UI
 		SetUIMode(true);
 	}
 	else
 	{
 		// Hide the Login UI
-		SampleGameLoginUI->RemoveFromViewport();
+		TPSLoginUI->RemoveFromViewport();
 		// Hide the Mouse Cursor, restore Look and Move control
 		SetUIMode(false);
 	}
@@ -210,7 +210,7 @@ void ATPSPlayerController::InitScoreboard()
 
 	if (Scoreboard == nullptr)
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to create scoreboard widget"), *TPSLogging::LogPrefix(this));
+		UE_LOG(LogTPS, Error, TEXT("%s: failed to create scoreboard widget"), *TPSLogging::LogPrefix(this));
 		return;
 	}
 
@@ -223,7 +223,7 @@ void ATPSPlayerController::InitScoreboard()
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("%s: failed to initialize scoreboard because GameState didn't exist"),
+		UE_LOG(LogTPS, Error, TEXT("%s: failed to initialize scoreboard because GameState didn't exist"),
 			*TPSLogging::LogPrefix(this));
 	}
 }
@@ -233,9 +233,9 @@ void ATPSPlayerController::ShowScoreboard()
 	check(GetNetMode() != NM_DedicatedServer);
 
 	// Make sure we stop firing when the user pulls up the scoreboard.
-	if (ATPSCharacter* SGCharacter = Cast<ATPSCharacter>(GetCharacter()))
+	if (ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(GetCharacter()))
 	{
-		SGCharacter->StopFire();
+		TPSCharacter->StopFire();
 	}
 
 	SetScoreboardIsVisible(true);
@@ -308,7 +308,7 @@ void ATPSPlayerController::ServerTryJoinGame_Implementation(const FString& NewPl
 	{
 		bJoinWasSuccessful = false;
 
-		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Player attempted to join with empty name."), *this->GetName());
+		UE_LOG(LogTPS, Error, TEXT("%s PlayerController: Player attempted to join with empty name."), *this->GetName());
 	}
 
 	// Validate PlayerState
@@ -317,7 +317,7 @@ void ATPSPlayerController::ServerTryJoinGame_Implementation(const FString& NewPl
 	{
 		bJoinWasSuccessful = false;
 
-		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Invalid PlayerState pointer (%s)"), *this->GetName(), PlayerState == nullptr ? TEXT("nullptr") : *PlayerState->GetName());
+		UE_LOG(LogTPS, Error, TEXT("%s PlayerController: Invalid PlayerState pointer (%s)"), *this->GetName(), PlayerState == nullptr ? TEXT("nullptr") : *PlayerState->GetName());
 	}
 
 	// Validate the join request
@@ -325,7 +325,7 @@ void ATPSPlayerController::ServerTryJoinGame_Implementation(const FString& NewPl
 	{
 		bJoinWasSuccessful = false;
 
-		UE_LOG(LogSampleGame, Error, TEXT("%s PlayerController: Already submitted Join request.  Client attempting to join session multiple times."), *this->GetName());
+		UE_LOG(LogTPS, Error, TEXT("%s PlayerController: Already submitted Join request.  Client attempting to join session multiple times."), *this->GetName());
 	}
 
 	// Inform Client as to whether or not join was accepted
@@ -360,7 +360,7 @@ void ATPSPlayerController::ServerTryJoinGame_Implementation(const FString& NewPl
 		}
 		else
 		{
-			UE_LOG(LogSampleGame, Error, TEXT("%s: failed to add player because GameMode didn't exist"),
+			UE_LOG(LogTPS, Error, TEXT("%s: failed to add player because GameMode didn't exist"),
 				*TPSLogging::LogPrefix(this));
 		}
 	}
@@ -374,7 +374,7 @@ bool ATPSPlayerController::ServerTryJoinGame_Validate(const FString& NewPlayerNa
 
 void ATPSPlayerController::ClientJoinResults_Implementation(const bool bJoinSucceeded)
 {
-	check(SampleGameLoginUI != nullptr);
+	check(TPSLoginUI != nullptr);
 
 	if (bJoinSucceeded)
 	{
@@ -383,7 +383,7 @@ void ATPSPlayerController::ClientJoinResults_Implementation(const bool bJoinSucc
 	}
 	else
 	{
-		SampleGameLoginUI->JoinGameWasRejected();
+		TPSLoginUI->JoinGameWasRejected();
 	}
 
 	InitScoreboard();
@@ -401,8 +401,8 @@ void ATPSPlayerController::RespawnCharacter()
 		ATPSCharacter* NewCharacter = Cast<ATPSCharacter>(NewPawn);
 		if (NewCharacter != nullptr)
 		{
-			ATPSPlayerState* SGPlayerState = Cast<ATPSPlayerState>(PlayerState);
-			NewCharacter->SetTeam(SGPlayerState != nullptr ? SGPlayerState->GetSelectedTeam() : ETPSTeam::Team_None);
+			ATPSPlayerState* TPSPlayerState = Cast<ATPSPlayerState>(PlayerState);
+			NewCharacter->SetTeam(TPSPlayerState != nullptr ? TPSPlayerState->GetSelectedTeam() : ETPSTeam::Team_None);
 		}
 	}
 }

@@ -9,7 +9,7 @@
 #include "SpatialNetDriver.h"
 
 
-DEFINE_LOG_CATEGORY(LogSampleGame);
+DEFINE_LOG_CATEGORY(LogTPS);
 
 FString TPSLogging::LogPrefix(AActor* Actor)
 {

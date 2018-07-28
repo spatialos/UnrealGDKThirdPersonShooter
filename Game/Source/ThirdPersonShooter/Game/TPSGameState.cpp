@@ -124,7 +124,7 @@ void ATPSGameState::AddPlayerInternal(ETPSTeam Team, const FString& Player)
 	FTeamScore* TeamScore = GetScoreForTeam(Team);
 	if (TeamScore == nullptr)
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("[GameState] Tried to add a player (%s) to the score list with an invalid team (%d)"),
+		UE_LOG(LogTPS, Error, TEXT("[GameState] Tried to add a player (%s) to the score list with an invalid team (%d)"),
 			*Player, static_cast<uint8>(Team));
 		return;
 	}

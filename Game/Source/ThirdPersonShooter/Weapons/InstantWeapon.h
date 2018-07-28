@@ -8,7 +8,7 @@
 
 
 // Tag for weapon line trace visualization.
-const FName kTraceTag("SampleGameTrace");
+const FName kTraceTag("TPSTrace");
 
 USTRUCT()
 struct FInstantHitInfo

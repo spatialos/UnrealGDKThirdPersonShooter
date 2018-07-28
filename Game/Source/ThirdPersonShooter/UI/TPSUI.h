@@ -18,7 +18,7 @@ public:
 
 protected:
 	// Blueprint event called whenever the current health value is updated.
-	UFUNCTION(BlueprintImplementableEvent, Category = "SampleGameUI")
+	UFUNCTION(BlueprintImplementableEvent, Category = "TPS UI")
 	void UpdateHealthBar();
 
 	// Current UI health value, between 0 and 1.

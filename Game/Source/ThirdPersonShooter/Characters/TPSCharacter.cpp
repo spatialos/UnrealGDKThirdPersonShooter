@@ -23,9 +23,6 @@
 
 static const FName kRightGunSocketName("GunSocket_r");
 
-//////////////////////////////////////////////////////////////////////////
-// ASampleGameCharacter
-
 ATPSCharacter::ATPSCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UTPSCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
@@ -83,7 +80,7 @@ void ATPSCharacter::BeginPlay()
 		FTimerHandle TimerHandle;
 		FTimerDelegate TimerDelegate;
 		TimerDelegate.BindLambda([this]() {
-			UE_LOG(LogSampleGame, Log, TEXT("%s EquippedWeapon: %s"), *this->GetName(), EquippedWeapon == nullptr ? TEXT("nullptr") : *EquippedWeapon->GetName());
+			UE_LOG(LogTPS, Log, TEXT("%s EquippedWeapon: %s"), *this->GetName(), EquippedWeapon == nullptr ? TEXT("nullptr") : *EquippedWeapon->GetName());
 			if (GetEquippedWeapon() == nullptr)
 			{
 				SpawnStarterWeapon();
@@ -216,7 +213,7 @@ void ATPSCharacter::Interact()
 		return;
 	}
 
-	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("SampleGame_Trace")), true, this);
+	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("TPS_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
 	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = false;
@@ -263,7 +260,7 @@ void ATPSCharacter::SpawnStarterWeapon()
 
 	if (StarterWeaponTemplate == nullptr)
 	{
-		UE_LOG(LogSampleGame, Warning, TEXT("No starter weapon defined."));
+		UE_LOG(LogTPS, Warning, TEXT("No starter weapon defined."));
 		return;
 	}
 
@@ -273,7 +270,7 @@ void ATPSCharacter::SpawnStarterWeapon()
 	StartWeapon->SetOwningCharacter(this);
 	StartWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, kRightGunSocketName);
 
-	UE_LOG(LogSampleGame, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());
+	UE_LOG(LogTPS, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());
 	EquippedWeapon = StartWeapon;
 }
 
@@ -339,7 +336,7 @@ void ATPSCharacter::StartRagdoll()
 	UCapsuleComponent* CapsuleComponent = GetCapsuleComponent();
 	if (CapsuleComponent == nullptr)
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("Invalid capsule component on character %s"), *this->GetName());
+		UE_LOG(LogTPS, Error, TEXT("Invalid capsule component on character %s"), *this->GetName());
 		return;
 	}
 	CapsuleComponent->SetSimulatePhysics(false);
@@ -470,7 +467,7 @@ void ATPSCharacter::OnRep_CurrentHealth()
 		}
 		else
 		{
-			UE_LOG(LogSampleGame, Warning, TEXT("Couldn't find a player controller for character: %s"), *this->GetName());
+			UE_LOG(LogTPS, Warning, TEXT("Couldn't find a player controller for character: %s"), *this->GetName());
 		}
 	}
 }

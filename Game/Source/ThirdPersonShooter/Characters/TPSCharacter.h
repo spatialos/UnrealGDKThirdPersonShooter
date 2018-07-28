@@ -160,7 +160,7 @@ private:
 	TSubclassOf<AWeapon> StarterWeaponTemplate;
 
 	// Cube to spawn when the player presses "SpawnCube".
-	UPROPERTY(EditDefaultsOnly, Category = "SampleGameDebugging")
+	UPROPERTY(EditDefaultsOnly, Category = "Test Cube")
 	TSubclassOf<AActor> TestCubeTemplate;
 
 	// Maximum distance at which the player can interact with objects.
