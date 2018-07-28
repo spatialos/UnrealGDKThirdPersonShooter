@@ -37,7 +37,7 @@
       },
       {
         "global_component_streaming_query": {
-          "component_name": "improbable.unreal.generated.sggamestate.SGGameStateMultiClientRepData"
+          "component_name": "improbable.unreal.generated.tpsgamestate.TPSGameStateMultiClientRepData"
         }
       }
     ],

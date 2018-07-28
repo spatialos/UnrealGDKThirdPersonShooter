@@ -14,7 +14,7 @@
 ATPSGameMode::ATPSGameMode()
 {
 	//set default pawn class to our Blueprinted character
-	const TCHAR* DefaultPawnBPPath = TEXT("/Game/EntityBlueprints/SampleGameCharacter_BP");
+	const TCHAR* DefaultPawnBPPath = TEXT("/Game/EntityBlueprints/TPSCharacter_BP");
 	const ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(DefaultPawnBPPath);
 	if (PlayerPawnBPClass.Class != nullptr)
 	{
@@ -22,12 +22,12 @@ ATPSGameMode::ATPSGameMode()
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("[SampleGameGameMode]: Couldn't find default Pawn blueprint class: %s"), DefaultPawnBPPath);
+		UE_LOG(LogSampleGame, Error, TEXT("[TPSGameMode]: Couldn't find default Pawn blueprint class: %s"), DefaultPawnBPPath);
 	}
 
 	HUDClass = ATPSHUD::StaticClass();
 
-	const TCHAR* DefaultPlayerControllerBPPath = TEXT("/Game/Characters/SampleGamePlayerController_BP");
+	const TCHAR* DefaultPlayerControllerBPPath = TEXT("/Game/Characters/TPSPlayerController_BP");
 	const ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(DefaultPlayerControllerBPPath);
 	if (PlayerControllerBPClass.Class != nullptr)
 	{
@@ -35,7 +35,7 @@ ATPSGameMode::ATPSGameMode()
 	}
 	else
 	{
-		UE_LOG(LogSampleGame, Error, TEXT("[SampleGameGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
+		UE_LOG(LogSampleGame, Error, TEXT("[TPSGameMode]: Couldn't find default PlayerController blueprint class: %s"), DefaultPlayerControllerBPPath);
 	}
 
 	PlayerStateClass = ATPSPlayerState::StaticClass();
