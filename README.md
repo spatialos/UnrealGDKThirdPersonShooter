@@ -38,6 +38,9 @@ The following controls are bound in-game, for gameplay and testing.
 
 ## Contributions
 
+**Feedback**<br/>
+Please give us your feedback! Please see the Unreal GDK [feedback section](https://github.com/improbable/UnrealGDK#give-us-feedback) for more information.
+
 **Public contributors**<br/>
 We are not currently accepting public contributions. However, we are accepting issues and we do want your feedback.
 
