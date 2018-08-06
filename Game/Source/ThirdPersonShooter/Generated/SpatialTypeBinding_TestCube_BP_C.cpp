@@ -35,7 +35,7 @@ const FHandoverHandlePropertyMap& USpatialTypeBinding_TestCube_BP_C::GetHandover
 
 UClass* USpatialTypeBinding_TestCube_BP_C::GetBoundClass() const
 {
-	return FindObject<UClass>(ANY_PACKAGE, TEXT("TestCube_BP_C"));
+	return LoadObject<UClass>(nullptr, TEXT("/Game/EntityBlueprints/TestCube_BP.TestCube_BP_C"), nullptr, LOAD_None, nullptr);
 }
 
 void USpatialTypeBinding_TestCube_BP_C::Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap)
@@ -867,7 +867,7 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorC
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1029,7 +1029,7 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorC
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1085,7 +1085,7 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorC
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1170,7 +1170,7 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorC
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 

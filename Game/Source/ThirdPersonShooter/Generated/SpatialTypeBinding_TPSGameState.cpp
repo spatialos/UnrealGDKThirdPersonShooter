@@ -69,7 +69,7 @@ void USpatialTypeBinding_TPSGameState::Init(USpatialInterop* InInterop, USpatial
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"ReplicatedWorldTimeSeconds"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
-	bIsSingleton = true;
+	bIsSingleton = false;
 }
 
 void USpatialTypeBinding_TPSGameState::BindToView(bool bIsClient)
@@ -956,7 +956,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1118,7 +1118,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1174,7 +1174,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1259,7 +1259,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1315,7 +1315,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
@@ -1371,7 +1371,7 @@ void USpatialTypeBinding_TPSGameState::ReceiveUpdate_MultiClient(USpatialActorCh
 					// A legal static object reference should never be unresolved.
 					check(ObjectRef.path().empty());
 					bWriteObjectProperty = false;
-					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, RepData);
+					Interop->QueueIncomingObjectRepUpdate_Internal(ObjectRef, ActorChannel, TargetObject, RepData);
 				}
 			}
 
