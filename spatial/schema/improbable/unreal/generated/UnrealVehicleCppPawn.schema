@@ -1,13 +1,13 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated.wheeledvehicle;
+package improbable.unreal.generated.vehiclecpppawn;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-component WheeledVehicleSingleClientRepData {
+component VehicleCppPawnSingleClientRepData {
 	id = 100046;
 }
-component WheeledVehicleMultiClientRepData {
+component VehicleCppPawnMultiClientRepData {
 	id = 100047;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
@@ -28,17 +28,17 @@ component WheeledVehicleMultiClientRepData {
 	uint32 field_remoteviewpitch0 = 17; // COND_SkipOwner // ::Pawn
 	UnrealObjectRef field_controller0 = 18; // COND_None // ::Pawn
 }
-component WheeledVehicleHandoverData {
+component VehicleCppPawnHandoverData {
 	id = 100048;
 }
 import "improbable/unreal/generated/UnrealWheeledVehicleMovementComponentTypes.schema";
 
-component WheeledVehicleClientRPCs {
+component VehicleCppPawnClientRPCs {
 	id = 100049;
 }
-component WheeledVehicleServerRPCs {
+component VehicleCppPawnServerRPCs {
 	id = 100050;
 }
-component WheeledVehicleNetMulticastRPCs {
+component VehicleCppPawnNetMulticastRPCs {
 	id = 100051;
 }
