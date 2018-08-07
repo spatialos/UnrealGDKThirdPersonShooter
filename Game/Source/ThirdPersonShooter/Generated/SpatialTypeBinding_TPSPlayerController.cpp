@@ -149,7 +149,7 @@ void USpatialTypeBinding_TPSPlayerController::Init(USpatialInterop* InInterop, U
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"SpawnLocation"}, {0}, COND_OwnerOnly, REPNOTIFY_OnChanged));
 
 	// Populate HandoverHandleToPropertyMap.
-	HandoverHandleToPropertyMap.Add(1, FHandoverHandleData(Class, {"AcknowledgedPawn"}));
+	HandoverHandleToPropertyMap.Add(1, FHandoverHandleData(Class, {"AcknowledgedPawn"}, {0}));
 
 	bIsSingleton = false;
 }
