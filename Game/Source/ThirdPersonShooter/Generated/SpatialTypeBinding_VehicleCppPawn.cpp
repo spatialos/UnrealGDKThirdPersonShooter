@@ -20,7 +20,6 @@
 #include "SpatialInterop.h"
 #include "VehicleCppPawn.h"
 #include "WheeledVehicle.h"
-#include "WheeledVehicleMovementComponent.h"
 
 #include "VehicleCppPawnSingleClientRepDataAddComponentOp.h"
 #include "VehicleCppPawnMultiClientRepDataAddComponentOp.h"

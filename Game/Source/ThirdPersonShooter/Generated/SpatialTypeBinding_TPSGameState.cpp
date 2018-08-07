@@ -69,7 +69,7 @@ void USpatialTypeBinding_TPSGameState::Init(USpatialInterop* InInterop, USpatial
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"ReplicatedWorldTimeSeconds"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
-	bIsSingleton = false;
+	bIsSingleton = true;
 }
 
 void USpatialTypeBinding_TPSGameState::BindToView(bool bIsClient)
