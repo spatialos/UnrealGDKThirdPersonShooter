@@ -5,12 +5,12 @@ package improbable.unreal.generated.tpsplayercontroller;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSPlayerControllerSingleClientRepData {
-	id = 100022;
+	id = 100038;
 	bytes field_targetviewrotation0 = 1; // COND_OwnerOnly // ::PlayerController
 	bytes field_spawnlocation0 = 2; // COND_OwnerOnly // ::PlayerController
 }
 component TPSPlayerControllerMultiClientRepData {
-	id = 100023;
+	id = 100039;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -30,7 +30,7 @@ component TPSPlayerControllerMultiClientRepData {
 	UnrealObjectRef field_pawn0 = 17; // COND_None // ::Controller
 }
 component TPSPlayerControllerHandoverData {
-	id = 100024;
+	id = 100040;
 	UnrealObjectRef field_acknowledgedpawn0 = 1;
 }
 import "improbable/unreal/generated/UnrealTPSPlayerControllerTypes.schema";
@@ -38,7 +38,7 @@ import "improbable/unreal/generated/UnrealPlayerControllerTypes.schema";
 import "improbable/unreal/generated/UnrealControllerTypes.schema";
 
 component TPSPlayerControllerClientRPCs {
-	id = 100025;
+	id = 100041;
 	command UnrealRPCCommandResponse clientjoinresults(tpsplayercontroller.ClientJoinResultsRequest);
 	command UnrealRPCCommandResponse onserverstartedvisuallogger(playercontroller.OnServerStartedVisualLoggerRequest);
 	command UnrealRPCCommandResponse clientwaskicked(playercontroller.ClientWasKickedRequest);
@@ -94,7 +94,7 @@ component TPSPlayerControllerClientRPCs {
 	command UnrealRPCCommandResponse clientsetlocation(controller.ClientSetLocationRequest);
 }
 component TPSPlayerControllerServerRPCs {
-	id = 100026;
+	id = 100042;
 	command UnrealRPCCommandResponse servertryjoingame(tpsplayercontroller.ServerTryJoinGameRequest);
 	command UnrealRPCCommandResponse serverviewself(playercontroller.ServerViewSelfRequest);
 	command UnrealRPCCommandResponse serverviewprevplayer(playercontroller.ServerViewPrevPlayerRequest);
@@ -118,6 +118,9 @@ component TPSPlayerControllerServerRPCs {
 	command UnrealRPCCommandResponse servercamera(playercontroller.ServerCameraRequest);
 	command UnrealRPCCommandResponse serveracknowledgepossession(playercontroller.ServerAcknowledgePossessionRequest);
 }
+component TPSPlayerControllerCrossServerRPCs {
+	id = 100043;
+}
 component TPSPlayerControllerNetMulticastRPCs {
-	id = 100027;
+	id = 100044;
 }

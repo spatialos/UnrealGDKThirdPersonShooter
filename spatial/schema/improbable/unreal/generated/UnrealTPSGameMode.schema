@@ -1,14 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
-package improbable.unreal.generated.vehiclecpppawn;
+package improbable.unreal.generated.tpsgamemode;
 
 import "improbable/unreal/gdk/core_types.schema";
 
-component VehicleCppPawnSingleClientRepData {
-	id = 100052;
+component TPSGameModeSingleClientRepData {
+	id = 100024;
 }
-component VehicleCppPawnMultiClientRepData {
-	id = 100053;
+component TPSGameModeMultiClientRepData {
+	id = 100025;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -24,25 +24,20 @@ component VehicleCppPawnMultiClientRepData {
 	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
 	uint32 field_role0 = 14; // COND_None // ::Actor
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
-	UnrealObjectRef field_playerstate0 = 16; // COND_None // ::Pawn
-	uint32 field_remoteviewpitch0 = 17; // COND_SkipOwner // ::Pawn
-	UnrealObjectRef field_controller0 = 18; // COND_None // ::Pawn
 }
-component VehicleCppPawnHandoverData {
-	id = 100054;
-	bytes field_vehiclemovement0_velocity0 = 1;
+component TPSGameModeHandoverData {
+	id = 100026;
 }
-import "improbable/unreal/generated/UnrealWheeledVehicleMovementComponentTypes.schema";
 
-component VehicleCppPawnClientRPCs {
-	id = 100055;
+component TPSGameModeClientRPCs {
+	id = 100027;
 }
-component VehicleCppPawnServerRPCs {
-	id = 100056;
+component TPSGameModeServerRPCs {
+	id = 100028;
 }
-component VehicleCppPawnCrossServerRPCs {
-	id = 100057;
+component TPSGameModeCrossServerRPCs {
+	id = 100029;
 }
-component VehicleCppPawnNetMulticastRPCs {
-	id = 100058;
+component TPSGameModeNetMulticastRPCs {
+	id = 100030;
 }

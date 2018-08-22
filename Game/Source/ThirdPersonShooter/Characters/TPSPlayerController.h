@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(SpatialType)
 class THIRDPERSONSHOOTER_API ATPSPlayerController : public APlayerController
 {
 	GENERATED_BODY()

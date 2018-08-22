@@ -12,7 +12,7 @@
 
 DECLARE_DELEGATE_OneParam(FSGTeamScoresUpdatedDelegate, const TArray<FTeamScore>&);
 
-UCLASS()
+UCLASS(SpatialType=Singleton)
 class THIRDPERSONSHOOTER_API ATPSGameState : public AGameStateBase
 {
 	GENERATED_BODY()

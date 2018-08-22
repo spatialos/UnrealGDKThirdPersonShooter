@@ -8,7 +8,7 @@
 #include "Teams/TPSTeams.h"
 #include "TPSCharacter.generated.h"
 
-UCLASS(config=Game)
+UCLASS(SpatialType, config = Game)
 class ATPSCharacter : public ACharacter
 {
 	GENERATED_BODY()

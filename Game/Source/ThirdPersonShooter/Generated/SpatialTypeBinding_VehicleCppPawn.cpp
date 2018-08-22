@@ -3,7 +3,6 @@
 
 #include "SpatialTypeBinding_VehicleCppPawn.h"
 
-#include "GameFramework/PlayerState.h"
 #include "NetworkGuid.h"
 
 #include "SpatialOS.h"
@@ -18,8 +17,8 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
+
 #include "VehicleCppPawn.h"
-#include "WheeledVehicle.h"
 
 #include "VehicleCppPawnSingleClientRepDataAddComponentOp.h"
 #include "VehicleCppPawnMultiClientRepDataAddComponentOp.h"
@@ -67,7 +66,9 @@ void USpatialTypeBinding_VehicleCppPawn::Init(USpatialInterop* InInterop, USpati
 	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"RemoteViewPitch"}, {0}, COND_SkipOwner, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(18, FRepHandleData(Class, {"Controller"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
-	bIsSingleton = false;
+	// Populate HandoverHandleToPropertyMap.
+	HandoverHandleToPropertyMap.Add(1, FHandoverHandleData(Class, {"VehicleMovement", "Velocity"}, {0, 0}));
+
 }
 
 void USpatialTypeBinding_VehicleCppPawn::BindToView(bool bIsClient)
@@ -210,6 +211,7 @@ worker::Entity USpatialTypeBinding_VehicleCppPawn::CreateActorEntity(const FStri
 		.AddComponent<improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnHandoverData>(VehicleCppPawnHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnClientRPCs>(improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnServerRPCs>(improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnCrossServerRPCs>(improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnCrossServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnNetMulticastRPCs>(improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }
@@ -710,6 +712,25 @@ void USpatialTypeBinding_VehicleCppPawn::ServerSendUpdate_MultiClient(const uint
 
 void USpatialTypeBinding_VehicleCppPawn::ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnHandoverData::Update& OutUpdate) const
 {
+	switch (Handle)
+	{
+		case 1: // field_vehiclemovement0_velocity0
+		{
+			FVector Value = *(reinterpret_cast<FVector const*>(Data));
+
+			TSet<const UObject*> UnresolvedObjects;
+			TArray<uint8> ValueData;
+			FSpatialMemoryWriter ValueDataWriter(ValueData, PackageMap, UnresolvedObjects);
+			bool bSuccess = true;
+			(const_cast<FVector&>(Value)).NetSerialize(ValueDataWriter, PackageMap, bSuccess);
+			checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+			OutUpdate.set_field_vehiclemovement0_velocity0(std::string(reinterpret_cast<char*>(ValueData.GetData()), ValueData.Num()));
+			break;
+		}
+	default:
+		checkf(false, TEXT("Unknown handover property handle %d encountered when creating a SpatialOS update."));
+		break;
+	}
 }
 
 void USpatialTypeBinding_VehicleCppPawn::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnSingleClientRepData::Update& Update) const
@@ -1381,6 +1402,33 @@ void USpatialTypeBinding_VehicleCppPawn::ReceiveUpdate_MultiClient(USpatialActor
 
 void USpatialTypeBinding_VehicleCppPawn::ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnHandoverData::Update& Update) const
 {
+	const FHandoverHandlePropertyMap& HandleToPropertyMap = GetHandoverHandlePropertyMap();
+
+	if (!Update.field_vehiclemovement0_velocity0().empty())
+	{
+		// field_vehiclemovement0_velocity0
+		uint16 Handle = 1;
+		const FHandoverHandleData* HandoverData = &HandleToPropertyMap[Handle];
+		uint8* PropertyData = HandoverData->GetPropertyData(reinterpret_cast<uint8*>(ActorChannel->Actor));
+		FVector Value = *(reinterpret_cast<FVector const*>(PropertyData));
+
+		auto& ValueDataStr = (*Update.field_vehiclemovement0_velocity0().data());
+		TArray<uint8> ValueData;
+		ValueData.Append(reinterpret_cast<const uint8*>(ValueDataStr.data()), ValueDataStr.size());
+		FSpatialMemoryReader ValueDataReader(ValueData, PackageMap);
+		bool bSuccess = true;
+		Value.NetSerialize(ValueDataReader, PackageMap, bSuccess);
+		checkf(bSuccess, TEXT("NetSerialize on FVector failed."));
+
+		ApplyIncomingHandoverPropertyUpdate(*HandoverData, ActorChannel->Actor, static_cast<const void*>(&Value));
+
+		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received handover property update. actor %s (%lld), property %s (handle %d)"),
+			*Interop->GetSpatialOS()->GetWorkerId(),
+			*ActorChannel->Actor->GetName(),
+			ActorChannel->GetEntityId().ToSpatialEntityId(),
+			*HandoverData->Property->GetName(),
+			Handle);
+	}
 }
 
 void USpatialTypeBinding_VehicleCppPawn::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::vehiclecpppawn::VehicleCppPawnNetMulticastRPCs::Update& Update)

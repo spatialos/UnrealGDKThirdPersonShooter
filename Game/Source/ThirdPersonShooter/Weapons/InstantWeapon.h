@@ -35,7 +35,7 @@ struct FInstantHitInfo
  * Hit detection is entirely client-side, with loose server validation.
  * Shot timing and rate-limiting is entirely client-side, with no server validation.
  */
-UCLASS()
+UCLASS(SpatialType)
 class THIRDPERSONSHOOTER_API AInstantWeapon : public AWeapon
 {
 	GENERATED_BODY()

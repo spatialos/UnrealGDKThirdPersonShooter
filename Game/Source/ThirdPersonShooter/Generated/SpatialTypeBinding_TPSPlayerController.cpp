@@ -3,7 +3,6 @@
 
 #include "SpatialTypeBinding_TPSPlayerController.h"
 
-#include "GameFramework/PlayerState.h"
 #include "NetworkGuid.h"
 
 #include "SpatialOS.h"
@@ -18,13 +17,20 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
-#include "Characters/TPSPlayerController.h"
+
 #include "Camera/CameraAnim.h"
 #include "Camera/CameraShake.h"
+#include "Characters/TPSPlayerController.h"
+#include "GameFramework/Actor.h"
+#include "GameFramework/ForceFeedbackEffect.h"
 #include "GameFramework/HUD.h"
 #include "GameFramework/LocalMessage.h"
+#include "GameFramework/Pawn.h"
+#include "GameFramework/PlayerState.h"
+#include "Materials/MaterialInterface.h"
 #include "Particles/EmitterCameraLensEffectBase.h"
-#include "Game/TPSGameState.h"
+#include "Sound/SoundBase.h"
+#include "UObject/NoExportTypes.h"
 
 #include "TPSPlayerControllerSingleClientRepDataAddComponentOp.h"
 #include "TPSPlayerControllerMultiClientRepDataAddComponentOp.h"
@@ -151,7 +157,6 @@ void USpatialTypeBinding_TPSPlayerController::Init(USpatialInterop* InInterop, U
 	// Populate HandoverHandleToPropertyMap.
 	HandoverHandleToPropertyMap.Add(1, FHandoverHandleData(Class, {"AcknowledgedPawn"}, {0}));
 
-	bIsSingleton = false;
 }
 
 void USpatialTypeBinding_TPSPlayerController::BindToView(bool bIsClient)
@@ -448,6 +453,7 @@ worker::Entity USpatialTypeBinding_TPSPlayerController::CreateActorEntity(const 
 		.AddComponent<improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerHandoverData>(TPSPlayerControllerHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerClientRPCs>(improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerServerRPCs>(improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerCrossServerRPCs>(improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerCrossServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerNetMulticastRPCs>(improbable::unreal::generated::tpsplayercontroller::TPSPlayerControllerNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }

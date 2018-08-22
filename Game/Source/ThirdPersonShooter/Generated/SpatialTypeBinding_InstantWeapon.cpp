@@ -3,7 +3,6 @@
 
 #include "SpatialTypeBinding_InstantWeapon.h"
 
-#include "GameFramework/PlayerState.h"
 #include "NetworkGuid.h"
 
 #include "SpatialOS.h"
@@ -18,7 +17,7 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
-#include "Characters/TPSCharacter.h"
+
 #include "Weapons/InstantWeapon.h"
 
 #include "InstantWeaponSingleClientRepDataAddComponentOp.h"
@@ -68,7 +67,6 @@ void USpatialTypeBinding_InstantWeapon::Init(USpatialInterop* InInterop, USpatia
 	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"OwningCharacter"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
-	bIsSingleton = false;
 }
 
 void USpatialTypeBinding_InstantWeapon::BindToView(bool bIsClient)
@@ -217,6 +215,7 @@ worker::Entity USpatialTypeBinding_InstantWeapon::CreateActorEntity(const FStrin
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponHandoverData>(InstantWeaponHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponCrossServerRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponCrossServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs>(improbable::unreal::generated::instantweapon::InstantWeaponNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }

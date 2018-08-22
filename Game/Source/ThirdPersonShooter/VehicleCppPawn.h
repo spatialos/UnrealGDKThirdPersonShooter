@@ -12,7 +12,7 @@ class USpringArmComponent;
 class UTextRenderComponent;
 class UInputComponent;
 
-UCLASS(config=Game)
+UCLASS(SpatialType, config=Game)
 class AVehicleCppPawn : public AWheeledVehicle
 {
 	GENERATED_BODY()

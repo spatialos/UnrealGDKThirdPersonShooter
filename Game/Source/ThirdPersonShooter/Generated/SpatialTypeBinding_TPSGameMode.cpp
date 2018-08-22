@@ -1,7 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 // Note that this file has been generated automatically
 
-#include "SpatialTypeBinding_TestCube_BP_C.h"
+#include "SpatialTypeBinding_TPSGameMode.h"
 
 #include "NetworkGuid.h"
 
@@ -18,34 +18,33 @@
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
 
-#include "GameFramework/Actor.h"
+#include "Game/TPSGameMode.h"
 
-#include "TestCubeBPCSingleClientRepDataAddComponentOp.h"
-#include "TestCubeBPCMultiClientRepDataAddComponentOp.h"
-#include "TestCubeBPCHandoverDataAddComponentOp.h"
+#include "TPSGameModeSingleClientRepDataAddComponentOp.h"
+#include "TPSGameModeMultiClientRepDataAddComponentOp.h"
+#include "TPSGameModeHandoverDataAddComponentOp.h"
 
-const FRepHandlePropertyMap& USpatialTypeBinding_TestCube_BP_C::GetRepHandlePropertyMap() const
+const FRepHandlePropertyMap& USpatialTypeBinding_TPSGameMode::GetRepHandlePropertyMap() const
 {
 	return RepHandleToPropertyMap;
 }
 
-const FHandoverHandlePropertyMap& USpatialTypeBinding_TestCube_BP_C::GetHandoverHandlePropertyMap() const
+const FHandoverHandlePropertyMap& USpatialTypeBinding_TPSGameMode::GetHandoverHandlePropertyMap() const
 {
 	return HandoverHandleToPropertyMap;
 }
 
-UClass* USpatialTypeBinding_TestCube_BP_C::GetBoundClass() const
+UClass* USpatialTypeBinding_TPSGameMode::GetBoundClass() const
 {
-	return LoadObject<UClass>(nullptr, TEXT("/Game/EntityBlueprints/TestCube_BP.TestCube_BP_C"), nullptr, LOAD_None, nullptr);
+	return ATPSGameMode::StaticClass();
 }
 
-void USpatialTypeBinding_TestCube_BP_C::Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap)
+void USpatialTypeBinding_TPSGameMode::Init(USpatialInterop* InInterop, USpatialPackageMapClient* InPackageMap)
 {
 	Super::Init(InInterop, InPackageMap);
 
-	RPCToSenderMap.Emplace("ServerInteract", &USpatialTypeBinding_TestCube_BP_C::ServerInteract_SendRPC);
 
-	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("TestCube_BP_C"));
+	UClass* Class = FindObject<UClass>(ANY_PACKAGE, TEXT("TPSGameMode"));
 
 	// Populate RepHandleToPropertyMap.
 	RepHandleToPropertyMap.Add(1, FRepHandleData(Class, {"bHidden"}, {0}, COND_None, REPNOTIFY_OnChanged));
@@ -63,23 +62,21 @@ void USpatialTypeBinding_TestCube_BP_C::Init(USpatialInterop* InInterop, USpatia
 	RepHandleToPropertyMap.Add(13, FRepHandleData(Class, {"Owner"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(14, FRepHandleData(Class, {"Role"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(15, FRepHandleData(Class, {"Instigator"}, {0}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(16, FRepHandleData(Class, {"IsColor1"}, {0}, COND_None, REPNOTIFY_OnChanged));
-	RepHandleToPropertyMap.Add(17, FRepHandleData(Class, {"CurrentHealth"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
 }
 
-void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
+void USpatialTypeBinding_TPSGameMode::BindToView(bool bIsClient)
 {
 	TSharedPtr<worker::View> View = Interop->GetSpatialOS()->GetView().Pin();
 	ViewCallbacks.Init(View);
 
 	if (Interop->GetNetDriver()->GetNetMode() == NM_Client)
 	{
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -87,11 +84,11 @@ void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
 			check(ActorChannel);
 			ReceiveUpdate_SingleClient(ActorChannel, Op.Update);
 		}));
-		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData>([this](
-			const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData>& Op)
+		ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData>([this](
+			const worker::ComponentUpdateOp<improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData>& Op)
 		{
 			// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::ComponentId))
+			if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::ComponentId))
 			{
 				return;
 			}
@@ -101,11 +98,11 @@ void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
 		}));
 		if (!bIsClient)
 		{
-			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData>([this](
-				const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData>& Op)
+			ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData>([this](
+				const worker::ComponentUpdateOp<improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData>& Op)
 			{
 				// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::ComponentId))
+				if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::ComponentId))
 				{
 					return;
 				}
@@ -115,28 +112,24 @@ void USpatialTypeBinding_TestCube_BP_C::BindToView(bool bIsClient)
 			}));
 		}
 	}
-	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>([this](
-		const worker::ComponentUpdateOp<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>& Op)
+	ViewCallbacks.Add(View->OnComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs>([this](
+		const worker::ComponentUpdateOp<improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs>& Op)
 	{
 		// TODO: Remove this check once we can disable component update short circuiting. This will be exposed in 14.0. See TIG-137.
-		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::ComponentId))
+		if (HasComponentAuthority(Interop->GetSpatialOS()->GetView(), Op.EntityId, improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs::ComponentId))
 		{
 			return;
 		}
 		ReceiveUpdate_NetMulticastRPCs(Op.EntityId, Op.Update);
 	}));
-
-	using ServerRPCCommandTypes = improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands;
-	ViewCallbacks.Add(View->OnCommandRequest<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload, this, std::placeholders::_1)));
-	ViewCallbacks.Add(View->OnCommandResponse<ServerRPCCommandTypes::Serverinteract>(std::bind(&USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnCommandResponse, this, std::placeholders::_1)));
 }
 
-void USpatialTypeBinding_TestCube_BP_C::UnbindFromView()
+void USpatialTypeBinding_TPSGameMode::UnbindFromView()
 {
 	ViewCallbacks.Reset();
 }
 
-worker::Entity USpatialTypeBinding_TestCube_BP_C::CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const
+worker::Entity USpatialTypeBinding_TPSGameMode::CreateActorEntity(const FString& ClientWorkerId, const FVector& Position, const FString& Metadata, const FPropertyChangeState& InitialChanges, USpatialActorChannel* Channel) const
 {
 	// Validate replication list.
 	const uint16 RepHandlePropertyMapCount = GetRepHandlePropertyMap().Num();
@@ -147,20 +140,20 @@ worker::Entity USpatialTypeBinding_TestCube_BP_C::CreateActorEntity(const FStrin
 
 	// Setup initial data.
 
-	improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Data SingleClientTestCube_BP_CData;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update SingleClientTestCube_BP_CUpdate;
-	bool bSingleClientTestCube_BP_CUpdateChanged = false;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Data MultiClientTestCube_BP_CData;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update MultiClientTestCube_BP_CUpdate;
-	bool bMultiClientTestCube_BP_CUpdateChanged = false;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Data TestCube_BP_CHandoverData;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update TestCube_BP_CHandoverDataUpdate;
-	bool bTestCube_BP_CHandoverDataUpdateChanged = false;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Data SingleClientTPSGameModeData;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update SingleClientTPSGameModeUpdate;
+	bool bSingleClientTPSGameModeUpdateChanged = false;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Data MultiClientTPSGameModeData;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update MultiClientTPSGameModeUpdate;
+	bool bMultiClientTPSGameModeUpdateChanged = false;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Data TPSGameModeHandoverData;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update TPSGameModeHandoverDataUpdate;
+	bool bTPSGameModeHandoverDataUpdateChanged = false;
 
-	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientTestCube_BP_CUpdate, bSingleClientTestCube_BP_CUpdateChanged, MultiClientTestCube_BP_CUpdate, bMultiClientTestCube_BP_CUpdateChanged, TestCube_BP_CHandoverDataUpdate, bTestCube_BP_CHandoverDataUpdateChanged);
-	SingleClientTestCube_BP_CUpdate.ApplyTo(SingleClientTestCube_BP_CData);
-	MultiClientTestCube_BP_CUpdate.ApplyTo(MultiClientTestCube_BP_CData);
-	TestCube_BP_CHandoverDataUpdate.ApplyTo(TestCube_BP_CHandoverData);
+	BuildSpatialComponentUpdate(InitialChanges, Channel, SingleClientTPSGameModeUpdate, bSingleClientTPSGameModeUpdateChanged, MultiClientTPSGameModeUpdate, bMultiClientTPSGameModeUpdateChanged, TPSGameModeHandoverDataUpdate, bTPSGameModeHandoverDataUpdateChanged);
+	SingleClientTPSGameModeUpdate.ApplyTo(SingleClientTPSGameModeData);
+	MultiClientTPSGameModeUpdate.ApplyTo(MultiClientTPSGameModeData);
+	TPSGameModeHandoverDataUpdate.ApplyTo(TPSGameModeHandoverData);
 
 	// Create entity.
 	std::string ClientWorkerIdString = TCHAR_TO_UTF8(*ClientWorkerId);
@@ -205,26 +198,26 @@ worker::Entity USpatialTypeBinding_TestCube_BP_C::CreateActorEntity(const FStrin
 		.AddPositionComponent(improbable::Position::Data{SpatialPosition}, WorkersOnly)
 		.AddMetadataComponent(improbable::Metadata::Data{TCHAR_TO_UTF8(*Metadata)})
 		.SetPersistence(true)
-		.SetReadAcl(AnyUnrealWorkerOrClient)
+		.SetReadAcl(WorkersOnly)
 		.AddComponent<improbable::unreal::UnrealMetadata>(UnrealMetadata, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData>(SingleClientTestCube_BP_CData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData>(MultiClientTestCube_BP_CData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData>(TestCube_BP_CHandoverData, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCClientRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCClientRPCs::Data{}, OwningClientOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCCrossServerRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCCrossServerRPCs::Data{}, WorkersOnly)
-		.AddComponent<improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs>(improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData>(SingleClientTPSGameModeData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData>(MultiClientTPSGameModeData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData>(TPSGameModeHandoverData, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeClientRPCs>(improbable::unreal::generated::tpsgamemode::TPSGameModeClientRPCs::Data{}, OwningClientOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeServerRPCs>(improbable::unreal::generated::tpsgamemode::TPSGameModeServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeCrossServerRPCs>(improbable::unreal::generated::tpsgamemode::TPSGameModeCrossServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs>(improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }
 
-void USpatialTypeBinding_TestCube_BP_C::SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const
+void USpatialTypeBinding_TPSGameMode::SendComponentUpdates(const FPropertyChangeState& Changes, USpatialActorChannel* Channel, const FEntityId& EntityId) const
 {
 	// Build SpatialOS updates.
-	improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update SingleClientUpdate;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update SingleClientUpdate;
 	bool bSingleClientUpdateChanged = false;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update MultiClientUpdate;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update MultiClientUpdate;
 	bool bMultiClientUpdateChanged = false;
-	improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update HandoverDataUpdate;
+	improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update HandoverDataUpdate;
 	bool bHandoverDataUpdateChanged = false;
 	BuildSpatialComponentUpdate(Changes, Channel, SingleClientUpdate, bSingleClientUpdateChanged, MultiClientUpdate, bMultiClientUpdateChanged, HandoverDataUpdate, bHandoverDataUpdateChanged);
 
@@ -232,19 +225,19 @@ void USpatialTypeBinding_TestCube_BP_C::SendComponentUpdates(const FPropertyChan
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	if (bSingleClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData>(EntityId.ToSpatialEntityId(), SingleClientUpdate);
 	}
 	if (bMultiClientUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData>(EntityId.ToSpatialEntityId(), MultiClientUpdate);
 	}
 	if (bHandoverDataUpdateChanged)
 	{
-		Connection->SendComponentUpdate<improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData>(EntityId.ToSpatialEntityId(), HandoverDataUpdate);
+		Connection->SendComponentUpdate<improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData>(EntityId.ToSpatialEntityId(), HandoverDataUpdate);
 	}
 }
 
-void USpatialTypeBinding_TestCube_BP_C::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
+void USpatialTypeBinding_TPSGameMode::SendRPCCommand(UObject* TargetObject, const UFunction* const Function, void* Parameters)
 {
 	TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
 	auto SenderFuncIterator = RPCToSenderMap.Find(Function->GetFName());
@@ -257,53 +250,53 @@ void USpatialTypeBinding_TestCube_BP_C::SendRPCCommand(UObject* TargetObject, co
 	(this->*(*SenderFuncIterator))(Connection.Get(), Parameters, TargetObject);
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
+void USpatialTypeBinding_TPSGameMode::ReceiveAddComponent(USpatialActorChannel* Channel, UAddComponentOpWrapperBase* AddComponentOp) const
 {
-	auto* SingleClientAddOp = Cast<UTestCubeBPCSingleClientRepDataAddComponentOp>(AddComponentOp);
+	auto* SingleClientAddOp = Cast<UTPSGameModeSingleClientRepDataAddComponentOp>(AddComponentOp);
 	if (SingleClientAddOp)
 	{
-		auto Update = improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update::FromInitialData(*SingleClientAddOp->Data.data());
 		ReceiveUpdate_SingleClient(Channel, Update);
 		return;
 	}
-	auto* MultiClientAddOp = Cast<UTestCubeBPCMultiClientRepDataAddComponentOp>(AddComponentOp);
+	auto* MultiClientAddOp = Cast<UTPSGameModeMultiClientRepDataAddComponentOp>(AddComponentOp);
 	if (MultiClientAddOp)
 	{
-		auto Update = improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
+		auto Update = improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update::FromInitialData(*MultiClientAddOp->Data.data());
 		ReceiveUpdate_MultiClient(Channel, Update);
 		return;
 	}
-	auto* HandoverDataAddOp = Cast<UTestCubeBPCHandoverDataAddComponentOp>(AddComponentOp);
+	auto* HandoverDataAddOp = Cast<UTPSGameModeHandoverDataAddComponentOp>(AddComponentOp);
 	if (HandoverDataAddOp)
 	{
-		auto Update = improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update::FromInitialData(*HandoverDataAddOp->Data.data());
+		auto Update = improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update::FromInitialData(*HandoverDataAddOp->Data.data());
 		ReceiveUpdate_Handover(Channel, Update);
 		return;
 	}
 }
 
-worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_TestCube_BP_C::GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const
+worker::Map<worker::ComponentId, worker::InterestOverride> USpatialTypeBinding_TPSGameMode::GetInterestOverrideMap(bool bIsClient, bool bAutonomousProxy) const
 {
 	worker::Map<worker::ComponentId, worker::InterestOverride> Interest;
 	if (bIsClient)
 	{
 		if (!bAutonomousProxy)
 		{
-			Interest.emplace(improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::ComponentId, worker::InterestOverride{false});
+			Interest.emplace(improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::ComponentId, worker::InterestOverride{false});
 		}
-		Interest.emplace(improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::ComponentId, worker::InterestOverride{false});
+		Interest.emplace(improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::ComponentId, worker::InterestOverride{false});
 	}
 	return Interest;
 }
 
-void USpatialTypeBinding_TestCube_BP_C::BuildSpatialComponentUpdate(
+void USpatialTypeBinding_TPSGameMode::BuildSpatialComponentUpdate(
 	const FPropertyChangeState& Changes,
 	USpatialActorChannel* Channel,
-	improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update& SingleClientUpdate,
+	improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update& SingleClientUpdate,
 	bool& bSingleClientUpdateChanged,
-	improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update& MultiClientUpdate,
+	improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update& MultiClientUpdate,
 	bool& bMultiClientUpdateChanged,
-	improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update& HandoverDataUpdate,
+	improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update& HandoverDataUpdate,
 	bool& bHandoverDataUpdateChanged) const
 {
 	const FRepHandlePropertyMap& RepPropertyMap = GetRepHandlePropertyMap();
@@ -361,11 +354,11 @@ void USpatialTypeBinding_TestCube_BP_C::BuildSpatialComponentUpdate(
 	}
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_TPSGameMode::ServerSendUpdate_SingleClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update& OutUpdate) const
+void USpatialTypeBinding_TPSGameMode::ServerSendUpdate_MultiClient(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update& OutUpdate) const
 {
 	switch (Handle)
 	{
@@ -634,31 +627,17 @@ void USpatialTypeBinding_TestCube_BP_C::ServerSendUpdate_MultiClient(const uint8
 			}
 			break;
 		}
-		case 16: // field_iscolor10
-		{
-			bool Value = static_cast<UBoolProperty*>(Property)->GetPropertyValue(Data);
-
-			OutUpdate.set_field_iscolor10(Value);
-			break;
-		}
-		case 17: // field_currenthealth0
-		{
-			int32 Value = *(reinterpret_cast<int32 const*>(Data));
-
-			OutUpdate.set_field_currenthealth0(int32_t(Value));
-			break;
-		}
 	default:
 		checkf(false, TEXT("Unknown replication handle %d encountered when creating a SpatialOS update."));
 		break;
 	}
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update& OutUpdate) const
+void USpatialTypeBinding_TPSGameMode::ServerSendUpdate_Handover(const uint8* RESTRICT Data, int32 Handle, UProperty* Property, USpatialActorChannel* Channel, improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update& OutUpdate) const
 {
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::testcubebpc::TestCubeBPCSingleClientRepData::Update& Update) const
+void USpatialTypeBinding_TPSGameMode::ReceiveUpdate_SingleClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::tpsgamemode::TPSGameModeSingleClientRepData::Update& Update) const
 {
 	AActor* TargetObject = ActorChannel->Actor;
 	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
@@ -666,14 +645,14 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_SingleClient(USpatialActor
 	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies);
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::testcubebpc::TestCubeBPCMultiClientRepData::Update& Update) const
+void USpatialTypeBinding_TPSGameMode::ReceiveUpdate_MultiClient(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::tpsgamemode::TPSGameModeMultiClientRepData::Update& Update) const
 {
 	AActor* TargetObject = ActorChannel->Actor;
 	ActorChannel->PreReceiveSpatialUpdate(TargetObject);
 	TSet<UProperty*> RepNotifies;
 
 	const bool bIsServer = Interop->GetNetDriver()->IsServer();
-	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::generated::testcubebpc::TestCubeBPCClientRPCs::ComponentId);
+	const bool bAutonomousProxy = ActorChannel->IsClientAutonomousProxy(improbable::unreal::generated::tpsgamemode::TPSGameModeClientRPCs::ComponentId);
 	const FRepHandlePropertyMap& HandleToPropertyMap = GetRepHandlePropertyMap();
 	FSpatialConditionMapFilter ConditionMap(ActorChannel, bAutonomousProxy);
 
@@ -1188,134 +1167,13 @@ void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_MultiClient(USpatialActorC
 			}
 		}
 	}
-	if (!Update.field_iscolor10().empty())
-	{
-		// field_iscolor10
-		uint16 Handle = 16;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
-			bool Value = static_cast<UBoolProperty*>(RepData->Property)->GetPropertyValue(PropertyData);
-
-			Value = (*Update.field_iscolor10().data());
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
-	if (!Update.field_currenthealth0().empty())
-	{
-		// field_currenthealth0
-		uint16 Handle = 17;
-		const FRepHandleData* RepData = &HandleToPropertyMap[Handle];
-		if (bIsServer || ConditionMap.IsRelevant(RepData->Condition))
-		{
-			uint8* PropertyData = RepData->GetPropertyData(reinterpret_cast<uint8*>(TargetObject));
-			int32 Value = *(reinterpret_cast<int32 const*>(PropertyData));
-
-			Value = (*Update.field_currenthealth0().data());
-
-			ApplyIncomingReplicatedPropertyUpdate(*RepData, TargetObject, static_cast<const void*>(&Value), RepNotifies);
-
-			UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received replicated property update. actor %s (%lld), property %s (handle %d)"),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ActorChannel->Actor->GetName(),
-				ActorChannel->GetEntityId().ToSpatialEntityId(),
-				*RepData->Property->GetName(),
-				Handle);
-		}
-	}
 	ActorChannel->PostReceiveSpatialUpdate(TargetObject, RepNotifies.Array());
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::testcubebpc::TestCubeBPCHandoverData::Update& Update) const
+void USpatialTypeBinding_TPSGameMode::ReceiveUpdate_Handover(USpatialActorChannel* ActorChannel, const improbable::unreal::generated::tpsgamemode::TPSGameModeHandoverData::Update& Update) const
 {
 }
 
-void USpatialTypeBinding_TestCube_BP_C::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::testcubebpc::TestCubeBPCNetMulticastRPCs::Update& Update)
+void USpatialTypeBinding_TPSGameMode::ReceiveUpdate_NetMulticastRPCs(worker::EntityId EntityId, const improbable::unreal::generated::tpsgamemode::TPSGameModeNetMulticastRPCs::Update& Update)
 {
-}
-void USpatialTypeBinding_TestCube_BP_C::ServerInteract_SendRPC(worker::Connection* const Connection, void* Parameters, UObject* TargetObject)
-{
-	auto Sender = [this, Connection, TargetObject]() mutable -> FRPCCommandRequestResult
-	{
-		// Resolve TargetObject.
-		improbable::unreal::UnrealObjectRef TargetObjectRef = PackageMap->GetUnrealObjectRefFromNetGUID(PackageMap->GetNetGUIDFromObject(TargetObject));
-		if (TargetObjectRef == SpatialConstants::UNRESOLVED_OBJECT_REF)
-		{
-			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: RPC ServerInteract queued. Target object is unresolved."), *Interop->GetSpatialOS()->GetWorkerId());
-			return {TargetObject};
-		}
-
-		// Build RPC Payload.
-		improbable::unreal::generated::testcubebpc::ServerInteractRequest RPCPayload;
-
-		// Send RPC
-		RPCPayload.set_target_subobject_offset(TargetObjectRef.offset());
-		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Sending RPC: ServerInteract, target: %s %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*TargetObject->GetName(),
-			*ObjectRefToString(TargetObjectRef));
-
-			auto RequestId = Connection->SendCommandRequest<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>(TargetObjectRef.entity(), RPCPayload, 0);
-			return {RequestId.Id};
-	};
-	Interop->InvokeRPCSendHandler_Internal(Sender, /*bReliable*/ true);
-}
-void USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnRPCPayload(const worker::CommandRequestOp<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>& Op)
-{
-	auto Receiver = [this, Op]() mutable -> FRPCCommandResponseResult
-	{
-		improbable::unreal::UnrealObjectRef TargetObjectRef{Op.EntityId, Op.Request.target_subobject_offset(), {}, {}};
-		FNetworkGUID TargetNetGUID = PackageMap->GetNetGUIDFromUnrealObjectRef(TargetObjectRef);
-		if (!TargetNetGUID.IsValid())
-		{
-			// A legal static object reference should never be unresolved.
-			checkf(TargetObjectRef.path().empty(), TEXT("A stably named object should not need resolution."));
-			UE_LOG(LogSpatialGDKInterop, Log, TEXT("%s: ServerInteract_OnRPCPayload: Target object %s is not resolved on this worker."),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*ObjectRefToString(TargetObjectRef));
-			return {TargetObjectRef};
-		}
-		UObject* TargetObject = PackageMap->GetObjectFromNetGUID(TargetNetGUID, false);
-		checkf(TargetObject, TEXT("%s: ServerInteract_OnRPCPayload: Object Ref %s (NetGUID %s) does not correspond to a UObject."),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*ObjectRefToString(TargetObjectRef),
-			*TargetNetGUID.ToString());
-
-		// Call implementation.
-		UE_LOG(LogSpatialGDKInterop, Verbose, TEXT("%s: Received RPC: ServerInteract, target: %s %s"),
-			*Interop->GetSpatialOS()->GetWorkerId(),
-			*TargetObject->GetName(),
-			*ObjectRefToString(TargetObjectRef));
-
-		if (UFunction* Function = TargetObject->FindFunction(FName(TEXT("ServerInteract"))))
-		{
-			TargetObject->ProcessEvent(Function, nullptr);
-		}
-		else
-		{
-			UE_LOG(LogSpatialGDKInterop, Error, TEXT("%s: ServerInteract_OnRPCPayload: Function not found. Object: %s, Function: ServerInteract."),
-				*Interop->GetSpatialOS()->GetWorkerId(),
-				*TargetObject->GetFullName());
-		}
-
-		// Send command response.
-		TSharedPtr<worker::Connection> Connection = Interop->GetSpatialOS()->GetConnection().Pin();
-		Connection->SendCommandResponse<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>(Op.RequestId, {});
-		return {};
-	};
-	Interop->InvokeRPCReceiveHandler_Internal(Receiver);
-}
-
-void USpatialTypeBinding_TestCube_BP_C::ServerInteract_OnCommandResponse(const worker::CommandResponseOp<improbable::unreal::generated::testcubebpc::TestCubeBPCServerRPCs::Commands::Serverinteract>& Op)
-{
-	Interop->HandleCommandResponse_Internal(TEXT("ServerInteract"), Op.RequestId.Id, Op.EntityId, Op.StatusCode, FString(UTF8_TO_TCHAR(Op.Message.c_str())));
 }

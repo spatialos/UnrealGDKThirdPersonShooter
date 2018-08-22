@@ -11,7 +11,7 @@
 // Delegate to allow Character class to register a listener to the OnRep_SelectedTeam event
 DECLARE_DELEGATE(CharacterListenerDelegate);
 
-UCLASS()
+UCLASS(SpatialType)
 class THIRDPERSONSHOOTER_API ATPSPlayerState : public APlayerState
 {
 	GENERATED_BODY()
