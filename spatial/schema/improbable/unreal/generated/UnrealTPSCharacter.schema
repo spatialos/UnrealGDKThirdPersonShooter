@@ -5,11 +5,11 @@ package improbable.unreal.generated.tpscharacter;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSCharacterSingleClientRepData {
-	id = 100034;
+	id = 100017;
 	int32 field_currenthealth0 = 1; // COND_AutonomousOnly // ::TPSCharacter
 }
 component TPSCharacterMultiClientRepData {
-	id = 100035;
+	id = 100018;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -60,16 +60,18 @@ component TPSCharacterMultiClientRepData {
 	uint32 field_team0 = 48; // COND_None // ::TPSCharacter
 }
 component TPSCharacterHandoverData {
-	id = 100036;
+	id = 100019;
 	uint32 field_charactermovement0_movementmode0 = 1;
 	uint32 field_charactermovement0_custommovementmode0 = 2;
 	uint32 field_charactermovement0_groundmovementmode0 = 3;
+	bytes field_charactermovement0_predictionhandoverdata0 = 4;
+	bytes field_charactermovement0_velocity0 = 5;
 }
 import "improbable/unreal/generated/UnrealTPSCharacterTypes.schema";
 import "improbable/unreal/generated/UnrealCharacterTypes.schema";
 
 component TPSCharacterClientRPCs {
-	id = 100037;
+	id = 100020;
 	command UnrealRPCCommandResponse rootmotiondebugclientprintonscreen(character.RootMotionDebugClientPrintOnScreenRequest);
 	command UnrealRPCCommandResponse clientveryshortadjustposition(character.ClientVeryShortAdjustPositionRequest);
 	command UnrealRPCCommandResponse clientcheatwalk(character.ClientCheatWalkRequest);
@@ -81,7 +83,7 @@ component TPSCharacterClientRPCs {
 	command UnrealRPCCommandResponse clientackgoodmove(character.ClientAckGoodMoveRequest);
 }
 component TPSCharacterServerRPCs {
-	id = 100038;
+	id = 100021;
 	command UnrealRPCCommandResponse serverspawncube(tpscharacter.ServerSpawnCubeRequest);
 	command UnrealRPCCommandResponse debugresetcharacter(tpscharacter.DebugResetCharacterRequest);
 	command UnrealRPCCommandResponse servermoveold(character.ServerMoveOldRequest);
@@ -91,6 +93,9 @@ component TPSCharacterServerRPCs {
 	command UnrealRPCCommandResponse servermovedual(character.ServerMoveDualRequest);
 	command UnrealRPCCommandResponse servermove(character.ServerMoveRequest);
 }
+component TPSCharacterCrossServerRPCs {
+	id = 100022;
+}
 component TPSCharacterNetMulticastRPCs {
-	id = 100039;
+	id = 100023;
 }

@@ -3,7 +3,6 @@
 
 #include "SpatialTypeBinding_TPSGameState.h"
 
-#include "GameFramework/PlayerState.h"
 #include "NetworkGuid.h"
 
 #include "SpatialOS.h"
@@ -18,8 +17,8 @@
 #include "SpatialMemoryWriter.h"
 #include "SpatialNetDriver.h"
 #include "SpatialInterop.h"
+
 #include "Game/TPSGameState.h"
-#include "Teams/TPSTeams.h"
 
 #include "TPSGameStateSingleClientRepDataAddComponentOp.h"
 #include "TPSGameStateMultiClientRepDataAddComponentOp.h"
@@ -69,7 +68,6 @@ void USpatialTypeBinding_TPSGameState::Init(USpatialInterop* InInterop, USpatial
 	RepHandleToPropertyMap.Add(19, FRepHandleData(Class, {"ReplicatedWorldTimeSeconds"}, {0}, COND_None, REPNOTIFY_OnChanged));
 	RepHandleToPropertyMap.Add(20, FRepHandleData(Class, {"TeamScores"}, {0}, COND_None, REPNOTIFY_OnChanged));
 
-	bIsSingleton = true;
 }
 
 void USpatialTypeBinding_TPSGameState::BindToView(bool bIsClient)
@@ -212,6 +210,7 @@ worker::Entity USpatialTypeBinding_TPSGameState::CreateActorEntity(const FString
 		.AddComponent<improbable::unreal::generated::tpsgamestate::TPSGameStateHandoverData>(TPSGameStateHandoverData, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::tpsgamestate::TPSGameStateClientRPCs>(improbable::unreal::generated::tpsgamestate::TPSGameStateClientRPCs::Data{}, OwningClientOnly)
 		.AddComponent<improbable::unreal::generated::tpsgamestate::TPSGameStateServerRPCs>(improbable::unreal::generated::tpsgamestate::TPSGameStateServerRPCs::Data{}, WorkersOnly)
+		.AddComponent<improbable::unreal::generated::tpsgamestate::TPSGameStateCrossServerRPCs>(improbable::unreal::generated::tpsgamestate::TPSGameStateCrossServerRPCs::Data{}, WorkersOnly)
 		.AddComponent<improbable::unreal::generated::tpsgamestate::TPSGameStateNetMulticastRPCs>(improbable::unreal::generated::tpsgamestate::TPSGameStateNetMulticastRPCs::Data{}, WorkersOnly)
 		.Build();
 }
