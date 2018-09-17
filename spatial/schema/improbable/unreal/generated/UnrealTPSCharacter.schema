@@ -5,11 +5,11 @@ package improbable.unreal.generated.tpscharacter;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSCharacterSingleClientRepData {
-	id = 100017;
-	int32 field_currenthealth0 = 1; // COND_AutonomousOnly // ::TPSCharacter
+	id = 100024;
+	int32 field_currenthealth0 = 45; // COND_AutonomousOnly // ::TPSCharacter
 }
 component TPSCharacterMultiClientRepData {
-	id = 100018;
+	id = 100025;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -54,48 +54,40 @@ component TPSCharacterMultiClientRepData {
 	bytes field_reprootmotion0_acceleration0 = 42; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
 	bytes field_reprootmotion0_linearvelocity0 = 43; // COND_SimulatedOnlyNoReplay // RepRootMotionMontage::RepRootMotion::Character
 	UnrealObjectRef field_equippedweapon0 = 44; // COND_None // ::TPSCharacter
-	bool field_bisragdoll0 = 45; // COND_None // ::TPSCharacter
-	float field_aimyaw0 = 46; // COND_SkipOwner // ::TPSCharacter
-	float field_aimpitch0 = 47; // COND_SkipOwner // ::TPSCharacter
-	uint32 field_team0 = 48; // COND_None // ::TPSCharacter
+	bool field_bisragdoll0 = 46; // COND_None // ::TPSCharacter
+	float field_aimyaw0 = 47; // COND_SkipOwner // ::TPSCharacter
+	float field_aimpitch0 = 48; // COND_SkipOwner // ::TPSCharacter
+	uint32 field_team0 = 49; // COND_None // ::TPSCharacter
 }
 component TPSCharacterHandoverData {
-	id = 100019;
-	uint32 field_charactermovement0_movementmode0 = 1;
-	uint32 field_charactermovement0_custommovementmode0 = 2;
-	uint32 field_charactermovement0_groundmovementmode0 = 3;
-	bytes field_charactermovement0_predictionhandoverdata0 = 4;
-	bytes field_charactermovement0_velocity0 = 5;
+	id = 100026;
 }
-import "improbable/unreal/generated/UnrealTPSCharacterTypes.schema";
-import "improbable/unreal/generated/UnrealCharacterTypes.schema";
-
 component TPSCharacterClientRPCs {
-	id = 100020;
-	command UnrealRPCCommandResponse rootmotiondebugclientprintonscreen(character.RootMotionDebugClientPrintOnScreenRequest);
-	command UnrealRPCCommandResponse clientveryshortadjustposition(character.ClientVeryShortAdjustPositionRequest);
-	command UnrealRPCCommandResponse clientcheatwalk(character.ClientCheatWalkRequest);
-	command UnrealRPCCommandResponse clientcheatghost(character.ClientCheatGhostRequest);
-	command UnrealRPCCommandResponse clientcheatfly(character.ClientCheatFlyRequest);
-	command UnrealRPCCommandResponse clientadjustrootmotionsourceposition(character.ClientAdjustRootMotionSourcePositionRequest);
-	command UnrealRPCCommandResponse clientadjustrootmotionposition(character.ClientAdjustRootMotionPositionRequest);
-	command UnrealRPCCommandResponse clientadjustposition(character.ClientAdjustPositionRequest);
-	command UnrealRPCCommandResponse clientackgoodmove(character.ClientAckGoodMoveRequest);
+	id = 100027;
+	command UnrealRPCCommandResponse rootmotiondebugclientprintonscreen(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientveryshortadjustposition(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcheatwalk(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcheatghost(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcheatfly(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientadjustrootmotionsourceposition(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientadjustrootmotionposition(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientadjustposition(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientackgoodmove(UnrealRPCCommandRequest);
 }
 component TPSCharacterServerRPCs {
-	id = 100021;
-	command UnrealRPCCommandResponse serverspawncube(tpscharacter.ServerSpawnCubeRequest);
-	command UnrealRPCCommandResponse debugresetcharacter(tpscharacter.DebugResetCharacterRequest);
-	command UnrealRPCCommandResponse servermoveold(character.ServerMoveOldRequest);
-	command UnrealRPCCommandResponse servermovenobase(character.ServerMoveNoBaseRequest);
-	command UnrealRPCCommandResponse servermovedualnobase(character.ServerMoveDualNoBaseRequest);
-	command UnrealRPCCommandResponse servermovedualhybridrootmotion(character.ServerMoveDualHybridRootMotionRequest);
-	command UnrealRPCCommandResponse servermovedual(character.ServerMoveDualRequest);
-	command UnrealRPCCommandResponse servermove(character.ServerMoveRequest);
+	id = 100028;
+	command UnrealRPCCommandResponse serverspawncube(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse debugresetcharacter(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermoveold(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermovenobase(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermovedualnobase(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermovedualhybridrootmotion(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermovedual(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermove(UnrealRPCCommandRequest);
 }
 component TPSCharacterCrossServerRPCs {
-	id = 100022;
+	id = 100029;
 }
 component TPSCharacterNetMulticastRPCs {
-	id = 100023;
+	id = 100030;
 }

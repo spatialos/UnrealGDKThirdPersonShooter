@@ -5,12 +5,12 @@ package improbable.unreal.generated.tpsplayercontroller;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSPlayerControllerSingleClientRepData {
-	id = 100038;
-	bytes field_targetviewrotation0 = 1; // COND_OwnerOnly // ::PlayerController
-	bytes field_spawnlocation0 = 2; // COND_OwnerOnly // ::PlayerController
+	id = 100045;
+	bytes field_targetviewrotation0 = 18; // COND_OwnerOnly // ::PlayerController
+	bytes field_spawnlocation0 = 19; // COND_OwnerOnly // ::PlayerController
 }
 component TPSPlayerControllerMultiClientRepData {
-	id = 100039;
+	id = 100046;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -30,97 +30,93 @@ component TPSPlayerControllerMultiClientRepData {
 	UnrealObjectRef field_pawn0 = 17; // COND_None // ::Controller
 }
 component TPSPlayerControllerHandoverData {
-	id = 100040;
+	id = 100047;
 	UnrealObjectRef field_acknowledgedpawn0 = 1;
 }
-import "improbable/unreal/generated/UnrealTPSPlayerControllerTypes.schema";
-import "improbable/unreal/generated/UnrealPlayerControllerTypes.schema";
-import "improbable/unreal/generated/UnrealControllerTypes.schema";
-
 component TPSPlayerControllerClientRPCs {
-	id = 100041;
-	command UnrealRPCCommandResponse clientjoinresults(tpsplayercontroller.ClientJoinResultsRequest);
-	command UnrealRPCCommandResponse onserverstartedvisuallogger(playercontroller.OnServerStartedVisualLoggerRequest);
-	command UnrealRPCCommandResponse clientwaskicked(playercontroller.ClientWasKickedRequest);
-	command UnrealRPCCommandResponse clientvoicehandshakecomplete(playercontroller.ClientVoiceHandshakeCompleteRequest);
-	command UnrealRPCCommandResponse clientupdatemultiplelevelsstreamingstatus(playercontroller.ClientUpdateMultipleLevelsStreamingStatusRequest);
-	command UnrealRPCCommandResponse clientupdatelevelstreamingstatus(playercontroller.ClientUpdateLevelStreamingStatusRequest);
-	command UnrealRPCCommandResponse clientunmuteplayer(playercontroller.ClientUnmutePlayerRequest);
-	command UnrealRPCCommandResponse clienttravelinternal(playercontroller.ClientTravelInternalRequest);
-	command UnrealRPCCommandResponse clientteammessage(playercontroller.ClientTeamMessageRequest);
-	command UnrealRPCCommandResponse clientstopforcefeedback(playercontroller.ClientStopForceFeedbackRequest);
-	command UnrealRPCCommandResponse clientstopcamerashake(playercontroller.ClientStopCameraShakeRequest);
-	command UnrealRPCCommandResponse clientstopcameraanim(playercontroller.ClientStopCameraAnimRequest);
-	command UnrealRPCCommandResponse clientstartonlinesession(playercontroller.ClientStartOnlineSessionRequest);
-	command UnrealRPCCommandResponse clientspawncameralenseffect(playercontroller.ClientSpawnCameraLensEffectRequest);
-	command UnrealRPCCommandResponse clientsetviewtarget(playercontroller.ClientSetViewTargetRequest);
-	command UnrealRPCCommandResponse clientsetspectatorwaiting(playercontroller.ClientSetSpectatorWaitingRequest);
-	command UnrealRPCCommandResponse clientsethud(playercontroller.ClientSetHUDRequest);
-	command UnrealRPCCommandResponse clientsetforcemiplevelstoberesident(playercontroller.ClientSetForceMipLevelsToBeResidentRequest);
-	command UnrealRPCCommandResponse clientsetcinematicmode(playercontroller.ClientSetCinematicModeRequest);
-	command UnrealRPCCommandResponse clientsetcameramode(playercontroller.ClientSetCameraModeRequest);
-	command UnrealRPCCommandResponse clientsetcamerafade(playercontroller.ClientSetCameraFadeRequest);
-	command UnrealRPCCommandResponse clientsetblockonasyncloading(playercontroller.ClientSetBlockOnAsyncLoadingRequest);
-	command UnrealRPCCommandResponse clientreturntomainmenuwithtextreason(playercontroller.ClientReturnToMainMenuWithTextReasonRequest);
-	command UnrealRPCCommandResponse clientreturntomainmenu(playercontroller.ClientReturnToMainMenuRequest);
-	command UnrealRPCCommandResponse clientretryclientrestart(playercontroller.ClientRetryClientRestartRequest);
-	command UnrealRPCCommandResponse clientrestart(playercontroller.ClientRestartRequest);
-	command UnrealRPCCommandResponse clientreset(playercontroller.ClientResetRequest);
-	command UnrealRPCCommandResponse clientrepobjref(playercontroller.ClientRepObjRefRequest);
-	command UnrealRPCCommandResponse clientreceivelocalizedmessage(playercontroller.ClientReceiveLocalizedMessageRequest);
-	command UnrealRPCCommandResponse clientprestreamtextures(playercontroller.ClientPrestreamTexturesRequest);
-	command UnrealRPCCommandResponse clientpreparemapchange(playercontroller.ClientPrepareMapChangeRequest);
-	command UnrealRPCCommandResponse clientplaysoundatlocation(playercontroller.ClientPlaySoundAtLocationRequest);
-	command UnrealRPCCommandResponse clientplaysound(playercontroller.ClientPlaySoundRequest);
-	command UnrealRPCCommandResponse clientplayforcefeedback(playercontroller.ClientPlayForceFeedbackRequest);
-	command UnrealRPCCommandResponse clientplaycamerashake(playercontroller.ClientPlayCameraShakeRequest);
-	command UnrealRPCCommandResponse clientplaycameraanim(playercontroller.ClientPlayCameraAnimRequest);
-	command UnrealRPCCommandResponse clientmuteplayer(playercontroller.ClientMutePlayerRequest);
-	command UnrealRPCCommandResponse clientmessage(playercontroller.ClientMessageRequest);
-	command UnrealRPCCommandResponse clientignoremoveinput(playercontroller.ClientIgnoreMoveInputRequest);
-	command UnrealRPCCommandResponse clientignorelookinput(playercontroller.ClientIgnoreLookInputRequest);
-	command UnrealRPCCommandResponse clientgotostate(playercontroller.ClientGotoStateRequest);
-	command UnrealRPCCommandResponse clientgameended(playercontroller.ClientGameEndedRequest);
-	command UnrealRPCCommandResponse clientforcegarbagecollection(playercontroller.ClientForceGarbageCollectionRequest);
-	command UnrealRPCCommandResponse clientflushlevelstreaming(playercontroller.ClientFlushLevelStreamingRequest);
-	command UnrealRPCCommandResponse clientendonlinesession(playercontroller.ClientEndOnlineSessionRequest);
-	command UnrealRPCCommandResponse clientenablenetworkvoice(playercontroller.ClientEnableNetworkVoiceRequest);
-	command UnrealRPCCommandResponse clientcommitmapchange(playercontroller.ClientCommitMapChangeRequest);
-	command UnrealRPCCommandResponse clientclearcameralenseffects(playercontroller.ClientClearCameraLensEffectsRequest);
-	command UnrealRPCCommandResponse clientcapbandwidth(playercontroller.ClientCapBandwidthRequest);
-	command UnrealRPCCommandResponse clientcancelpendingmapchange(playercontroller.ClientCancelPendingMapChangeRequest);
-	command UnrealRPCCommandResponse clientaddtexturestreamingloc(playercontroller.ClientAddTextureStreamingLocRequest);
-	command UnrealRPCCommandResponse clientsetrotation(controller.ClientSetRotationRequest);
-	command UnrealRPCCommandResponse clientsetlocation(controller.ClientSetLocationRequest);
+	id = 100048;
+	command UnrealRPCCommandResponse clientjoinresults(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse onserverstartedvisuallogger(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientwaskicked(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientvoicehandshakecomplete(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientupdatemultiplelevelsstreamingstatus(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientupdatelevelstreamingstatus(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientunmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clienttravelinternal(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientteammessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopforcefeedback(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopcamerashake(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopcameraanim(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstartonlinesession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientspawncameralenseffect(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetviewtarget(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetspectatorwaiting(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsethud(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetforcemiplevelstoberesident(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcinematicmode(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcameramode(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcamerafade(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetblockonasyncloading(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreturntomainmenuwithtextreason(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreturntomainmenu(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientretryclientrestart(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientrestart(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreset(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientrepobjref(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreceivelocalizedmessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientprestreamtextures(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientpreparemapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaysoundatlocation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaysound(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplayforcefeedback(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaycamerashake(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaycameraanim(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientmessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientignoremoveinput(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientignorelookinput(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientgotostate(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientgameended(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientforcegarbagecollection(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientflushlevelstreaming(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientendonlinesession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientenablenetworkvoice(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcommitmapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientclearcameralenseffects(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcapbandwidth(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcancelpendingmapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientaddtexturestreamingloc(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetrotation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetlocation(UnrealRPCCommandRequest);
 }
 component TPSPlayerControllerServerRPCs {
-	id = 100042;
-	command UnrealRPCCommandResponse servertryjoingame(tpsplayercontroller.ServerTryJoinGameRequest);
-	command UnrealRPCCommandResponse serverviewself(playercontroller.ServerViewSelfRequest);
-	command UnrealRPCCommandResponse serverviewprevplayer(playercontroller.ServerViewPrevPlayerRequest);
-	command UnrealRPCCommandResponse serverviewnextplayer(playercontroller.ServerViewNextPlayerRequest);
-	command UnrealRPCCommandResponse serververifyviewtarget(playercontroller.ServerVerifyViewTargetRequest);
-	command UnrealRPCCommandResponse serverupdatemultiplelevelsvisibility(playercontroller.ServerUpdateMultipleLevelsVisibilityRequest);
-	command UnrealRPCCommandResponse serverupdatelevelvisibility(playercontroller.ServerUpdateLevelVisibilityRequest);
-	command UnrealRPCCommandResponse serverupdatecamera(playercontroller.ServerUpdateCameraRequest);
-	command UnrealRPCCommandResponse serverunmuteplayer(playercontroller.ServerUnmutePlayerRequest);
-	command UnrealRPCCommandResponse servertoggleailogging(playercontroller.ServerToggleAILoggingRequest);
-	command UnrealRPCCommandResponse servershorttimeout(playercontroller.ServerShortTimeoutRequest);
-	command UnrealRPCCommandResponse serversetspectatorwaiting(playercontroller.ServerSetSpectatorWaitingRequest);
-	command UnrealRPCCommandResponse serversetspectatorlocation(playercontroller.ServerSetSpectatorLocationRequest);
-	command UnrealRPCCommandResponse serverrestartplayer(playercontroller.ServerRestartPlayerRequest);
-	command UnrealRPCCommandResponse serverpause(playercontroller.ServerPauseRequest);
-	command UnrealRPCCommandResponse servernotifyloadedworld(playercontroller.ServerNotifyLoadedWorldRequest);
-	command UnrealRPCCommandResponse servermuteplayer(playercontroller.ServerMutePlayerRequest);
-	command UnrealRPCCommandResponse servercheckclientpossessionreliable(playercontroller.ServerCheckClientPossessionReliableRequest);
-	command UnrealRPCCommandResponse servercheckclientpossession(playercontroller.ServerCheckClientPossessionRequest);
-	command UnrealRPCCommandResponse serverchangename(playercontroller.ServerChangeNameRequest);
-	command UnrealRPCCommandResponse servercamera(playercontroller.ServerCameraRequest);
-	command UnrealRPCCommandResponse serveracknowledgepossession(playercontroller.ServerAcknowledgePossessionRequest);
+	id = 100049;
+	command UnrealRPCCommandResponse servertryjoingame(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverviewself(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverviewprevplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverviewnextplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serververifyviewtarget(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatemultiplelevelsvisibility(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatelevelvisibility(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatecamera(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverunmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servertoggleailogging(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servershorttimeout(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serversetspectatorwaiting(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serversetspectatorlocation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverrestartplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverpause(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servernotifyloadedworld(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercheckclientpossessionreliable(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercheckclientpossession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverchangename(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercamera(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serveracknowledgepossession(UnrealRPCCommandRequest);
 }
 component TPSPlayerControllerCrossServerRPCs {
-	id = 100043;
+	id = 100050;
 }
 component TPSPlayerControllerNetMulticastRPCs {
-	id = 100044;
+	id = 100051;
 }

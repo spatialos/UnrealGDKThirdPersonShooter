@@ -14,6 +14,7 @@
 #include "UnrealNetwork.h"
 
 #include "SpatialNetDriver.h"
+#include "Connection/SpatialWorkerConnection.h"
 
 
 ATPSPlayerController::ATPSPlayerController()
@@ -125,7 +126,7 @@ void ATPSPlayerController::SetPlayerUIVisible(bool bIsVisible)
 				USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
 				UE_LOG(LogTPS, Error, TEXT("Failed to create UI for controller %s on worker %s"),
 					*this->GetName(),
-					SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+					SpatialNetDriver != nullptr ? *SpatialNetDriver->Connection->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 				return;
 			}
 		}
@@ -166,7 +167,7 @@ void ATPSPlayerController::SetLoginUIVisible(bool bIsVisible)
 			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
 			UE_LOG(LogTPS, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
 				*this->GetName(),
-				SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+				SpatialNetDriver != nullptr ? *SpatialNetDriver->Connection->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 
 			return;
 		}
@@ -251,7 +252,7 @@ FString ATPSPlayerController::GetDefaultPlayerName()
 {
 	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver()))
 	{
-		return SpatialNetDriver->GetSpatialOS()->GetWorkerId();
+		return SpatialNetDriver->Connection->GetWorkerId();
 	}
 	return "Player" + FGuid::NewGuid().ToString();
 }

@@ -7,6 +7,7 @@
 #include "EntityRegistry.h"
 #include "GameFramework/Actor.h"
 #include "SpatialNetDriver.h"
+#include "Connection/SpatialWorkerConnection.h"
 
 
 DEFINE_LOG_CATEGORY(LogTPS);
@@ -17,8 +18,8 @@ FString TPSLogging::LogPrefix(AActor* Actor)
 	int32 EntityId = -1;
 	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(Actor->GetNetDriver()))
 	{
-		WorkerId = SpatialNetDriver->GetSpatialOS()->GetWorkerId();
-		EntityId = SpatialNetDriver->GetEntityRegistry()->GetEntityIdFromActor(Actor).ToSpatialEntityId();
+		WorkerId = SpatialNetDriver->Connection->GetWorkerId();
+		EntityId = SpatialNetDriver->GetEntityRegistry()->GetEntityIdFromActor(Actor);
 	}
 	else
 	{

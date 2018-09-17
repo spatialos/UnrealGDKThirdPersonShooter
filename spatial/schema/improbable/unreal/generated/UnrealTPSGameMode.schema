@@ -5,10 +5,10 @@ package improbable.unreal.generated.tpsgamemode;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSGameModeSingleClientRepData {
-	id = 100024;
+	id = 100031;
 }
 component TPSGameModeMultiClientRepData {
-	id = 100025;
+	id = 100032;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -26,18 +26,17 @@ component TPSGameModeMultiClientRepData {
 	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
 }
 component TPSGameModeHandoverData {
-	id = 100026;
+	id = 100033;
 }
-
 component TPSGameModeClientRPCs {
-	id = 100027;
+	id = 100034;
 }
 component TPSGameModeServerRPCs {
-	id = 100028;
+	id = 100035;
 }
 component TPSGameModeCrossServerRPCs {
-	id = 100029;
+	id = 100036;
 }
 component TPSGameModeNetMulticastRPCs {
-	id = 100030;
+	id = 100037;
 }
