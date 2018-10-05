@@ -5,10 +5,10 @@ package improbable.unreal.generated.vehiclecpppawn;
 import "improbable/unreal/gdk/core_types.schema";
 
 component VehicleCppPawnSingleClientRepData {
-	id = 100052;
+	id = 101466;
 }
 component VehicleCppPawnMultiClientRepData {
-	id = 100053;
+	id = 101467;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -29,20 +29,17 @@ component VehicleCppPawnMultiClientRepData {
 	UnrealObjectRef field_controller0 = 18; // COND_None // ::Pawn
 }
 component VehicleCppPawnHandoverData {
-	id = 100054;
-	bytes field_vehiclemovement0_velocity0 = 1;
+	id = 101468;
 }
-import "improbable/unreal/generated/UnrealWheeledVehicleMovementComponentTypes.schema";
-
 component VehicleCppPawnClientRPCs {
-	id = 100055;
+	id = 101469;
 }
 component VehicleCppPawnServerRPCs {
-	id = 100056;
+	id = 101470;
 }
 component VehicleCppPawnCrossServerRPCs {
-	id = 100057;
+	id = 101471;
 }
 component VehicleCppPawnNetMulticastRPCs {
-	id = 100058;
+	id = 101472;
 }

@@ -1,0 +1,90 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.serverstatreplicator;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component ServerStatReplicatorSingleClientRepData {
+	id = 101011;
+}
+component ServerStatReplicatorMultiClientRepData {
+	id = 101012;
+	bool field_bhidden0 = 1; // COND_None // ::Actor
+	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
+	bool field_btearoff0 = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged0 = 4; // COND_None // ::Actor
+	uint32 field_remoterole0 = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement0 = 6; // COND_None // ::Actor
+	UnrealObjectRef field_attachmentreplication0_attachparent0 = 7; // COND_None // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_locationoffset0 = 8; // COND_None // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_relativescale3d0 = 9; // COND_None // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_rotationoffset0 = 10; // COND_None // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication0_attachsocket0 = 11; // COND_None // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication0_attachcomponent0 = 12; // COND_None // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
+	uint32 field_role0 = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
+	uint32 field_channels0 = 16; // COND_None // ::ServerStatReplicator
+	uint32 field_inrate0 = 17; // COND_None // ::ServerStatReplicator
+	uint32 field_outrate0 = 18; // COND_None // ::ServerStatReplicator
+	uint32 field_outsaturation0 = 19; // COND_None // ::ServerStatReplicator
+	uint32 field_maxpacketoverhead0 = 20; // COND_None // ::ServerStatReplicator
+	uint32 field_inrateclientmax0 = 21; // COND_None // ::ServerStatReplicator
+	uint32 field_inrateclientmin0 = 22; // COND_None // ::ServerStatReplicator
+	uint32 field_inrateclientavg0 = 23; // COND_None // ::ServerStatReplicator
+	uint32 field_inpacketsclientmax0 = 24; // COND_None // ::ServerStatReplicator
+	uint32 field_inpacketsclientmin0 = 25; // COND_None // ::ServerStatReplicator
+	uint32 field_inpacketsclientavg0 = 26; // COND_None // ::ServerStatReplicator
+	uint32 field_outrateclientmax0 = 27; // COND_None // ::ServerStatReplicator
+	uint32 field_outrateclientmin0 = 28; // COND_None // ::ServerStatReplicator
+	uint32 field_outrateclientavg0 = 29; // COND_None // ::ServerStatReplicator
+	uint32 field_outpacketsclientmax0 = 30; // COND_None // ::ServerStatReplicator
+	uint32 field_outpacketsclientmin0 = 31; // COND_None // ::ServerStatReplicator
+	uint32 field_outpacketsclientavg0 = 32; // COND_None // ::ServerStatReplicator
+	uint32 field_netnumclients0 = 33; // COND_None // ::ServerStatReplicator
+	uint32 field_inpackets0 = 34; // COND_None // ::ServerStatReplicator
+	uint32 field_outpackets0 = 35; // COND_None // ::ServerStatReplicator
+	uint32 field_inbunches0 = 36; // COND_None // ::ServerStatReplicator
+	uint32 field_outbunches0 = 37; // COND_None // ::ServerStatReplicator
+	uint32 field_outloss0 = 38; // COND_None // ::ServerStatReplicator
+	uint32 field_inloss0 = 39; // COND_None // ::ServerStatReplicator
+	uint32 field_voicebytessent0 = 40; // COND_None // ::ServerStatReplicator
+	uint32 field_voicebytesrecv0 = 41; // COND_None // ::ServerStatReplicator
+	uint32 field_voicepacketssent0 = 42; // COND_None // ::ServerStatReplicator
+	uint32 field_voicepacketsrecv0 = 43; // COND_None // ::ServerStatReplicator
+	uint32 field_percentinvoice0 = 44; // COND_None // ::ServerStatReplicator
+	uint32 field_percentoutvoice0 = 45; // COND_None // ::ServerStatReplicator
+	uint32 field_numactorchannels0 = 46; // COND_None // ::ServerStatReplicator
+	uint32 field_numconsideredactors0 = 47; // COND_None // ::ServerStatReplicator
+	uint32 field_prioritizedactors0 = 48; // COND_None // ::ServerStatReplicator
+	uint32 field_numrelevantactors0 = 49; // COND_None // ::ServerStatReplicator
+	uint32 field_numrelevantdeletedactors0 = 50; // COND_None // ::ServerStatReplicator
+	uint32 field_numreplicatedactorattempts0 = 51; // COND_None // ::ServerStatReplicator
+	uint32 field_numreplicatedactors0 = 52; // COND_None // ::ServerStatReplicator
+	uint32 field_numactors0 = 53; // COND_None // ::ServerStatReplicator
+	uint32 field_numnetactors0 = 54; // COND_None // ::ServerStatReplicator
+	uint32 field_numdormantactors0 = 55; // COND_None // ::ServerStatReplicator
+	uint32 field_numinitiallydormantactors0 = 56; // COND_None // ::ServerStatReplicator
+	uint32 field_numnetguidsackd0 = 57; // COND_None // ::ServerStatReplicator
+	uint32 field_numnetguidspending0 = 58; // COND_None // ::ServerStatReplicator
+	uint32 field_numnetguidsunackd0 = 59; // COND_None // ::ServerStatReplicator
+	uint32 field_objpathbytes0 = 60; // COND_None // ::ServerStatReplicator
+	uint32 field_netguidoutrate0 = 61; // COND_None // ::ServerStatReplicator
+	uint32 field_netguidinrate0 = 62; // COND_None // ::ServerStatReplicator
+	uint32 field_netsaturated0 = 63; // COND_None // ::ServerStatReplicator
+}
+component ServerStatReplicatorHandoverData {
+	id = 101013;
+}
+component ServerStatReplicatorClientRPCs {
+	id = 101014;
+}
+component ServerStatReplicatorServerRPCs {
+	id = 101015;
+}
+component ServerStatReplicatorCrossServerRPCs {
+	id = 101016;
+}
+component ServerStatReplicatorNetMulticastRPCs {
+	id = 101017;
+}

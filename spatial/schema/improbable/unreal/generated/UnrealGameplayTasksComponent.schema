@@ -1,0 +1,30 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.gameplaytaskscomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component GameplayTasksComponentSingleClientRepData {
+	id = 100038;
+}
+component GameplayTasksComponentMultiClientRepData {
+	id = 100039;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+	list<UnrealObjectRef> field_simulatedtasks0 = 3; // COND_SkipOwner // ::GameplayTasksComponent
+}
+component GameplayTasksComponentHandoverData {
+	id = 100040;
+}
+component GameplayTasksComponentClientRPCs {
+	id = 100041;
+}
+component GameplayTasksComponentServerRPCs {
+	id = 100042;
+}
+component GameplayTasksComponentCrossServerRPCs {
+	id = 100043;
+}
+component GameplayTasksComponentNetMulticastRPCs {
+	id = 100044;
+}

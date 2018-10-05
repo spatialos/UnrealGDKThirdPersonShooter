@@ -1,0 +1,37 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.wheeledvehiclemovementcomponent4w;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component WheeledVehicleMovementComponent4WSingleClientRepData {
+	id = 101389;
+}
+component WheeledVehicleMovementComponent4WMultiClientRepData {
+	id = 101390;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+	float field_replicatedstate0_steeringinput0 = 3; // COND_None // ReplicatedVehicleState::ReplicatedState::WheeledVehicleMovementComponent
+	float field_replicatedstate0_throttleinput0 = 4; // COND_None // ReplicatedVehicleState::ReplicatedState::WheeledVehicleMovementComponent
+	float field_replicatedstate0_brakeinput0 = 5; // COND_None // ReplicatedVehicleState::ReplicatedState::WheeledVehicleMovementComponent
+	float field_replicatedstate0_handbrakeinput0 = 6; // COND_None // ReplicatedVehicleState::ReplicatedState::WheeledVehicleMovementComponent
+	int32 field_replicatedstate0_currentgear0 = 7; // COND_None // ReplicatedVehicleState::ReplicatedState::WheeledVehicleMovementComponent
+	UnrealObjectRef field_overridecontroller0 = 8; // COND_None // ::WheeledVehicleMovementComponent
+}
+component WheeledVehicleMovementComponent4WHandoverData {
+	id = 101391;
+	bytes field_velocity0 = 1;
+}
+component WheeledVehicleMovementComponent4WClientRPCs {
+	id = 101392;
+}
+component WheeledVehicleMovementComponent4WServerRPCs {
+	id = 101393;
+	command UnrealRPCCommandResponse serverupdatestate(UnrealRPCCommandRequest);
+}
+component WheeledVehicleMovementComponent4WCrossServerRPCs {
+	id = 101394;
+}
+component WheeledVehicleMovementComponent4WNetMulticastRPCs {
+	id = 101395;
+}

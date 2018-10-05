@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.viewportdragoperationcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component ViewportDragOperationComponentSingleClientRepData {
+	id = 100185;
+}
+component ViewportDragOperationComponentMultiClientRepData {
+	id = 100186;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component ViewportDragOperationComponentHandoverData {
+	id = 100187;
+}
+component ViewportDragOperationComponentClientRPCs {
+	id = 100188;
+}
+component ViewportDragOperationComponentServerRPCs {
+	id = 100189;
+}
+component ViewportDragOperationComponentCrossServerRPCs {
+	id = 100190;
+}
+component ViewportDragOperationComponentNetMulticastRPCs {
+	id = 100191;
+}

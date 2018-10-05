@@ -1,0 +1,53 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.playerstate;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PlayerStateSingleClientRepData {
+	id = 100934;
+}
+component PlayerStateMultiClientRepData {
+	id = 100935;
+	bool field_bhidden0 = 1; // COND_None // ::Actor
+	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
+	bool field_btearoff0 = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged0 = 4; // COND_None // ::Actor
+	uint32 field_remoterole0 = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement0 = 6; // COND_SimulatedOrPhysics // ::Actor
+	UnrealObjectRef field_attachmentreplication0_attachparent0 = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_locationoffset0 = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_relativescale3d0 = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_rotationoffset0 = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication0_attachsocket0 = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication0_attachcomponent0 = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
+	uint32 field_role0 = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
+	float field_score0 = 16; // COND_None // ::PlayerState
+	uint32 field_ping0 = 17; // COND_SkipOwner // ::PlayerState
+	int32 field_playerid0 = 18; // COND_InitialOnly // ::PlayerState
+	bool field_bfrompreviouslevel0 = 19; // COND_None // ::PlayerState
+	bool field_bisabot0 = 20; // COND_InitialOnly // ::PlayerState
+	bool field_bisinactive0 = 21; // COND_InitialOnly // ::PlayerState
+	bool field_bisspectator0 = 22; // COND_None // ::PlayerState
+	bool field_bonlyspectator0 = 23; // COND_None // ::PlayerState
+	int32 field_starttime0 = 24; // COND_None // ::PlayerState
+	bytes field_uniqueid0 = 25; // COND_InitialOnly // ::PlayerState
+	string field_playernameprivate0 = 26; // COND_None // ::PlayerState
+}
+component PlayerStateHandoverData {
+	id = 100936;
+}
+component PlayerStateClientRPCs {
+	id = 100937;
+}
+component PlayerStateServerRPCs {
+	id = 100938;
+}
+component PlayerStateCrossServerRPCs {
+	id = 100939;
+}
+component PlayerStateNetMulticastRPCs {
+	id = 100940;
+}

@@ -1,0 +1,30 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.pawnmovementcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PawnMovementComponentSingleClientRepData {
+	id = 100472;
+}
+component PawnMovementComponentMultiClientRepData {
+	id = 100473;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component PawnMovementComponentHandoverData {
+	id = 100474;
+	bytes field_velocity0 = 1;
+}
+component PawnMovementComponentClientRPCs {
+	id = 100475;
+}
+component PawnMovementComponentServerRPCs {
+	id = 100476;
+}
+component PawnMovementComponentCrossServerRPCs {
+	id = 100477;
+}
+component PawnMovementComponentNetMulticastRPCs {
+	id = 100478;
+}

@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.braincomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component BrainComponentSingleClientRepData {
+	id = 100087;
+}
+component BrainComponentMultiClientRepData {
+	id = 100088;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component BrainComponentHandoverData {
+	id = 100089;
+}
+component BrainComponentClientRPCs {
+	id = 100090;
+}
+component BrainComponentServerRPCs {
+	id = 100091;
+}
+component BrainComponentCrossServerRPCs {
+	id = 100092;
+}
+component BrainComponentNetMulticastRPCs {
+	id = 100093;
+}

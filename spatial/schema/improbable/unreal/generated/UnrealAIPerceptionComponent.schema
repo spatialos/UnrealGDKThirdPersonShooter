@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.aiperceptioncomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component AIPerceptionComponentSingleClientRepData {
+	id = 100073;
+}
+component AIPerceptionComponentMultiClientRepData {
+	id = 100074;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component AIPerceptionComponentHandoverData {
+	id = 100075;
+}
+component AIPerceptionComponentClientRPCs {
+	id = 100076;
+}
+component AIPerceptionComponentServerRPCs {
+	id = 100077;
+}
+component AIPerceptionComponentCrossServerRPCs {
+	id = 100078;
+}
+component AIPerceptionComponentNetMulticastRPCs {
+	id = 100079;
+}

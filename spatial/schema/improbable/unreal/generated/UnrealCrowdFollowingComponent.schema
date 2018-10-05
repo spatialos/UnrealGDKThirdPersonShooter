@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.crowdfollowingcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component CrowdFollowingComponentSingleClientRepData {
+	id = 100115;
+}
+component CrowdFollowingComponentMultiClientRepData {
+	id = 100116;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component CrowdFollowingComponentHandoverData {
+	id = 100117;
+}
+component CrowdFollowingComponentClientRPCs {
+	id = 100118;
+}
+component CrowdFollowingComponentServerRPCs {
+	id = 100119;
+}
+component CrowdFollowingComponentCrossServerRPCs {
+	id = 100120;
+}
+component CrowdFollowingComponentNetMulticastRPCs {
+	id = 100121;
+}

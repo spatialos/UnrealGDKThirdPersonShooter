@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.steamvrchaperonecomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component SteamVRChaperoneComponentSingleClientRepData {
+	id = 101207;
+}
+component SteamVRChaperoneComponentMultiClientRepData {
+	id = 101208;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component SteamVRChaperoneComponentHandoverData {
+	id = 101209;
+}
+component SteamVRChaperoneComponentClientRPCs {
+	id = 101210;
+}
+component SteamVRChaperoneComponentServerRPCs {
+	id = 101211;
+}
+component SteamVRChaperoneComponentCrossServerRPCs {
+	id = 101212;
+}
+component SteamVRChaperoneComponentNetMulticastRPCs {
+	id = 101213;
+}

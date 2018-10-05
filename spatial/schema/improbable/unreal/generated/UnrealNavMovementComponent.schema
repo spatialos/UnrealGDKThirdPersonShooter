@@ -1,0 +1,30 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.navmovementcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component NavMovementComponentSingleClientRepData {
+	id = 100465;
+}
+component NavMovementComponentMultiClientRepData {
+	id = 100466;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component NavMovementComponentHandoverData {
+	id = 100467;
+	bytes field_velocity0 = 1;
+}
+component NavMovementComponentClientRPCs {
+	id = 100468;
+}
+component NavMovementComponentServerRPCs {
+	id = 100469;
+}
+component NavMovementComponentCrossServerRPCs {
+	id = 100470;
+}
+component NavMovementComponentNetMulticastRPCs {
+	id = 100471;
+}

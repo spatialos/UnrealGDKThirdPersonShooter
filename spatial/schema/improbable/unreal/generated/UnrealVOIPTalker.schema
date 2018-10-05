@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.voiptalker;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component VOIPTalkerSingleClientRepData {
+	id = 101116;
+}
+component VOIPTalkerMultiClientRepData {
+	id = 101117;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component VOIPTalkerHandoverData {
+	id = 101118;
+}
+component VOIPTalkerClientRPCs {
+	id = 101119;
+}
+component VOIPTalkerServerRPCs {
+	id = 101120;
+}
+component VOIPTalkerCrossServerRPCs {
+	id = 101121;
+}
+component VOIPTalkerNetMulticastRPCs {
+	id = 101122;
+}

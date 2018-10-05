@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.applicationlifecyclecomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component ApplicationLifecycleComponentSingleClientRepData {
+	id = 100395;
+}
+component ApplicationLifecycleComponentMultiClientRepData {
+	id = 100396;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component ApplicationLifecycleComponentHandoverData {
+	id = 100397;
+}
+component ApplicationLifecycleComponentClientRPCs {
+	id = 100398;
+}
+component ApplicationLifecycleComponentServerRPCs {
+	id = 100399;
+}
+component ApplicationLifecycleComponentCrossServerRPCs {
+	id = 100400;
+}
+component ApplicationLifecycleComponentNetMulticastRPCs {
+	id = 100401;
+}

@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.blackboardcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component BlackboardComponentSingleClientRepData {
+	id = 100101;
+}
+component BlackboardComponentMultiClientRepData {
+	id = 100102;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component BlackboardComponentHandoverData {
+	id = 100103;
+}
+component BlackboardComponentClientRPCs {
+	id = 100104;
+}
+component BlackboardComponentServerRPCs {
+	id = 100105;
+}
+component BlackboardComponentCrossServerRPCs {
+	id = 100106;
+}
+component BlackboardComponentNetMulticastRPCs {
+	id = 100107;
+}

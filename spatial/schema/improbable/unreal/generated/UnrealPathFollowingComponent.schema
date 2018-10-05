@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.pathfollowingcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PathFollowingComponentSingleClientRepData {
+	id = 100108;
+}
+component PathFollowingComponentMultiClientRepData {
+	id = 100109;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component PathFollowingComponentHandoverData {
+	id = 100110;
+}
+component PathFollowingComponentClientRPCs {
+	id = 100111;
+}
+component PathFollowingComponentServerRPCs {
+	id = 100112;
+}
+component PathFollowingComponentCrossServerRPCs {
+	id = 100113;
+}
+component PathFollowingComponentNetMulticastRPCs {
+	id = 100114;
+}

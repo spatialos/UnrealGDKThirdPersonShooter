@@ -190,7 +190,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION(ATPSCharacter, AimPitch, COND_SkipOwner);
 
 	// Only replicate health to the owning client.
-	DOREPLIFETIME_CONDITION(ATPSCharacter, CurrentHealth, COND_AutonomousOnly);
+	DOREPLIFETIME(ATPSCharacter, CurrentHealth);
 }
 
 bool ATPSCharacter::IgnoreActionInput() const
@@ -509,11 +509,11 @@ FString ATPSCharacter::GetPlayerName() const
 	return FString("UNKNOWN");
 }
 
-float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+void ATPSCharacter::TakeGunDamage_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (!HasAuthority())
 	{
-		return 0;
+		return;
 	}
 
 	const ATPSCharacter* Killer = nullptr;
@@ -528,7 +528,7 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 			if (Team != ETPSTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
 				&& DamageDealer->GetTeam() == Team)
 			{
-				return 0;
+				return;
 			}
 			Killer = DamageDealer;
 		}
@@ -541,8 +541,6 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	{
 		Die(Killer);
 	}
-
-	return DamageDealt;
 }
 
 bool ATPSCharacter::IsSprinting()

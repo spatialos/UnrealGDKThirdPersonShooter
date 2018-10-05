@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.pawnnoiseemittercomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PawnNoiseEmitterComponentSingleClientRepData {
+	id = 100843;
+}
+component PawnNoiseEmitterComponentMultiClientRepData {
+	id = 100844;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component PawnNoiseEmitterComponentHandoverData {
+	id = 100845;
+}
+component PawnNoiseEmitterComponentClientRPCs {
+	id = 100846;
+}
+component PawnNoiseEmitterComponentServerRPCs {
+	id = 100847;
+}
+component PawnNoiseEmitterComponentCrossServerRPCs {
+	id = 100848;
+}
+component PawnNoiseEmitterComponentNetMulticastRPCs {
+	id = 100849;
+}

@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.physicalanimationcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PhysicalAnimationComponentSingleClientRepData {
+	id = 100850;
+}
+component PhysicalAnimationComponentMultiClientRepData {
+	id = 100851;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component PhysicalAnimationComponentHandoverData {
+	id = 100852;
+}
+component PhysicalAnimationComponentClientRPCs {
+	id = 100853;
+}
+component PhysicalAnimationComponentServerRPCs {
+	id = 100854;
+}
+component PhysicalAnimationComponentCrossServerRPCs {
+	id = 100855;
+}
+component PhysicalAnimationComponentNetMulticastRPCs {
+	id = 100856;
+}

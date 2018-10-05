@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.navigationinvokercomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component NavigationInvokerComponentSingleClientRepData {
+	id = 100759;
+}
+component NavigationInvokerComponentMultiClientRepData {
+	id = 100760;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component NavigationInvokerComponentHandoverData {
+	id = 100761;
+}
+component NavigationInvokerComponentClientRPCs {
+	id = 100762;
+}
+component NavigationInvokerComponentServerRPCs {
+	id = 100763;
+}
+component NavigationInvokerComponentCrossServerRPCs {
+	id = 100764;
+}
+component NavigationInvokerComponentNetMulticastRPCs {
+	id = 100765;
+}

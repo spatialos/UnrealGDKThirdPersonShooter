@@ -1,0 +1,120 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.playercontroller;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PlayerControllerSingleClientRepData {
+	id = 100486;
+	bytes field_targetviewrotation0 = 18; // COND_OwnerOnly // ::PlayerController
+	bytes field_spawnlocation0 = 19; // COND_OwnerOnly // ::PlayerController
+}
+component PlayerControllerMultiClientRepData {
+	id = 100487;
+	bool field_bhidden0 = 1; // COND_None // ::Actor
+	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
+	bool field_btearoff0 = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged0 = 4; // COND_None // ::Actor
+	uint32 field_remoterole0 = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement0 = 6; // COND_SimulatedOrPhysics // ::Actor
+	UnrealObjectRef field_attachmentreplication0_attachparent0 = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_locationoffset0 = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_relativescale3d0 = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_rotationoffset0 = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication0_attachsocket0 = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication0_attachcomponent0 = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
+	uint32 field_role0 = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
+	UnrealObjectRef field_playerstate0 = 16; // COND_None // ::Controller
+	UnrealObjectRef field_pawn0 = 17; // COND_None // ::Controller
+}
+component PlayerControllerHandoverData {
+	id = 100488;
+	UnrealObjectRef field_acknowledgedpawn0 = 1;
+}
+component PlayerControllerClientRPCs {
+	id = 100489;
+	command UnrealRPCCommandResponse onserverstartedvisuallogger(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientwaskicked(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientvoicehandshakecomplete(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientupdatemultiplelevelsstreamingstatus(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientupdatelevelstreamingstatus(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientunmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clienttravelinternal(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientteammessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopforcefeedback(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopcamerashake(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstopcameraanim(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientstartonlinesession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientspawncameralenseffect(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetviewtarget(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetspectatorwaiting(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsethud(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetforcemiplevelstoberesident(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcinematicmode(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcameramode(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetcamerafade(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetblockonasyncloading(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreturntomainmenuwithtextreason(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreturntomainmenu(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientretryclientrestart(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientrestart(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreset(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientrepobjref(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientreceivelocalizedmessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientprestreamtextures(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientpreparemapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaysoundatlocation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaysound(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplayforcefeedback(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaycamerashake(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientplaycameraanim(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientmessage(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientignoremoveinput(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientignorelookinput(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientgotostate(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientgameended(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientforcegarbagecollection(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientflushlevelstreaming(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientendonlinesession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientenablenetworkvoice(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcommitmapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientclearcameralenseffects(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcapbandwidth(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientcancelpendingmapchange(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientaddtexturestreamingloc(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetrotation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse clientsetlocation(UnrealRPCCommandRequest);
+}
+component PlayerControllerServerRPCs {
+	id = 100490;
+	command UnrealRPCCommandResponse serverviewself(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverviewprevplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverviewnextplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serververifyviewtarget(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatemultiplelevelsvisibility(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatelevelvisibility(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverupdatecamera(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverunmuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servertoggleailogging(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servershorttimeout(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serversetspectatorwaiting(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serversetspectatorlocation(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverrestartplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverpause(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servernotifyloadedworld(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servermuteplayer(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercheckclientpossessionreliable(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercheckclientpossession(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverchangename(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse servercamera(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serveracknowledgepossession(UnrealRPCCommandRequest);
+}
+component PlayerControllerCrossServerRPCs {
+	id = 100491;
+}
+component PlayerControllerNetMulticastRPCs {
+	id = 100492;
+}

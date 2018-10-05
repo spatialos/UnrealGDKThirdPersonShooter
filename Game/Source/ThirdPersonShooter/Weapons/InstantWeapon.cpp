@@ -215,7 +215,10 @@ void AInstantWeapon::DealDamage(const FInstantHitInfo& HitInfo)
 	DmgEvent.DamageTypeClass = DamageTypeClass;
 	DmgEvent.HitInfo.ImpactPoint = HitInfo.Location;
 
-	HitInfo.HitActor->TakeDamage(ShotBaseDamage, DmgEvent, GetOwningCharacter()->GetController(), this);
+	if (ATPSCharacter* Character = Cast<ATPSCharacter>(HitInfo.HitActor))
+	{
+		Character->TakeGunDamage(ShotBaseDamage, DmgEvent, GetOwningCharacter()->GetController(), this);
+	}
 }
 
 bool AInstantWeapon::ServerDidHit_Validate(const FInstantHitInfo& HitInfo)

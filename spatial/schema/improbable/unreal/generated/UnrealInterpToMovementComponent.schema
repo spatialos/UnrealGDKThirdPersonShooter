@@ -1,0 +1,30 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.interptomovementcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component InterpToMovementComponentSingleClientRepData {
+	id = 100661;
+}
+component InterpToMovementComponentMultiClientRepData {
+	id = 100662;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component InterpToMovementComponentHandoverData {
+	id = 100663;
+	bytes field_velocity0 = 1;
+}
+component InterpToMovementComponentClientRPCs {
+	id = 100664;
+}
+component InterpToMovementComponentServerRPCs {
+	id = 100665;
+}
+component InterpToMovementComponentCrossServerRPCs {
+	id = 100666;
+}
+component InterpToMovementComponentNetMulticastRPCs {
+	id = 100667;
+}

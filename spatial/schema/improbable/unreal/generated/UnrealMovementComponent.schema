@@ -1,0 +1,30 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.movementcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component MovementComponentSingleClientRepData {
+	id = 100458;
+}
+component MovementComponentMultiClientRepData {
+	id = 100459;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component MovementComponentHandoverData {
+	id = 100460;
+	bytes field_velocity0 = 1;
+}
+component MovementComponentClientRPCs {
+	id = 100461;
+}
+component MovementComponentServerRPCs {
+	id = 100462;
+}
+component MovementComponentCrossServerRPCs {
+	id = 100463;
+}
+component MovementComponentNetMulticastRPCs {
+	id = 100464;
+}

@@ -7,7 +7,7 @@
 #include "Teams/TPSTeams.h"
 #include "TPSGameMode.generated.h"
 
-UCLASS(SpatialType = (Singleton, ServerOnly), minimalapi)
+UCLASS(minimalapi)
 class ATPSGameMode : public AGameModeBase
 {
 	GENERATED_BODY()

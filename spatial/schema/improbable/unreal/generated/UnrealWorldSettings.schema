@@ -1,0 +1,47 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.worldsettings;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component WorldSettingsSingleClientRepData {
+	id = 101137;
+}
+component WorldSettingsMultiClientRepData {
+	id = 101138;
+	bool field_bhidden0 = 1; // COND_None // ::Actor
+	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
+	bool field_btearoff0 = 3; // COND_None // ::Actor
+	bool field_bcanbedamaged0 = 4; // COND_None // ::Actor
+	uint32 field_remoterole0 = 5; // COND_None // ::Actor
+	bytes field_replicatedmovement0 = 6; // COND_SimulatedOrPhysics // ::Actor
+	UnrealObjectRef field_attachmentreplication0_attachparent0 = 7; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_locationoffset0 = 8; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_relativescale3d0 = 9; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	bytes field_attachmentreplication0_rotationoffset0 = 10; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	string field_attachmentreplication0_attachsocket0 = 11; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_attachmentreplication0_attachcomponent0 = 12; // COND_Custom // RepAttachment::AttachmentReplication::Actor
+	UnrealObjectRef field_owner0 = 13; // COND_None // ::Actor
+	uint32 field_role0 = 14; // COND_None // ::Actor
+	UnrealObjectRef field_instigator0 = 15; // COND_None // ::Actor
+	float field_worldgravityz0 = 16; // COND_None // ::WorldSettings
+	float field_timedilation0 = 17; // COND_None // ::WorldSettings
+	float field_matineetimedilation0 = 18; // COND_None // ::WorldSettings
+	UnrealObjectRef field_pauser0 = 19; // COND_None // ::WorldSettings
+	bool field_bhighpriorityloading0 = 20; // COND_None // ::WorldSettings
+}
+component WorldSettingsHandoverData {
+	id = 101139;
+}
+component WorldSettingsClientRPCs {
+	id = 101140;
+}
+component WorldSettingsServerRPCs {
+	id = 101141;
+}
+component WorldSettingsCrossServerRPCs {
+	id = 101142;
+}
+component WorldSettingsNetMulticastRPCs {
+	id = 101143;
+}

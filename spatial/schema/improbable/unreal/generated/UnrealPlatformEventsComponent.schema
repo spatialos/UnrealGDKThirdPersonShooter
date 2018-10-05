@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.platformeventscomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component PlatformEventsComponentSingleClientRepData {
+	id = 100906;
+}
+component PlatformEventsComponentMultiClientRepData {
+	id = 100907;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component PlatformEventsComponentHandoverData {
+	id = 100908;
+}
+component PlatformEventsComponentClientRPCs {
+	id = 100909;
+}
+component PlatformEventsComponentServerRPCs {
+	id = 100910;
+}
+component PlatformEventsComponentCrossServerRPCs {
+	id = 100911;
+}
+component PlatformEventsComponentNetMulticastRPCs {
+	id = 100912;
+}

@@ -5,10 +5,10 @@ package improbable.unreal.generated.tpsplayerstate;
 import "improbable/unreal/gdk/core_types.schema";
 
 component TPSPlayerStateSingleClientRepData {
-	id = 100045;
+	id = 101452;
 }
 component TPSPlayerStateMultiClientRepData {
-	id = 100046;
+	id = 101453;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -38,18 +38,17 @@ component TPSPlayerStateMultiClientRepData {
 	uint32 field_selectedteam0 = 27; // COND_None // ::TPSPlayerState
 }
 component TPSPlayerStateHandoverData {
-	id = 100047;
+	id = 101454;
 }
-
 component TPSPlayerStateClientRPCs {
-	id = 100048;
+	id = 101455;
 }
 component TPSPlayerStateServerRPCs {
-	id = 100049;
+	id = 101456;
 }
 component TPSPlayerStateCrossServerRPCs {
-	id = 100050;
+	id = 101457;
 }
 component TPSPlayerStateNetMulticastRPCs {
-	id = 100051;
+	id = 101458;
 }

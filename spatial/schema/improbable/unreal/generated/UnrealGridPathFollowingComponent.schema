@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.gridpathfollowingcomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component GridPathFollowingComponentSingleClientRepData {
+	id = 100157;
+}
+component GridPathFollowingComponentMultiClientRepData {
+	id = 100158;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component GridPathFollowingComponentHandoverData {
+	id = 100159;
+}
+component GridPathFollowingComponentClientRPCs {
+	id = 100160;
+}
+component GridPathFollowingComponentServerRPCs {
+	id = 100161;
+}
+component GridPathFollowingComponentCrossServerRPCs {
+	id = 100162;
+}
+component GridPathFollowingComponentNetMulticastRPCs {
+	id = 100163;
+}

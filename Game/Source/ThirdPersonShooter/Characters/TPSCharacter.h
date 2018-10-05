@@ -69,7 +69,9 @@ public:
 	// Returns the player's name, as specified on login.
 	FString GetPlayerName() const;
 
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(CrossServer, Reliable)
+	void TakeGunDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+	void TakeGunDamage_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	FORCEINLINE float GetCurrentHealth() const
 	{
@@ -168,7 +170,7 @@ private:
 	float InteractDistance;
 
 	// Max health this character can have.
-	UPROPERTY(EditDefaultsOnly, Category = "Health", meta = (ClampMin = "1"))
+	UPROPERTY(EditDefaultsOnly, Category = "Health", meta = (ClampMin = "1"), Handover)
 	int32 MaxHealth;
 
 	// Current health of the character, can be at most MaxHealth.

@@ -1,0 +1,34 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.timelinecomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component TimelineComponentSingleClientRepData {
+	id = 101067;
+}
+component TimelineComponentMultiClientRepData {
+	id = 101068;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+	bool field_thetimeline0_blooping0 = 3; // COND_None // Timeline::TheTimeline::TimelineComponent
+	bool field_thetimeline0_bplaying0 = 4; // COND_None // Timeline::TheTimeline::TimelineComponent
+	bool field_thetimeline0_breverseplayback0 = 5; // COND_None // Timeline::TheTimeline::TimelineComponent
+	float field_thetimeline0_playrate0 = 6; // COND_None // Timeline::TheTimeline::TimelineComponent
+	float field_thetimeline0_position0 = 7; // COND_None // Timeline::TheTimeline::TimelineComponent
+}
+component TimelineComponentHandoverData {
+	id = 101069;
+}
+component TimelineComponentClientRPCs {
+	id = 101070;
+}
+component TimelineComponentServerRPCs {
+	id = 101071;
+}
+component TimelineComponentCrossServerRPCs {
+	id = 101072;
+}
+component TimelineComponentNetMulticastRPCs {
+	id = 101073;
+}

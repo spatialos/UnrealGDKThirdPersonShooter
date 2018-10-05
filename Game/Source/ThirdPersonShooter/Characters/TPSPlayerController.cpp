@@ -123,9 +123,9 @@ void ATPSPlayerController::SetPlayerUIVisible(bool bIsVisible)
 			if (TPSUI == nullptr)
 			{
 				USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
-				UE_LOG(LogTPS, Error, TEXT("Failed to create UI for controller %s on worker %s"),
-					*this->GetName(),
-					SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+				//UE_LOG(LogTPS, Error, TEXT("Failed to create UI for controller %s on worker %s"),
+				//	*this->GetName(),
+				//	SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 				return;
 			}
 		}
@@ -164,9 +164,9 @@ void ATPSPlayerController::SetLoginUIVisible(bool bIsVisible)
 		if (TPSLoginUI == nullptr)
 		{
 			USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
-			UE_LOG(LogTPS, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
-				*this->GetName(),
-				SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
+			//UE_LOG(LogTPS, Error, TEXT("Failed to create Login UI for controller %s on worker %s"),
+			//	*this->GetName(),
+			//	SpatialNetDriver != nullptr ? *SpatialNetDriver->GetSpatialOS()->GetWorkerId() : TEXT("Invalid SpatialNetDriver"));
 
 			return;
 		}
@@ -249,10 +249,10 @@ void ATPSPlayerController::HideScoreboard()
 
 FString ATPSPlayerController::GetDefaultPlayerName()
 {
-	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver()))
-	{
-		return SpatialNetDriver->GetSpatialOS()->GetWorkerId();
-	}
+	//if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver()))
+	//{
+	//	return SpatialNetDriver->GetSpatialOS()->GetWorkerId();
+	//}
 	return "Player" + FGuid::NewGuid().ToString();
 }
 
@@ -395,6 +395,11 @@ void ATPSPlayerController::RespawnCharacter()
 	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode != nullptr)
 	{
+		if (!StartSpot.IsValid())
+		{
+			return;
+		}
+
 		APawn* NewPawn = GameMode->SpawnDefaultPawnFor(this, StartSpot.Get());
 		Possess(NewPawn);
 

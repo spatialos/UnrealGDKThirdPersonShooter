@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.oculusboundarycomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component OculusBoundaryComponentSingleClientRepData {
+	id = 101200;
+}
+component OculusBoundaryComponentMultiClientRepData {
+	id = 101201;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component OculusBoundaryComponentHandoverData {
+	id = 101202;
+}
+component OculusBoundaryComponentClientRPCs {
+	id = 101203;
+}
+component OculusBoundaryComponentServerRPCs {
+	id = 101204;
+}
+component OculusBoundaryComponentCrossServerRPCs {
+	id = 101205;
+}
+component OculusBoundaryComponentNetMulticastRPCs {
+	id = 101206;
+}

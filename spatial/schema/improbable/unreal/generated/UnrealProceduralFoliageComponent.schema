@@ -1,0 +1,29 @@
+// Copyright (c) Improbable Worlds Ltd, All Rights Reserved
+// Note that this file has been generated automatically
+package improbable.unreal.generated.proceduralfoliagecomponent;
+
+import "improbable/unreal/gdk/core_types.schema";
+
+component ProceduralFoliageComponentSingleClientRepData {
+	id = 100318;
+}
+component ProceduralFoliageComponentMultiClientRepData {
+	id = 100319;
+	bool field_breplicates0 = 1; // COND_None // ::ActorComponent
+	bool field_bisactive0 = 2; // COND_None // ::ActorComponent
+}
+component ProceduralFoliageComponentHandoverData {
+	id = 100320;
+}
+component ProceduralFoliageComponentClientRPCs {
+	id = 100321;
+}
+component ProceduralFoliageComponentServerRPCs {
+	id = 100322;
+}
+component ProceduralFoliageComponentCrossServerRPCs {
+	id = 100323;
+}
+component ProceduralFoliageComponentNetMulticastRPCs {
+	id = 100324;
+}

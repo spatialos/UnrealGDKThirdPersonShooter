@@ -5,10 +5,10 @@ package improbable.unreal.generated.instantweapon;
 import "improbable/unreal/gdk/core_types.schema";
 
 component InstantWeaponSingleClientRepData {
-	id = 100010;
+	id = 101403;
 }
 component InstantWeaponMultiClientRepData {
-	id = 100011;
+	id = 101404;
 	bool field_bhidden0 = 1; // COND_None // ::Actor
 	bool field_breplicatemovement0 = 2; // COND_None // ::Actor
 	bool field_btearoff0 = 3; // COND_None // ::Actor
@@ -27,22 +27,20 @@ component InstantWeaponMultiClientRepData {
 	UnrealObjectRef field_owningcharacter0 = 16; // COND_None // ::Weapon
 }
 component InstantWeaponHandoverData {
-	id = 100012;
+	id = 101405;
 }
-import "improbable/unreal/generated/UnrealInstantWeaponTypes.schema";
-
 component InstantWeaponClientRPCs {
-	id = 100013;
+	id = 101406;
 }
 component InstantWeaponServerRPCs {
-	id = 100014;
-	command UnrealRPCCommandResponse serverdidmiss(instantweapon.ServerDidMissRequest);
-	command UnrealRPCCommandResponse serverdidhit(instantweapon.ServerDidHitRequest);
+	id = 101407;
+	command UnrealRPCCommandResponse serverdidmiss(UnrealRPCCommandRequest);
+	command UnrealRPCCommandResponse serverdidhit(UnrealRPCCommandRequest);
 }
 component InstantWeaponCrossServerRPCs {
-	id = 100015;
+	id = 101408;
 }
 component InstantWeaponNetMulticastRPCs {
-	id = 100016;
-	event instantweapon.MulticastNotifyHitRequest multicastnotifyhit;
+	id = 101409;
+	event UnrealRPCCommandRequest multicastnotifyhit;
 }
