@@ -19,10 +19,6 @@
         {
           "name": "qos_max_unacked_pings_rate",
           "value": "10"
-        },
-        {
-          "name": "enable_bridge_shunt_network_stack",
-          "value": "true"
         }
       ],
     "snapshots": {

@@ -125,6 +125,8 @@ private:
 
 	// Pawn to be deleted when the DeletePawn timer expires.
 	class APawn* PawnToDelete;
+	// If the pawn dies on a different server from its spawn location, respawn it where it died.
+	FTransform DeadPawnTransform;
 
 	FTimerHandle RespawnTimerHandle;
 	FTimerHandle DeleteCharacterTimerHandle;

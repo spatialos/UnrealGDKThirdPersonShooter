@@ -69,7 +69,8 @@ public:
 	// Returns the player's name, as specified on login.
 	FString GetPlayerName() const;
 
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+	UFUNCTION(CrossServer, Reliable)
+	void TakeGunDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
 	FORCEINLINE float GetCurrentHealth() const
 	{

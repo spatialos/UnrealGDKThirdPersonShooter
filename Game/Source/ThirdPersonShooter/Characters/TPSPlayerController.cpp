@@ -98,6 +98,7 @@ void ATPSPlayerController::KillCharacter(const ATPSCharacter* Killer)
 	}
 
 	PawnToDelete = GetPawn();
+	DeadPawnTransform = PawnToDelete->GetActorTransform();
 	UnPossess();
 
 	// TODO: timers won't persist across worker boundary migrations, and neither will PawnToDelete
@@ -396,7 +397,16 @@ void ATPSPlayerController::RespawnCharacter()
 	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
 	if (GameMode != nullptr)
 	{
-		APawn* NewPawn = GameMode->SpawnDefaultPawnFor(this, StartSpot.Get());
+		APawn* NewPawn = nullptr;
+		if (StartSpot.IsValid())
+		{
+			NewPawn = GameMode->SpawnDefaultPawnFor(this, StartSpot.Get());
+		}
+		else
+		{
+			NewPawn = GameMode->SpawnDefaultPawnAtTransform(this, DeadPawnTransform);
+		}
+
 		Possess(NewPawn);
 
 		ATPSCharacter* NewCharacter = Cast<ATPSCharacter>(NewPawn);
