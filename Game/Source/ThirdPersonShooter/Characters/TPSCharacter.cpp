@@ -61,7 +61,7 @@ ATPSCharacter::ATPSCharacter(const FObjectInitializer& ObjectInitializer)
 	EquippedWeapon = nullptr;
 	InteractDistance = 500.0f;
 	MaxHealth = 100;
-	CurrentHealth = 0;
+	CurrentHealth = MaxHealth;
 	bIsRagdoll = false;
 	AimYaw = 0.0f;
 	AimPitch = 0.0f;
@@ -509,11 +509,18 @@ FString ATPSCharacter::GetPlayerName() const
 	return FString("UNKNOWN");
 }
 
-float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ATPSCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	TakeGunDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	return Damage;
+}
+
+void ATPSCharacter::TakeGunDamage_Implementation(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (!HasAuthority())
 	{
-		return 0;
+		return;
 	}
 
 	const ATPSCharacter* Killer = nullptr;
@@ -528,7 +535,7 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 			if (Team != ETPSTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
 				&& DamageDealer->GetTeam() == Team)
 			{
-				return 0;
+				return;
 			}
 			Killer = DamageDealer;
 		}
@@ -541,8 +548,6 @@ float ATPSCharacter::TakeDamage(float Damage, struct FDamageEvent const& DamageE
 	{
 		Die(Killer);
 	}
-
-	return DamageDealt;
 }
 
 bool ATPSCharacter::IsSprinting()

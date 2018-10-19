@@ -1,5 +1,5 @@
 {
-  "template": "small",
+  "template": "small_bridge_v2",
   "world": {
     "dimensions": {
       "x_meters": 200,

@@ -155,8 +155,11 @@ bool UTPSCharacterMovementComponent::IsMovingForward() const
 	FVector Forward = PawnOwner->GetActorForwardVector();
 	if (ATPSCharacter* Character = Cast<ATPSCharacter>(PawnOwner))
 	{
-		// Check move direction against control rotation.
-		Forward = Character->GetController()->GetControlRotation().Vector();
+		if (AController* PlayerController = Character->GetController())
+		{
+			// Check move direction against control rotation.
+			Forward = PlayerController->GetControlRotation().Vector();
+		}
 	}
 
 	// Ignore the Z axis for comparison.
