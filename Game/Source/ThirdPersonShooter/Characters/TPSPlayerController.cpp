@@ -394,8 +394,7 @@ void ATPSPlayerController::ClientJoinResults_Implementation(const bool bJoinSucc
 void ATPSPlayerController::RespawnCharacter()
 {
 	check(GetNetMode() == NM_DedicatedServer);
-	AGameModeBase* GameMode = GetWorld()->GetAuthGameMode();
-	if (GameMode != nullptr)
+	if (AGameModeBase* GameMode = GetWorld()->GetAuthGameMode())
 	{
 		APawn* NewPawn = nullptr;
 		if (StartSpot.IsValid())
