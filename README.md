@@ -16,11 +16,11 @@ For more information, see the [SpatialOS Unreal GDK repository](https://github.c
 
 This repository contains a set of helper scripts to get you started.
 
-| Helper script | Parameters | Description |
-| --- | --- | --- |
-| CleanGeneratedFiles.bat | `[-a]` | Cleans generated schema and/or type bindings and/or worker code. Call with `-a` flag to clean everything without prompting. |
-| CreateGDKSymlinks.bat | `[Unreal GDK path]` | Creates symlinks to the directories in the Unreal GDK containing the SpatialGDK module, plugins, scripts, binaries, and schema. |
-| SafeClean.bat | `[-a]` | Cleans the symlinks, uncommitted changes, and all built files. Call with `-a` flag to clean everything without prompting. Optionally calls `CreateGDKSymlinks.bat` to restore the symlinks. |
+| Helper script | Description |
+| --- | --- |
+| LaunchSpatial.bat | Starts a local Spatial deployment with the default launch configuration  |
+| LaunchServer.bat | Starts an Unreal server worker, and connects it to the local deployment |
+| LaunchClient.bat | Starts an Unreal client worker, and connects it to the local deployment |
 
 ## Game Controls
 
