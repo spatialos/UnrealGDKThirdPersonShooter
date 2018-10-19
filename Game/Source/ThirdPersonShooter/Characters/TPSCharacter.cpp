@@ -509,7 +509,14 @@ FString ATPSCharacter::GetPlayerName() const
 	return FString("UNKNOWN");
 }
 
-void ATPSCharacter::TakeGunDamage_Implementation(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float ATPSCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	TakeGunDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+	return Damage;
+}
+
+void ATPSCharacter::TakeGunDamage_Implementation(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	if (!HasAuthority())
 	{

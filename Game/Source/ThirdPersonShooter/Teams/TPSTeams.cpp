@@ -18,7 +18,7 @@ FString TPSTeamName(ETPSTeam Team)
 {
 	if (Team > ETPSTeam::Team_MAX)
 	{
-		return "UNKNOWN TEAM";
+		return TEXT("UNKNOWN TEAM");
 	}
 	return kTeamNames[static_cast<uint8>(Team)];
 }
