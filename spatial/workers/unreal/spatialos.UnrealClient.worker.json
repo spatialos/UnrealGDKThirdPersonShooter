@@ -29,6 +29,18 @@
         "radius": 50
       }
     },
+    "streaming_query": [
+      {
+        "global_component_streaming_query": {
+          "component_name": "improbable.unreal.GlobalStateManager"
+        }
+      },
+      {
+        "global_component_streaming_query": {
+          "component_name": "improbable.unreal.generated.tpsgamestate.TPSGameStateMultiClientRepData"
+        }
+      }
+    ],
     "component_delivery": {
       "default": "RELIABLE_ORDERED",
       "checkout_all_initially": true
