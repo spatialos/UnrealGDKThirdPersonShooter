@@ -37,12 +37,7 @@
       },
       {
         "global_component_streaming_query": {
-          "component_name": "improbable.unreal.generated.tpsgamestate.TPSGameStateMultiClientRepData"
-        }
-      },
-      {
-        "global_component_streaming_query": {
-          "component_name": "improbable.unreal.generated.tpsgamemode.TPSGameModeMultiClientRepData"
+          "component_name": "improbable.unreal.Singleton"
         }
       }
     ],
