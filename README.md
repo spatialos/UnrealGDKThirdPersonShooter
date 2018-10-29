@@ -60,5 +60,3 @@ We are not currently accepting public contributions. However, we are accepting [
 * The scoreboard occasionally does not initialize properly.
 
 &copy; 2018 Improbable
-
-
