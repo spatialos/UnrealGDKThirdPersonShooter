@@ -4,7 +4,7 @@
 * **REPOSITORY:** [github.com/spatialos/UnrealGDKStarterProject](https://github.com/spatialos/UnrealGDKThirdPersonShooter)
 
 
-This project is a sample third-person shooter deathmatch game which uses the [SpatialOS GDK for Unreal](github.com/spatialos/unrealGDK). 
+This project is a sample third-person shooter deathmatch game which uses the [SpatialOS GDK for Unreal](https://github.com/spatialos/unrealGDK). 
 
 It is both a reference project and a starting point for those building games on SpatialOS and Unreal Engine 4. In the game, you can join a team, run around, shoot characters on other teams, and spawn "test cubes" (which are cubes you can shoot around).
 
