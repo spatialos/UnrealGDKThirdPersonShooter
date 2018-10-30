@@ -494,13 +494,6 @@ FString ATPSCharacter::GetPlayerName() const
 
 float ATPSCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	TakeGunDamageCrossServer(Damage, DamageEvent, EventInstigator, DamageCauser);
-
-	return Damage;
-}
-
-void ATPSCharacter::TakeGunDamageCrossServer_Implementation(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
-{
 	if (!HasAuthority())
 	{
 		return 0.0f;
