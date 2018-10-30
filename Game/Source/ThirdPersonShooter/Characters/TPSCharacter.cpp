@@ -102,6 +102,8 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 	{
 		UpdateAimRotation(LocalAimUpdateThreshold);
 	}
+
+	Super::Tick(DeltaSeconds);
 }
 
 void ATPSCharacter::UpdateTeamColor()
