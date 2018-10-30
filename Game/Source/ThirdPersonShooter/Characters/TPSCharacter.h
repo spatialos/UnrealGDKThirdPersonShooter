@@ -69,6 +69,8 @@ public:
 	// Returns the player's name, as specified on login.
 	FString GetPlayerName() const;
 
+	float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
+
 	FORCEINLINE float GetCurrentHealth() const
 	{
 		return CurrentHealth;
