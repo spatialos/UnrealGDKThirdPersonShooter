@@ -70,6 +70,9 @@ public:
 
 	float TakeDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
+	UFUNCTION(CrossServer, Reliable)
+	void TakeGunDamageCrossServer(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
+
 	FORCEINLINE float GetCurrentHealth() const
 	{
 		return CurrentHealth;
