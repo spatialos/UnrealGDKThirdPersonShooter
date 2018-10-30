@@ -492,6 +492,42 @@ FString ATPSCharacter::GetPlayerName() const
 	return FString("UNKNOWN");
 }
 
+float ATPSCharacter::TakeDamage(float Damage, const FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	if (!HasAuthority())
+	{
+		return 0.0f;
+	}
+
+	const ATPSCharacter* Killer = nullptr;
+
+	// Ignore friendly fire
+	const AInstantWeapon* DamageSourceWeapon = Cast<AInstantWeapon>(DamageCauser);
+	if (DamageSourceWeapon != nullptr)
+	{
+		const ATPSCharacter* DamageDealer = Cast<ATPSCharacter>(DamageSourceWeapon->GetWeilder());
+		if (DamageDealer != nullptr)
+		{
+			if (Team != ETPSTeam::Team_None    // "Team_None" is not actually a team, and "teamless" should be able to damage one another
+				&& DamageDealer->GetTeam() == Team)
+			{
+				return 0.0f;
+			}
+			Killer = DamageDealer;
+		}
+	}
+
+	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);
+	CurrentHealth -= DamageDealt;
+
+	if (CurrentHealth <= 0)
+	{
+		Die(Killer);
+	}
+
+	return Damage;
+}
+
 bool ATPSCharacter::IsSprinting()
 {
 	UTPSCharacterMovementComponent* Movement = Cast<UTPSCharacterMovementComponent>(GetCharacterMovement());
