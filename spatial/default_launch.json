@@ -1,11 +1,11 @@
 {
-  "template": "small_bridge_v2",
+  "template": "small_loadbalancer_v2",
   "world": {
     "dimensions": {
-      "x_meters": 5000,
-      "z_meters": 5000
+      "x_meters": 200,
+      "z_meters": 200
     },
-    "chunk_edge_length_meters": 100,
+    "chunk_edge_length_meters": 5,
     "streaming_query_interval": 4,
     "legacy_flags": [
         {
@@ -25,28 +25,24 @@
       "snapshot_write_period_seconds": 0
     }
   },
+  "load_balancing": {
+    "layer_configurations": [
+      {
+          "layer": "UnrealWorker",
+          "rectangle_grid": {
+              "cols": 1,
+              "rows": 1
+          },
+          "options": {
+            "manual_worker_connection_only": true
+        }
+      }
+    ]
+  },
   "workers": [
     {
       "worker_type": "UnrealWorker",
       "flags" : [],
-      "load_balancing": {
-        "dynamic_loadbalancer": {
-          "worker_scaler_config": {
-            "constant_config": {
-              "num_workers": 0
-            }
-          },
-          "worker_placer_config": {
-            "random_params": {}
-          },
-          "loadbalancer_config": {
-            "min_range_meters": 500.0,
-            "max_range_meters": 1000.0,
-            "speed_meters_per_second": 100.0,
-            "expansion_time_millis": 60000
-          }
-        }
-      },
       "permissions": [
         {
           "all": {}
