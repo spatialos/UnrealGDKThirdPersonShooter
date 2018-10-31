@@ -143,9 +143,6 @@ private:
 	void DebugResetCharacter();
 
 	UFUNCTION()
-	void OnRep_CurrentHealth();
-
-	UFUNCTION()
 	void OnRep_IsRagdoll();
 
 	UFUNCTION()
@@ -171,7 +168,7 @@ private:
 	int32 MaxHealth;
 
 	// Current health of the character, can be at most MaxHealth.
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
+	UPROPERTY()
 	int32 CurrentHealth;
 
 	// If true, the character is currently ragdoll-ing.
