@@ -190,9 +190,6 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	// Skip the owner here because we're updating the values locally on the owning client.
 	DOREPLIFETIME_CONDITION(ATPSCharacter, AimYaw, COND_SkipOwner);
 	DOREPLIFETIME_CONDITION(ATPSCharacter, AimPitch, COND_SkipOwner);
-
-	// Only replicate health to the owning client.
-	DOREPLIFETIME_CONDITION(ATPSCharacter, CurrentHealth, COND_AutonomousOnly);
 }
 
 bool ATPSCharacter::IgnoreActionInput() const
@@ -456,22 +453,6 @@ bool ATPSCharacter::DebugResetCharacter_Validate()
 void ATPSCharacter::DebugResetCharacter_Implementation()
 {
 	CurrentHealth = MaxHealth;
-}
-
-void ATPSCharacter::OnRep_CurrentHealth()
-{
-	if (GetNetMode() != NM_DedicatedServer)
-	{
-		ATPSPlayerController* PC = Cast<ATPSPlayerController>(GetController());
-		if (PC)
-		{
-			PC->UpdateHealthUI(CurrentHealth, MaxHealth);
-		}
-		else
-		{
-			UE_LOG(LogTPS, Warning, TEXT("Couldn't find a player controller for character: %s"), *this->GetName());
-		}
-	}
 }
 
 void ATPSCharacter::OnRep_IsRagdoll()
