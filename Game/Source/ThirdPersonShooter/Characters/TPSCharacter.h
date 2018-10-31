@@ -175,7 +175,7 @@ private:
 	int32 MaxHealth;
 
 	// Current health of the character, can be at most MaxHealth.
-	UPROPERTY(VisibleAnywhere, ReplicatedUsing = OnRep_CurrentHealth, Category = "Health")
+	UPROPERTY(ReplicatedUsing = OnRep_CurrentHealth)
 	int32 CurrentHealth;
 
 	// If true, the character is currently ragdoll-ing.
