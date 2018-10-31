@@ -169,7 +169,7 @@ private:
 	int32 MaxHealth;
 
 	// Current health of the character, can be at most MaxHealth.
-	UPROPERTY(VisibleAnywhere, Category = "Health")
+	UPROPERTY()
 	int32 CurrentHealth;
 
 	// If true, the character is currently ragdoll-ing.
