@@ -26,6 +26,10 @@
 			"Enabled": true
 		},
 		{
+			"Name": "SpatialGDKEditorToolbar",
+			"Enabled": true
+		},
+		{
 			"Name": "OnlineSubsystem",
 			"Enabled": true
 		},
@@ -48,10 +52,6 @@
 			"SupportedTargetPlatforms": [
 				"XboxOne"
 			]
-		},
-		{
-			"Name": "SpatialGDKEditorToolbar",
-			"Enabled": true
 		}
 	]
 }

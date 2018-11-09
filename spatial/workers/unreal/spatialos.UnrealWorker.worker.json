@@ -26,18 +26,18 @@
     },
     "entity_interest": {
       "range_entity_interest": {
-        "radius": 0
+        "radius": 50
       }
     },
     "streaming_query": [
       {
         "global_component_streaming_query": {
-          "component_name": "improbable.unreal.GlobalStateManager"
+          "component_name": "unreal.GlobalStateManager"
         }
       },
       {
         "global_component_streaming_query": {
-          "component_name": "improbable.unreal.generated.tpsgamestate.TPSGameStateMultiClientRepData"
+          "component_name": "unreal.Singleton"
         }
       }
     ],
@@ -64,7 +64,7 @@
         "UnrealWorker",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
-        "+receptionistIp",
+        "+receptionistHost",
         "${IMPROBABLE_RECEPTIONIST_HOST}",
         "+receptionistPort",
         "${IMPROBABLE_RECEPTIONIST_PORT}",
@@ -87,7 +87,7 @@
         "ThirdPersonExampleMap",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
-        "+receptionistIp",
+        "+receptionistHost",
         "${IMPROBABLE_RECEPTIONIST_HOST}",
         "+receptionistPort",
         "${IMPROBABLE_RECEPTIONIST_PORT}",
