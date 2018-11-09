@@ -9,5 +9,5 @@ public class ThirdPersonShooterTarget : TargetRules
 	{
 		Type = TargetType.Game;
 		ExtraModuleNames.Add("ThirdPersonShooter");
-	}
+    }
 }

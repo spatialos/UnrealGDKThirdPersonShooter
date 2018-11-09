@@ -5,26 +5,30 @@
       "x_meters": 5000,
       "z_meters": 5000
     },
-    "chunk_edge_length_meters": 100,
+    "chunk_edge_length_meters": 200,
     "streaming_query_interval": 4,
     "legacy_flags": [
-        {
-          "name": "streaming_query_diff",
-          "value": "true"
-        },
-        {
-          "name": "bridge_qos_max_timeout",
-          "value": "0"
-        },
-        {
-          "name": "qos_max_unacked_pings_rate",
-          "value": "10"
-        },
-        {
-          "name": "enable_bridge_shunt_network_stack",
-          "value": "true"
-        }
-      ],
+      {
+        "name": "streaming_query_diff",
+        "value": "true"
+      },
+      {
+        "name": "bridge_qos_max_timeout",
+        "value": "0"
+      },
+      {
+        "name": "qos_max_unacked_pings_rate",
+        "value": "10"
+      },
+      {
+        "name": "enable_bridge_shunt_network_stack",
+        "value": "true"
+      },
+      {
+        "name": "enable_receptionist_v2",
+        "value": "true"
+      }
+    ],
     "snapshots": {
       "snapshot_write_period_seconds": 0
     }

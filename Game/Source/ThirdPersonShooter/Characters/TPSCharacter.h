@@ -6,6 +6,7 @@
 #include "EntityRegistry.h"
 #include "GameFramework/Character.h"
 #include "Teams/TPSTeams.h"
+#include "Materials/MaterialInstance.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(SpatialType, config = Game)

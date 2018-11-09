@@ -1,7 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "Characters/TPSCharacterMovementComponent.h"
-
+#include "GameFramework/Controller.h"
 #include "Characters/TPSCharacter.h"
 #include "GameFramework/Character.h"
 

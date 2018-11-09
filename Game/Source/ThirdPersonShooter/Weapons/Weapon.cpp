@@ -3,6 +3,7 @@
 #include "Weapon.h"
 
 #include "Characters/TPSCharacter.h"
+#include "Components/SkeletalMeshComponent.h"
 #include "Engine/World.h"
 #include "UnrealNetwork.h"
 

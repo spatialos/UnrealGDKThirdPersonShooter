@@ -372,8 +372,6 @@ void ATPSCharacter::StartRagdoll()
 	// Fix up the camera to a "death view".
 	if (GetNetMode() == NM_Client)
 	{
-		USpringArmComponent* CameraBoom = GetCameraBoom();
-
 		// Enable lag on the spring arm to smooth movement, counters sporadic movement of the ragdoll.
 		CameraBoom->bEnableCameraLag = true;
 		CameraBoom->bEnableCameraRotationLag = true;

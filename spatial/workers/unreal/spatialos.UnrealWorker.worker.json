@@ -48,7 +48,7 @@
   },
   "managed": {
     "windows": {
-      "artifact_name": "UnrealEditor@Windows.zip",
+      "artifact_name": "UnrealWorker@Windows.zip",
       "command": "StartEditor.bat",
       "arguments": [
         "ThirdPersonExampleMap",
@@ -83,7 +83,7 @@
       "command": "StartWorker.sh",
       "arguments": [
         "${IMPROBABLE_WORKER_ID}",
-        "SampleGame",
+        "ThirdPersonShooter",
         "ThirdPersonExampleMap",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",

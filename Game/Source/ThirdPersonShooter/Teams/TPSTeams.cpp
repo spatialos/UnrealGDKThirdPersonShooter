@@ -20,5 +20,5 @@ FString TPSTeamName(ETPSTeam Team)
 	{
 		return "UNKNOWN TEAM";
 	}
-	return FString::Printf(kTeamNames[static_cast<uint8>(Team)]);
+	return FString::Printf(TEXT("%s"), kTeamNames[static_cast<uint8>(Team)]);
 }

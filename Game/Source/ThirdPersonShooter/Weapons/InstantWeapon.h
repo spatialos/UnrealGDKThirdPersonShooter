@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Weapons/Weapon.h"
+#include "Public/TimerManager.h"
 #include "InstantWeapon.generated.h"
 
 

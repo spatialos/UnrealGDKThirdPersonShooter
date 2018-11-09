@@ -16,11 +16,15 @@ public class ThirdPersonShooter : ModuleRules
 				"Engine",
 				"InputCore",
 				"Sockets",
+				"OnlineSubsystem",
 				"OnlineSubsystemUtils",
 				"PhysXVehicles",
 				"UMG",
 				"Slate",
 				"SlateCore",
+				"Http",
+				"Json",
+				"JsonUtilities",
 				"SpatialGDK"
 			});
 	}
