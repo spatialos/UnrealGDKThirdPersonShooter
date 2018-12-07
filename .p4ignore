@@ -1,0 +1,31 @@
+
+# GDK ignores
+UnrealGDK/Binaries/*
+UnrealGDK/build/*
+UnrealGDK/packages/*
+UnrealGDK/Plugins/*/Intermediate/*
+UnrealGDK/Plugins/*/Binaries/*
+UnrealGDK/Source/SpatialGDK/Generated/*
+
+# Project ignores
+Game/Binaries/*
+Game/DerivedDataCache
+Game/Intermediate/**
+#Game/Plugins/*
+Game/Saved/*
+Game/Scripts/*
+Spatial/Build/assembly/*
+Spatial/Build/descriptor/cache.json
+Spatial/Logs/*
+spatial/schema/unreal/generated/*
+Game/Content/Spatial/SchemaDatabase.uasset
+
+# Root ignores
+*.sln
+.vs
+*.suo
+*.opensdf
+*.sdf
+*.pdb
+*-Debug.*
+*.vcxproj
