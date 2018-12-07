@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{E7EDB5D0-4DFB-B0F3-7595-6087D4EC6018}",
+	"EngineAssociation": "{79D3ABEC-48D8-E758-1DA4-78B915D9E0B1}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -11,7 +11,8 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"SpatialGDK",
-				"UMG"
+				"UMG",
+				"CoreUObject"
 			]
 		},
 		{
@@ -23,6 +24,10 @@
 	"Plugins": [
 		{
 			"Name": "SpatialGDK",
+			"Enabled": true
+		},
+		{
+			"Name": "SpatialGDKEditorToolbar",
 			"Enabled": true
 		}
 	]
