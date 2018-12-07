@@ -110,15 +110,14 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void ShowRespawnScreen();
 private:
 	// [client] If true, the character should ignore all action inputs.
 	bool IgnoreActionInput() const;
 
 	// [client] Checks if the crosshair is pointing at an interactable object, and if so, calls Interact() on it.
 	void Interact();
-
-	// [client] Tells the server to spawn a test cube.
-	void SpawnCube();
 
 	// [server] Spawns a starter weapon and attaches it to the character.
 	void SpawnStarterWeapon();
@@ -138,9 +137,9 @@ private:
 	// Returns the currently equipped weapon, or nullptr if there isn't one.
 	class AWeapon* GetEquippedWeapon() const;
 
-	// RPC to tell the server to spawn a test cube.
-	UFUNCTION(Server, Reliable, WithValidation)
-	void ServerSpawnCube();
+	// Notifies all clients that a the character has been hit and from what direction.
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastDamageTaken(FVector damageSource);
 
 	// Debug RPC to tell the server to reset all of the characters stats (weapons, health, etc.)
 	UFUNCTION(Server, Reliable, WithValidation)
@@ -161,10 +160,6 @@ private:
 	// Weapon to spawn the player with initially.
 	UPROPERTY(EditDefaultsOnly, Category = "Weapons")
 	TSubclassOf<AWeapon> StarterWeaponTemplate;
-
-	// Cube to spawn when the player presses "SpawnCube".
-	UPROPERTY(EditDefaultsOnly, Category = "Test Cube")
-	TSubclassOf<AActor> TestCubeTemplate;
 
 	// Maximum distance at which the player can interact with objects.
 	UPROPERTY(EditDefaultsOnly, Category = "Interaction", meta = (ClampMin = "0.0"))
@@ -215,27 +210,38 @@ private:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* NoneTeamMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* NoneTeamLodMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* NoneTeamRifleMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* RedTeamMaterial;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
-	UMaterialInstance* GreenTeamMaterial;
+	UMaterialInstance* RedTeamLodMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* RedTeamRifleMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* BlueTeamMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlueTeamLodMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* BlueTeamRifleMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* YellowTeamMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* YellowTeamLodMaterial;
+	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
+	UMaterialInstance* YellowTeamRifleMaterial;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
 	UMaterialInstance* PurpleTeamMaterial;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
-	UMaterialInstance* BlackTeamMaterial;
-
+	UMaterialInstance* PurpleTeamLodMaterial;
 	UPROPERTY(EditDefaultsOnly, Category = "Team Appearance")
-	UMaterialInstance* WhiteTeamMaterial;
+	UMaterialInstance* PurpleTeamRifleMaterial;
 
 public:
 	// Change the color of this character to match their chosen team
@@ -247,5 +253,13 @@ public:
 
 	// Returns the current value of Team.
 	ETPSTeam GetTeam() const;
+
+	// Called on clients when the player health changes
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void OnHealthUpdated(float newHealth, float maximumHealth);
+
+	// Called on clients when the player health changes
+	UFUNCTION(BlueprintImplementableEvent, Category = "Health")
+	void OnDamageTaken(FVector damageSource);
 };
 

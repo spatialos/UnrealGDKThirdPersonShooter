@@ -10,14 +10,10 @@ enum class ETPSTeam : uint8
 {
 	Team_None				UMETA(DisplayName = "UNSELECTED"),
 	Team_Red				UMETA(DisplayName = "Red Team"),
-	Team_Green				UMETA(DisplayName = "Green Team"),
 	Team_Blue				UMETA(DisplayName = "Blue Team"),
 	Team_Yellow				UMETA(DisplayName = "Yellow Team"),
 	Team_Purple				UMETA(DisplayName = "Purple Team"),
-	Team_Black				UMETA(DisplayName = "Black Team"),
-	Team_White				UMETA(DisplayName = "White Team"),
-	Team_MIN = Team_Red		UMETA(DisplayName = "Team MIN"),
-	Team_MAX = Team_White	UMETA(DisplayName = "Team MAX"),
+	Team_Overflow			UMETA(DisplayName = "OVERFLOW"),
 };
 
 // Returns the display name for a given team.

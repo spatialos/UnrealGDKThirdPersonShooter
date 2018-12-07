@@ -38,6 +38,7 @@ void AWeapon::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeP
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AWeapon, OwningCharacter);
+	DOREPLIFETIME(AWeapon, Team);
 }
 
 EWeaponState AWeapon::GetWeaponState() const
@@ -48,4 +49,59 @@ EWeaponState AWeapon::GetWeaponState() const
 void AWeapon::SetWeaponState(EWeaponState NewState)
 {
 	CurrentState = NewState;
+}
+
+void AWeapon::OnRep_Team()
+{
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
+	UpdateTeamColor();
+}
+
+void AWeapon::SetTeam(ETPSTeam NewTeam)
+{
+	Team = NewTeam;
+}
+
+ETPSTeam AWeapon::GetTeam() const
+{
+	return Team;
+}
+
+void AWeapon::UpdateTeamColor()
+{
+	check(NoneTeamMaterial != nullptr);
+	check(RedTeamMaterial != nullptr);
+	check(BlueTeamMaterial != nullptr);
+	check(PurpleTeamMaterial != nullptr);
+	check(YellowTeamMaterial != nullptr);
+	check(Mesh != nullptr);
+
+	switch (Team)
+	{
+	case ETPSTeam::Team_Red:
+		Mesh->SetMaterial(0, RedTeamMaterial);
+		Mesh->SetMaterial(1, RedTeamMaterial);
+		break;
+	case ETPSTeam::Team_Blue:
+		Mesh->SetMaterial(0, BlueTeamMaterial);
+		Mesh->SetMaterial(1, BlueTeamMaterial);
+		break;
+	case ETPSTeam::Team_Purple:
+		Mesh->SetMaterial(0, PurpleTeamMaterial);
+		Mesh->SetMaterial(1, PurpleTeamMaterial);
+		break;
+	case ETPSTeam::Team_Yellow:
+		Mesh->SetMaterial(0, YellowTeamMaterial);
+		Mesh->SetMaterial(1, YellowTeamMaterial);
+		break;
+	default:
+		// If team value has not yet replicated, use the temporary colors
+		Mesh->SetMaterial(0, NoneTeamMaterial);
+		Mesh->SetMaterial(1, NoneTeamMaterial);
+		break;
+	}
 }

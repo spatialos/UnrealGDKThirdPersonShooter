@@ -36,6 +36,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Sprint")
 	bool IsSprinting() const;
 
+	// Returns true if the character is actually sprinting.
+	UFUNCTION(BlueprintCallable, Category = "Sprint")
+	void SetSprintEnabled(bool bSprintEnabled);
+
 	// Returns the max speed of the character, modified if sprinting.
 	virtual float GetMaxSpeed() const override;
 
@@ -46,6 +50,9 @@ public:
 	bool IsMovingForward() const;
 
 private:
+	// Override whether sprint is allowed.
+	uint8 bCanSprint : 1;
+
 	// If true, the player is attempting to sprint. The character will sprint if all conditions are met
 	// (e.g. the player is moving in a direction within SprintDirectionTolerance of the camera direction).
 	uint8 bWantsToSprint : 1;
