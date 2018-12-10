@@ -94,6 +94,10 @@ public:
 	UFUNCTION(BlueprintPure, Category = "Aim")
 	float GetAimPitch();
 
+	// Returns the currently equipped weapon, or nullptr if there isn't one.
+	UFUNCTION(BlueprintPure, Category = "Weapon")
+	class AWeapon* GetEquippedWeapon() const;
+
 	// [server + client] Returns true if the character is able to shoot at the given moment.
 	bool CanFire();
 
@@ -112,6 +116,7 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void ShowRespawnScreen();
+
 private:
 	// [client] If true, the character should ignore all action inputs.
 	bool IgnoreActionInput() const;
@@ -133,9 +138,6 @@ private:
 	// if we're executing on the owning client.
 	// Will only update the angles if they differ from the current stored value by more than AngleUpdateThreshold.
 	void UpdateAimRotation(float AngleUpdateThreshold);
-
-	// Returns the currently equipped weapon, or nullptr if there isn't one.
-	class AWeapon* GetEquippedWeapon() const;
 
 	// Notifies all clients that a the character has been hit and from what direction.
 	UFUNCTION(NetMulticast, Unreliable)
