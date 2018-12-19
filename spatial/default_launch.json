@@ -17,6 +17,10 @@
           "value": "0"
         },
         {
+          "name": "bridge_soft_handover_enabled",
+          "value": "false"
+        },
+        {
           "name": "qos_max_unacked_pings_rate",
           "value": "10"
         }
