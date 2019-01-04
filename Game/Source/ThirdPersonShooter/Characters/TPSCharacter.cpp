@@ -192,7 +192,7 @@ void ATPSCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME_CONDITION(ATPSCharacter, AimPitch, COND_SkipOwner);
 
 	// Only replicate health to the owning client.
-	DOREPLIFETIME_CONDITION(ATPSCharacter, CurrentHealth, COND_AutonomousOnly);
+	DOREPLIFETIME_CONDITION(ATPSCharacter, CurrentHealth, COND_OwnerOnly);
 }
 
 bool ATPSCharacter::IgnoreActionInput() const
