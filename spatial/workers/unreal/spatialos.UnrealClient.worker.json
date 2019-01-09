@@ -32,7 +32,7 @@
     "streaming_query": [
       {
         "global_component_streaming_query": {
-          "component_name": "unreal.GlobalStateManager"
+          "component_name": "unreal.SingletonManager"
         }
       },
       {
