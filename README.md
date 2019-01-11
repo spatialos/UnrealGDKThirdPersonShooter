@@ -1,6 +1,6 @@
 # SpatialOS GDK Third-Person Shooter game
 
-* **LICENSE:** Use of the contents of this repository is subject to the [Improbable license](LICENSE.md)
+* **LICENSE:** Use of the contents of this repository is subject to the [license](LICENSE.md)
 * **REPOSITORY:** [github.com/spatialos/UnrealGDKStarterProject](https://github.com/spatialos/UnrealGDKThirdPersonShooter)
 
 
