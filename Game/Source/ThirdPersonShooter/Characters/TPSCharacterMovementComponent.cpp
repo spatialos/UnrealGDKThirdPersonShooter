@@ -136,12 +136,12 @@ float UTPSCharacterMovementComponent::GetMaxSpeed() const
 
 float UTPSCharacterMovementComponent::GetMaxAcceleration() const
 {
-	float MaxAcceleration = Super::GetMaxAcceleration();
+	float LocalMaxAcceleration = Super::GetMaxAcceleration();
 	if (IsSprinting())
 	{
-		MaxAcceleration *= SprintAccelerationMultiplier;
+		LocalMaxAcceleration *= SprintAccelerationMultiplier;
 	}
-	return MaxAcceleration;
+	return LocalMaxAcceleration;
 }
 
 bool UTPSCharacterMovementComponent::IsMovingForward() const
