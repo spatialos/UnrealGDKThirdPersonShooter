@@ -353,10 +353,10 @@ void ATPSCharacter::StartRagdoll()
 
 	// Gather list of child components of the capsule.
 	TArray<USceneComponent*> ComponentsToMove;
-	int NumChildren = CapsuleComponent->GetNumChildrenComponents();
+	int NumChildren = LocalCapsuleComponent->GetNumChildrenComponents();
 	for (int i = 0; i < NumChildren; ++i)
 	{
-		USceneComponent* Component = CapsuleComponent->GetChildComponent(i);
+		USceneComponent* Component = LocalCapsuleComponent->GetChildComponent(i);
 		if (Component != nullptr && Component != MeshComponent)
 		{
 			ComponentsToMove.Add(Component);
