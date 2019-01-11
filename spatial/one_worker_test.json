@@ -1,5 +1,5 @@
 {
-  "template": "small_bridge_v2",
+  "template": "small_entity_db_v2",
   "world": {
     "dimensions": {
       "x_meters": 200,
@@ -15,6 +15,10 @@
       {
         "name": "bridge_qos_max_timeout",
         "value": "0"
+      },
+      {
+        "name": "bridge_soft_handover_enabled",
+        "value": "false"
       },
       {
         "name": "worker_start_connection_timeout_ms",
