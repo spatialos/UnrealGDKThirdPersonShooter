@@ -83,6 +83,7 @@
       "command": "StartWorker.sh",
       "arguments": [
         "${IMPROBABLE_WORKER_ID}",
+        "${IMPROBABLE_LOG_FILE}",
         "ThirdPersonExampleMap",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
@@ -96,7 +97,6 @@
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
         "RakNet",
-        "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
     }
