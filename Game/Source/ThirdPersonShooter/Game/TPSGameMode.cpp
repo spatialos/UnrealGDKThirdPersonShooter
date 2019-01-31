@@ -43,6 +43,8 @@ ATPSGameMode::ATPSGameMode()
 
 	// Start in Spectator Mode - The PlayerController will spawn the Characters after login, instead of on connect
 	bStartPlayersAsSpectators = true;
+	
+	bUseSeamlessTravel = false;
 }
 
 AActor* ATPSGameMode::ChoosePlayerStart_Implementation(AController* Player)
