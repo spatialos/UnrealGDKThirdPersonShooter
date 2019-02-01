@@ -44,6 +44,7 @@ ATPSGameMode::ATPSGameMode()
 	// Start in Spectator Mode - The PlayerController will spawn the Characters after login, instead of on connect
 	bStartPlayersAsSpectators = true;
 	
+	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
 	bUseSeamlessTravel = false;
 }
 
