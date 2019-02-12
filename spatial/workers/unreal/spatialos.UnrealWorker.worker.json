@@ -33,7 +33,9 @@
       {
         "global_component_streaming_query": {
           "component_name": "unreal.SingletonManager"
-        },
+        }
+      },
+      {
         "global_component_streaming_query": {
           "component_name": "unreal.Singleton"
         }
@@ -81,7 +83,7 @@
       "command": "StartWorker.sh",
       "arguments": [
         "${IMPROBABLE_WORKER_ID}",
-        "ThirdPersonShooter",
+        "${IMPROBABLE_LOG_FILE}",
         "ThirdPersonExampleMap",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
@@ -95,7 +97,6 @@
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
         "RakNet",
-        "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
     }

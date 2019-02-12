@@ -53,13 +53,12 @@ void ATPSPlayerController::SetPawn(APawn* InPawn)
 	{
 		SetPlayerUIVisible(InPawn != nullptr);
 
-		ATPSCharacter* Character = Cast<ATPSCharacter>(InPawn);
-		if (Character != nullptr)
+		if (ATPSCharacter* TPSCharacter = Cast<ATPSCharacter>(InPawn))
 		{
-			UpdateHealthUI(Character->GetCurrentHealth(), Character->GetMaxHealth());
+			UpdateHealthUI(TPSCharacter->GetCurrentHealth(), TPSCharacter->GetMaxHealth());
 
 			// Make the new pawn's camera this controller's camera.
-			SetViewTarget(InPawn);
+			SetViewTarget(TPSCharacter);
 		}
 	}
 }

@@ -1,11 +1,11 @@
 {
-  "template": "small_bridge_v2",
+  "template": "small",
   "world": {
     "dimensions": {
-      "x_meters": 200,
-      "z_meters": 200
+      "x_meters": 2000,
+      "z_meters": 2000
     },
-    "chunk_edge_length_meters": 5,
+    "chunk_edge_length_meters": 50,
     "streaming_query_interval": 4,
     "legacy_flags": [
       {
@@ -15,6 +15,10 @@
       {
         "name": "bridge_qos_max_timeout",
         "value": "0"
+      },
+      {
+        "name": "bridge_soft_handover_enabled",
+        "value": "false"
       },
       {
         "name": "worker_start_connection_timeout_ms",

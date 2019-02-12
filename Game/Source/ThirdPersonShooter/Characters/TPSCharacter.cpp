@@ -323,15 +323,14 @@ void ATPSCharacter::Die(const ATPSCharacter* Killer)
 void ATPSCharacter::StartRagdoll()
 {
 	// Disable capsule collision and disable movement.
-	UCapsuleComponent* CapsuleComponent = GetCapsuleComponent();
-	if (CapsuleComponent == nullptr)
+	UCapsuleComponent* LocalCapsuleComponent = GetCapsuleComponent();
+	if (LocalCapsuleComponent == nullptr)
 	{
 		UE_LOG(LogTPS, Error, TEXT("Invalid capsule component on character %s"), *this->GetName());
 		return;
 	}
-
-	CapsuleComponent->SetSimulatePhysics(false);
-	CapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	LocalCapsuleComponent->SetSimulatePhysics(false);
+	LocalCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCharacterMovement()->DisableMovement();
 
 	// Enable mesh collision and physics.
@@ -342,10 +341,10 @@ void ATPSCharacter::StartRagdoll()
 
 	// Gather list of child components of the capsule.
 	TArray<USceneComponent*> ComponentsToMove;
-	int NumChildren = CapsuleComponent->GetNumChildrenComponents();
+	int NumChildren = LocalCapsuleComponent->GetNumChildrenComponents();
 	for (int i = 0; i < NumChildren; ++i)
 	{
-		USceneComponent* Component = CapsuleComponent->GetChildComponent(i);
+		USceneComponent* Component = LocalCapsuleComponent->GetChildComponent(i);
 		if (Component != nullptr && Component != MeshComponent)
 		{
 			ComponentsToMove.Add(Component);
@@ -363,23 +362,21 @@ void ATPSCharacter::StartRagdoll()
 	// Fix up the camera to a "death view".
 	if (GetNetMode() == NM_Client)
 	{
-		USpringArmComponent* CameraBoom = GetCameraBoom();
+		USpringArmComponent* LocalCameraBoom = GetCameraBoom();
 
 		// Enable lag on the spring arm to smooth movement, counters sporadic movement of the ragdoll.
-		CameraBoom->bEnableCameraLag = true;
-		CameraBoom->bEnableCameraRotationLag = true;
+		LocalCameraBoom->bEnableCameraLag = true;
+		LocalCameraBoom->bEnableCameraRotationLag = true;
 		// Change the camera boom so it's looking down on the ragdoll from slightly further away.
-		CameraBoom->bUsePawnControlRotation = false;
-		CameraBoom->bInheritPitch = false;
-		CameraBoom->bInheritRoll = false;
-		CameraBoom->bInheritYaw = false;
-		CameraBoom->SocketOffset = FVector::ZeroVector;  // Zero out the over-the-shoulder offset.
-		CameraBoom->TargetOffset = FVector(0, 0, 50);  // Offset slightly up so the camera target doesn't collide with the floor.
-		CameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
-		CameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
-		CameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
-
-		ShowRespawnScreen();
+		LocalCameraBoom->bUsePawnControlRotation = false;
+		LocalCameraBoom->bInheritPitch = false;
+		LocalCameraBoom->bInheritRoll = false;
+		LocalCameraBoom->bInheritYaw = false;
+		LocalCameraBoom->SocketOffset = FVector::ZeroVector;  // Zero out the over-the-shoulder offset.
+		LocalCameraBoom->TargetOffset = FVector(0, 0, 50);  // Offset slightly up so the camera target doesn't collide with the floor.
+		LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
+		LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
+		LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
 	}
 }
 
