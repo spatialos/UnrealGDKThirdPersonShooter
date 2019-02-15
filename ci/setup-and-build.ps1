@@ -1,7 +1,6 @@
 param(
   [string] $game_home = (get-item "$($PSScriptRoot)").parent.FullName, ## The root of the ThirdPersonShooter repo
   [string] $gdk_repo = "git@github.com:spatialos/UnrealGDK.git",
-  [string] $gdk_home = $game_home"\Game\Plugins\UnrealGDK",
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production"
 )
 
@@ -107,7 +106,7 @@ pushd "$($game_home)"
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
     Start-Event "build-project" "build-project-:windows:"
-        $build_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$gdk_home" -ArgumentList @(`
+        $build_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "BuildPlugin", `
             " -Plugin=`"$($gdk_home)/SpatialGDK/SpatialGDK.uplugin`"", `
             "-TargetPlatforms=Win64", `
