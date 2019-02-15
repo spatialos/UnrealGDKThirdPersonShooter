@@ -377,6 +377,8 @@ void ATPSCharacter::StartRagdoll()
 		LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
 		LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
 		LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
+
+		ShowRespawnScreen();
 	}
 }
 
