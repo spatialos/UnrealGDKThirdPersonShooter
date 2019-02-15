@@ -5,23 +5,23 @@ agent_transients: &agent_transients
   exit_status: -1
   limit: 3
 
-
 common: &common
   agents:
     - "capable_of_building=gdk-for-unreal"
     - "environment=production"
     - "platform=windows"
-    - "permission_set=builder"
+    # - "permission_set=builder" Temporary, since this will be changing to pusher soon.
     - "queue=v2-1549893371-183fd9b7177e2649-------z"
   retry:
     automatic:
       - <<: *agent_transients
-    timeout_in_minutes: 60
+  timeout_in_minutes: 60
+
 
 # NOTE: step labels turn into commit-status names like {org}/{repo}/{pipeline}/{step-label}, lower-case and hyphenated.
 # These are then relied on to have stable names by other things, so once named, please beware renaming has consequences.
 
 steps:
-  - label: "build-unreal-third-person-shooter-:windows:"
+  - label: "build-unreal-gdk-third-person-shooter-:windows:"
     command: powershell -NoProfile -NonInteractive -InputFormat Text -Command ./ci/setup-and-build.ps1
     <<: *common # This folds the YAML named anchor into this step. Overrides, if any, should follow, not precede.
