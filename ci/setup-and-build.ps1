@@ -86,16 +86,17 @@ popd
 Finish-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
 
 
-
 pushd "$($game_home)"
-
     Start-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
-    pushd "Game/Plugins"
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "git" -ArgumentList @(`
+    pushd "Game"
+        New-Item -Name "Plugins" -ItemType Directory -Force
+        pushd "Plugins"
+          Start-Process -Wait -PassThru -NoNewWindow -FilePath "git" -ArgumentList @(`
             "clone", `
             "git@github.com:spatialos/UnrealGDK.git", `
             "--depth 1" `
         )
+        popd
     popd
     Finish-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
 
