@@ -102,7 +102,11 @@ pushd "$($game_home)"
 
     Start-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
     pushd "Game/Plugins/UnrealGDK"
-        &$PSScriptRoot"\setup-gdk.ps1"
+         $setup_gdk_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
+        if ($setup_gdk_proc.ExitCode -ne 0) { 
+            Write-Log "Failed to set up the Unreal GDK. Error: $($setup_gdk_proc.ExitCode)" 
+            Throw "Failed to set up the Unreal GDK."  
+        }
     popd
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
