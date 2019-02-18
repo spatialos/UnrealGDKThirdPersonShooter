@@ -2,7 +2,7 @@ param(
   [string] $game_home = (get-item "$($PSScriptRoot)").parent.FullName, ## The root of the ThirdPersonShooter repo
   [string] $gdk_repo = "git@github.com:spatialos/UnrealGDK.git",
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production",
-  [string] $gdk_branch_name - "feature/buildkite-setup"
+  [string] $gdk_branch_name = "feature/buildkite-setup"
 )
 
 $ErrorActionPreference = 'Stop'
