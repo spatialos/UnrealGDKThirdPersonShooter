@@ -10,8 +10,8 @@ static const FSavedMove_Character::CompressedFlags FLAG_WantsToSprint = FSavedMo
 
 UTPSCharacterMovementComponent::UTPSCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, SprintSpeedMultiplier(1.5f)
-	, SprintAccelerationMultiplier(1.5f)
+	, SprintSpeedMultiplier(2.0f)
+	, SprintAccelerationMultiplier(2.0f)
 	, SprintDirectionTolerance(0.7f)
 	, bShouldOrientToControlRotation(false)
 	, bCanSprint(true)
