@@ -1,7 +1,8 @@
 param(
   [string] $game_home = (get-item "$($PSScriptRoot)").parent.FullName, ## The root of the ThirdPersonShooter repo
   [string] $gdk_repo = "git@github.com:spatialos/UnrealGDK.git",
-  [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production"
+  [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production",
+  [string] $gdk_branch_name - "feature/buildkite-setup"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -94,7 +95,8 @@ pushd "$($game_home)"
           Start-Process -Wait -PassThru -NoNewWindow -FilePath "git" -ArgumentList @(`
             "clone", `
             "git@github.com:spatialos/UnrealGDK.git", `
-            "--depth 1" `
+            "--depth 1", `
+            "-b $gdk_branch_name" # TODO: Remove this once we're on master
         )
         popd
     popd
@@ -102,11 +104,8 @@ pushd "$($game_home)"
 
     Start-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
     pushd "Game/Plugins/UnrealGDK"
-         $setup_gdk_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
-        if ($setup_gdk_proc.ExitCode -ne 0) { 
-            Write-Log "Failed to set up the Unreal GDK. Error: $($setup_gdk_proc.ExitCode)" 
-            Throw "Failed to set up the Unreal GDK."  
-        }
+        # Invoke the GDK's setup script
+        &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
     popd
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
