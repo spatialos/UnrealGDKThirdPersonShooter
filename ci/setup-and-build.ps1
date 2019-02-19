@@ -2,7 +2,10 @@ param(
   [string] $game_home = (get-item "$($PSScriptRoot)").parent.FullName, ## The root of the ThirdPersonShooter repo
   [string] $gdk_repo = "git@github.com:spatialos/UnrealGDK.git",
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production",
-  [string] $gdk_branch_name = "feature/buildkite-setup"
+  [string] $gdk_branch_name = "feature/buildkite-setup",
+  [string] $deployment_launch_configuration = "one_worker_test.json",
+  [string] $deployment_snapshot_path = "snapshots/default.snapshot",
+  [string] $deployment_cluster_region = "eu"
 )
 
 $ErrorActionPreference = 'Stop'
@@ -149,19 +152,27 @@ pushd "$($game_home)"
     Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
 
     Start-Event "deploy-game"
-        # Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-        # "build", `
-        # "build-config"
-        # )
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+            "build", `
+            "build-config"
+        )
 
-        # Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-        # "cloud", `
-        # "upload", `
-        # ""
-        # )
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+            "cloud", `
+            "upload", `
+            "$($deployment_name)", `
+            "--force"
+        )
 
-
-
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+            "cloud", `
+            "launch", `
+            "$($deployment_name)", `
+            "$($deployment_launch_configuration)", `
+            "$($deployment_name)", `
+            "--snapshot=$($deployment_snapshot_path)", `
+            "--cluster_region=$($deployment_cluster_region)"
+        )
     Finish-Event "deploy-game"
 
 popd
