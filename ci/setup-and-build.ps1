@@ -129,7 +129,7 @@ pushd "$($game_home)"
             "ThirdPersonShooter", `
             "Win64", `
             "Development", `
-            "ThirdPersonShooter.uproject" `,
+            "ThirdPersonShooter.uproject", `
             "--skip-codegen"
         )       
         if ($build_client_proc.ExitCode -ne 0) { 
@@ -141,7 +141,7 @@ pushd "$($game_home)"
             "ThirdPersonShooterServer", `
             "Linux", `
             "Development", `
-            "ThirdPersonShooter.uproject" `,
+            "ThirdPersonShooter.uproject", `
             "--skip-codegen"
         )       
         if ($build_server_proc.ExitCode -ne 0) { 
