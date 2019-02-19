@@ -82,7 +82,15 @@ pushd "UnrealEngine"
     if ($zip_proc.ExitCode -ne 0) { 
         Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
         Throw "Failed to unzip Unreal Engine."  
-    }
+    }  
+
+    $unreal_path = "$($game_home)\UnrealEngine"
+    Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
+    [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$($unreal_path)", "Machine")
+
+    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
+    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
 popd
 Finish-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
 
@@ -110,17 +118,51 @@ pushd "$($game_home)"
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
     Start-Event "build-project" "build-project-:windows:"
-        $build_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
-            "BuildPlugin", `
-            " -Plugin=`"$($gdk_home)/SpatialGDK/SpatialGDK.uplugin`"", `
-            "-TargetPlatforms=Win64", `
-            "-Package=`"$gdk_home/SpatialGDK/Intermediate/BuildPackage/Win64`"" `
-        )
-        if ($build_proc.ExitCode -ne 0) { 
-            Write-Log "Failed to build the Unreal GDK. Error: $($build_proc.ExitCode)" 
-            Throw "Failed to build the Unreal GDK."  
+
+        # Allow the GDK plugin to find the engine
+        $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
+
+        $build_client_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+            "ThirdPersonShooter", `
+            "Win64", `
+            "Development", `
+            "ThirdPersonShooter.uproject" `,
+            "--skip-codegen"
+        )       
+        if ($build_client_proc.ExitCode -ne 0) { 
+            Write-Log "Failed to build the Unreal GDK. Error: $($build_client_proc.ExitCode)" 
+            Throw "Failed to build ThirdPersonShooter development client."  
+        }
+
+        $build_server_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+            "ThirdPersonShooterServer", `
+            "Linux", `
+            "Development", `
+            "ThirdPersonShooter.uproject" `,
+            "--skip-codegen"
+        )       
+        if ($build_server_proc.ExitCode -ne 0) { 
+            Write-Log "Failed to build the Unreal GDK. Error: $($build_server_proc.ExitCode)" 
+            Throw "Failed to build ThirdPersonShooter development server."  
         }
     popd
     Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
 
+    Start-Event "deploy-game"
+        # Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+        # "build", `
+        # "build-config"
+        # )
+
+        # Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+        # "cloud", `
+        # "upload", `
+        # ""
+        # )
+
+
+
+    Finish-Event "deploy-game"
+
 popd
+
