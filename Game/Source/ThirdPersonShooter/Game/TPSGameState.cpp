@@ -12,7 +12,7 @@ ATPSGameState::ATPSGameState()
 	PrimaryActorTick.bCanEverTick = false;
 }
 
-void ATPSGameState::AddPlayer(ETPSTeam Team, const FString& Player)
+void ATPSGameState::AddPlayer_Implementation(ETPSTeam Team, const FString& Player)
 {
 	if (Team == ETPSTeam::Team_None || Team > ETPSTeam::Team_MAX)
 	{
@@ -26,7 +26,7 @@ void ATPSGameState::AddPlayer(ETPSTeam Team, const FString& Player)
 	}
 }
 
-void ATPSGameState::AddDeath(const FString& KillerName, ETPSTeam KillerTeam, const FString& VictimName, ETPSTeam VictimTeam)
+void ATPSGameState::AddDeath_Implementation(const FString& KillerName, ETPSTeam KillerTeam, const FString& VictimName, ETPSTeam VictimTeam)
 {
 	// Ignore invalid teams.
 	if (VictimTeam >= ETPSTeam::Team_MIN && VictimTeam <= ETPSTeam::Team_MAX)
