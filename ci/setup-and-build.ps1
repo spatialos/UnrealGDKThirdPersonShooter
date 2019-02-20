@@ -85,7 +85,7 @@ pushd "UnrealEngine"
     if ($zip_proc.ExitCode -ne 0) { 
         Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
         Throw "Failed to unzip Unreal Engine."  
-    }  
+    } 
 
     $unreal_path = "$($game_home)\UnrealEngine"
     Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
@@ -125,33 +125,51 @@ pushd "$($game_home)"
         # Allow the GDK plugin to find the engine
         $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
 
-        $build_client_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+        $build_client_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooter", `
             "Win64", `
             "Development", `
-            "ThirdPersonShooter.uproject", `
-            "--skip-codegen"
+            "ThirdPersonShooter.uproject"
         )       
-        if ($build_client_proc.ExitCode -ne 0) { 
-            Write-Log "Failed to build the Unreal GDK. Error: $($build_client_proc.ExitCode)" 
-            Throw "Failed to build ThirdPersonShooter development client."  
-        }
+        $build_client_handle = $build_client_proc.Handle
+	    Wait-Process -Id (Get-Process -InputObject $build_client_proc).id
+	    if ($build_client_proc.ExitCode -ne 0) {
+		    Write-Log "Failed to build Win64 Development Client. Error: $($build_client_proc.ExitCode)"
+		    Throw "Failed to build Win64 Development Client"
+	    }
 
-        $build_server_proc = Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+        $build_server_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooterServer", `
             "Linux", `
             "Development", `
-            "ThirdPersonShooter.uproject", `
-            "--skip-codegen"
+            "ThirdPersonShooter.uproject"
         )       
-        if ($build_server_proc.ExitCode -ne 0) { 
-            Write-Log "Failed to build the Unreal GDK. Error: $($build_server_proc.ExitCode)" 
-            Throw "Failed to build ThirdPersonShooter development server."  
-        }
+        $build_server_handle = $build_server_proc.Handle
+	    Wait-Process -Id (Get-Process -InputObject $build_server_proc).id
+	    if ($build_server_proc.ExitCode -ne 0) {
+		    Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
+		    Throw "Failed to build Linux Development Server"
+	    }
     popd
     Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
 
+    Start-Event "generate-schema"
+    pushd "UnrealEngine/Engine/Binaries/Win64"
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "UE4Editor.exe" -ArgumentList @(`
+            "$($game_home)/Game/ThirdPersonShooter.uproject", `
+            "-run=GenerateSchemaAndSnapshots", `
+            "-MapPaths=`"/Maps/TPS-Start_Small`""
+        )
+
+        New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
+        Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
+    popd
+    Finish-Event "generate-schema"
+
     Start-Event "deploy-game"
+    pushd "spatial"
+        $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
+
         Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
             "build", `
             "build-config"
@@ -173,6 +191,7 @@ pushd "$($game_home)"
             "--snapshot=$($deployment_snapshot_path)", `
             "--cluster_region=$($deployment_cluster_region)"
         )
+    popd
     Finish-Event "deploy-game"
 
 popd
