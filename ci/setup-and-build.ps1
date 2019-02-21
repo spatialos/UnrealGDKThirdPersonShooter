@@ -126,7 +126,7 @@ pushd "$($game_home)"
 
     Start-Event "generate-schema" "generate-schema"
         pushd "UnrealEngine/Engine/Binaries/Win64"
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath (Convert-Path .) + "\UE4Editor.exe" -ArgumentList @(`
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath ((Convert-Path .) + "\UE4Editor.exe") -ArgumentList @(`
                 "$($game_home)/Game/ThirdPersonShooter.uproject", `
                 "-run=GenerateSchemaAndSnapshots", `
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
