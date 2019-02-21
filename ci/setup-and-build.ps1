@@ -63,69 +63,81 @@ popd
 New-Item -Name "UnrealEngine" -ItemType Directory -Force
 
 Start-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
-pushd "UnrealEngine"
-    Write-Log "Downloading the Unreal Engine artifacts from GCS"
-    $gcs_unreal_location = "$($unreal_version).zip"
+    pushd "UnrealEngine"
+        Write-Log "Downloading the Unreal Engine artifacts from GCS"
+        $gcs_unreal_location = "$($unreal_version).zip"
 
-    $gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
-        "cp", `
-        "gs://$($gcs_publish_bucket)/$($gcs_unreal_location)", `
-        "$($unreal_version).zip" `
-    )
-    if ($gsu_proc.ExitCode -ne 0) {
-        Write-Log "Failed to download Engine artifacts. Error: $($gsu_proc.ExitCode)"
-        Throw "Failed to download Engine artifacts"
-    }
+        $gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
+            "cp", `
+            "gs://$($gcs_publish_bucket)/$($gcs_unreal_location)", `
+            "$($unreal_version).zip" `
+        )
+        if ($gsu_proc.ExitCode -ne 0) {
+            Write-Log "Failed to download Engine artifacts. Error: $($gsu_proc.ExitCode)"
+            Throw "Failed to download Engine artifacts"
+        }
 
-    Write-Log "Unzipping Unreal Engine"
-    $zip_proc = Start-Process -Wait -PassThru -NoNewWindow "7z" -ArgumentList @(`
-    "x", `  
-    "$($unreal_version).zip" `    
-    )   
-    if ($zip_proc.ExitCode -ne 0) { 
-        Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
-        Throw "Failed to unzip Unreal Engine."  
-    } 
+        Write-Log "Unzipping Unreal Engine"
+        $zip_proc = Start-Process -Wait -PassThru -NoNewWindow "7z" -ArgumentList @(`
+        "x", `  
+        "$($unreal_version).zip" `    
+        )   
+        if ($zip_proc.ExitCode -ne 0) { 
+            Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
+            Throw "Failed to unzip Unreal Engine."  
+        } 
 
-    $unreal_path = "$($game_home)\UnrealEngine"
-    Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
-    [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$($unreal_path)", "Machine")
+        $unreal_path = "$($game_home)\UnrealEngine"
+        Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
+        [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$($unreal_path)", "Machine")
 
-    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
-    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
-popd
+        $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
+        Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
+        [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
+    popd
 Finish-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
 
 
 pushd "$($game_home)"
     Start-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
-    pushd "Game"
-        New-Item -Name "Plugins" -ItemType Directory -Force
-        pushd "Plugins"
-          Start-Process -Wait -PassThru -NoNewWindow -FilePath "git" -ArgumentList @(`
-            "clone", `
-            "git@github.com:spatialos/UnrealGDK.git", `
-            "--depth 1", `
-            "-b $gdk_branch_name" # TODO: Remove this once we're on master
-        )
+        pushd "Game"
+            New-Item -Name "Plugins" -ItemType Directory -Force
+            pushd "Plugins"
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "git" -ArgumentList @(`
+                "clone", `
+                "git@github.com:spatialos/UnrealGDK.git", `
+                "--depth 1", `
+                "-b $gdk_branch_name" # TODO: Remove this once we're on master
+            )
+            popd
         popd
-    popd
     Finish-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
 
     Start-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
-    pushd "Game/Plugins/UnrealGDK"
-        # Set the required variables for the GDK's setup script to use
-        $gdk_home = Convert-Path .
-        $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
+        pushd "Game/Plugins/UnrealGDK"
+            # Set the required variables for the GDK's setup script to use
+            $gdk_home = Convert-Path .
+            $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
 
-        # Invoke the setup script
-        &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
-    popd
+            # Invoke the setup script
+            &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
+        popd
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
-    Start-Event "build-project" "build-project-:windows:"
+    Start-Event "generate-schema"
+        pushd "UnrealEngine/Engine/Binaries/Win64"
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "UE4Editor.exe" -ArgumentList @(`
+                "$($game_home)/Game/ThirdPersonShooter.uproject", `
+                "-run=GenerateSchemaAndSnapshots", `
+                "-MapPaths=`"/Maps/TPS-Start_Small`""
+            )
 
+            New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
+            Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
+        popd
+    Finish-Event "generate-schema"
+
+    Start-Event "build-project" "build-project-:windows:"
         # Allow the GDK plugin to find the engine
         $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
 
@@ -136,11 +148,11 @@ pushd "$($game_home)"
             "ThirdPersonShooter.uproject"
         )       
         $build_client_handle = $build_client_proc.Handle
-	    Wait-Process -Id (Get-Process -InputObject $build_client_proc).id
-	    if ($build_client_proc.ExitCode -ne 0) {
-		    Write-Log "Failed to build Win64 Development Client. Error: $($build_client_proc.ExitCode)"
-		    Throw "Failed to build Win64 Development Client"
-	    }
+        Wait-Process -Id (Get-Process -InputObject $build_client_proc).id
+        if ($build_client_proc.ExitCode -ne 0) {
+            Write-Log "Failed to build Win64 Development Client. Error: $($build_client_proc.ExitCode)"
+            Throw "Failed to build Win64 Development Client"
+        }
 
         $build_server_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooterServer", `
@@ -149,53 +161,40 @@ pushd "$($game_home)"
             "ThirdPersonShooter.uproject"
         )       
         $build_server_handle = $build_server_proc.Handle
-	    Wait-Process -Id (Get-Process -InputObject $build_server_proc).id
-	    if ($build_server_proc.ExitCode -ne 0) {
-		    Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
-		    Throw "Failed to build Linux Development Server"
-	    }
-    popd
+        Wait-Process -Id (Get-Process -InputObject $build_server_proc).id
+        if ($build_server_proc.ExitCode -ne 0) {
+            Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
+            Throw "Failed to build Linux Development Server"
+        }
     Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
 
-    Start-Event "generate-schema"
-    pushd "UnrealEngine/Engine/Binaries/Win64"
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "UE4Editor.exe" -ArgumentList @(`
-            "$($game_home)/Game/ThirdPersonShooter.uproject", `
-            "-run=GenerateSchemaAndSnapshots", `
-            "-MapPaths=`"/Maps/TPS-Start_Small`""
-        )
-
-        New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
-        Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
-    popd
-    Finish-Event "generate-schema"
-
     Start-Event "deploy-game"
-    pushd "spatial"
-        $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
+        pushd "spatial"
+            $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
+            $assembly_name = "$($deployment_name)_asm"
 
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-            "build", `
-            "build-config"
-        )
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+                "build", `
+                "build-config"
+            )
 
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-            "cloud", `
-            "upload", `
-            "$($deployment_name)", `
-            "--force"
-        )
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+                "cloud", `
+                "upload", `
+                "$($assembly_name)", `
+                "--force"
+            )
 
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-            "cloud", `
-            "launch", `
-            "$($deployment_name)", `
-            "$($deployment_launch_configuration)", `
-            "$($deployment_name)", `
-            "--snapshot=$($deployment_snapshot_path)", `
-            "--cluster_region=$($deployment_cluster_region)"
-        )
-    popd
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+                "cloud", `
+                "launch", `
+                "$($assembly_name)", `
+                "$($deployment_launch_configuration)", `
+                "$($deployment_name)", `
+                "--snapshot=$($deployment_snapshot_path)", `
+                "--cluster_region=$($deployment_cluster_region)"
+            )
+        popd
     Finish-Event "deploy-game"
 
 popd
