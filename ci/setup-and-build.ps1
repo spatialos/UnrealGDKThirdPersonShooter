@@ -124,7 +124,7 @@ pushd "$($game_home)"
         popd
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
 
-    Start-Event "generate-schema"
+    Start-Event "generate-schema" "generate-schema"
         pushd "UnrealEngine/Engine/Binaries/Win64"
             Start-Process -Wait -PassThru -NoNewWindow -FilePath "UE4Editor.exe" -ArgumentList @(`
                 "$($game_home)/Game/ThirdPersonShooter.uproject", `
@@ -135,7 +135,7 @@ pushd "$($game_home)"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
         popd
-    Finish-Event "generate-schema"
+    Finish-Event "generate-schema" "generate-schema"
 
     Start-Event "build-project" "build-project-:windows:"
         # Allow the GDK plugin to find the engine
@@ -162,13 +162,14 @@ pushd "$($game_home)"
         )       
         $build_server_handle = $build_server_proc.Handle
         Wait-Process -Id (Get-Process -InputObject $build_server_proc).id
+        
         if ($build_server_proc.ExitCode -ne 0) {
             Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
             Throw "Failed to build Linux Development Server"
         }
     Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
 
-    Start-Event "deploy-game"
+    Start-Event "deploy-game" "deploy-game"
         pushd "spatial"
             $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
             $assembly_name = "$($deployment_name)_asm"
@@ -195,7 +196,7 @@ pushd "$($game_home)"
                 "--cluster_region=$($deployment_cluster_region)"
             )
         popd
-    Finish-Event "deploy-game"
+    Finish-Event "deploy-game" "deploy-game"
 
 popd
 
