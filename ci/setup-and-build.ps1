@@ -135,7 +135,7 @@ pushd "$($game_home)"
             "Development", `
             "ThirdPersonShooter.uproject"
         )
-        $build_editor_proc = $build_editor_proc.Handle
+        $build_editor_handle = $build_editor_proc.Handle
         Wait-Process -Id (Get-Process -InputObject $build_editor_proc).id
         if ($build_editor_proc.ExitCode -ne 0) {
             Write-Log "Failed to build Win64 Development Editor. Error: $($build_editor_proc.ExitCode)"
