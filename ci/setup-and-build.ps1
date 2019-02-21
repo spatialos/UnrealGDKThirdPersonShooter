@@ -67,7 +67,7 @@ pushd "UnrealEngine"
     Write-Log "Downloading the Unreal Engine artifacts from GCS"
     $gcs_unreal_location = "$($unreal_version).zip"
 
-    $gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
+    <#$gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
         "cp", `
         "gs://$($gcs_publish_bucket)/$($gcs_unreal_location)", `
         "$($unreal_version).zip" `
@@ -85,7 +85,7 @@ pushd "UnrealEngine"
     if ($zip_proc.ExitCode -ne 0) { 
         Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
         Throw "Failed to unzip Unreal Engine."  
-    } 
+    }#> 
 
     $unreal_path = "$($game_home)\UnrealEngine"
     Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
@@ -115,7 +115,9 @@ pushd "$($game_home)"
 
     Start-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
     pushd "Game/Plugins/UnrealGDK"
-        # Invoke the GDK's setup script
+        # Set the gdk_home variable for the GDK's setup script to use
+        $gdk_home = Convert-Path .
+        # Invoke the setup script
         &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
     popd
     Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
