@@ -1,7 +1,7 @@
 param(
   [string] $game_home = (get-item "$($PSScriptRoot)").parent.FullName, ## The root of the ThirdPersonShooter repo
   [string] $gdk_repo = "git@github.com:spatialos/UnrealGDK.git",
-  [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production",
+  [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production/UnrealEngine",
   [string] $gdk_branch_name = "feature/buildkite-setup",
   [string] $deployment_launch_configuration = "one_worker_test.json",
   [string] $deployment_snapshot_path = "snapshots/default.snapshot",
