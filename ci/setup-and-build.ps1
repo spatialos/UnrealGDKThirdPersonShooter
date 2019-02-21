@@ -62,7 +62,7 @@ popd
 ## Create an UnrealEngine directory if it doesn't already exist
 New-Item -Name "UnrealEngine" -ItemType Directory -Force
 
-Start-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
+Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
     pushd "UnrealEngine"
         Write-Log "Downloading the Unreal Engine artifacts from GCS"
         $gcs_unreal_location = "$($unreal_version).zip"
@@ -95,11 +95,11 @@ Start-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
         Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
         [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     popd
-Finish-Event "download-unreal-engine" "build-unreal-gdk-:windows:"
+Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
 
 
 pushd "$($game_home)"
-    Start-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
+    Start-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
         pushd "Game"
             New-Item -Name "Plugins" -ItemType Directory -Force
             pushd "Plugins"
@@ -111,9 +111,9 @@ pushd "$($game_home)"
             )
             popd
         popd
-    Finish-Event "clone-gdk-plugin" "clone-gdk-plugin-:windows:"
+    Finish-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
+    Start-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
         pushd "Game/Plugins/UnrealGDK"
             # Set the required variables for the GDK's setup script to use
             $gdk_home = Convert-Path .
@@ -122,9 +122,28 @@ pushd "$($game_home)"
             # Invoke the setup script
             &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
         popd
-    Finish-Event "set-up-gdk-plugin" "set-up-gdk-plugin-:windows:"
+    Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "generate-schema" "generate-schema"
+    # Allow the GDK plugin to find the engine
+    $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
+
+    Start-Event "build-editor" "build-gdk-third-person-shooter-:windows:"
+        # Build the project editor to allow the snapshot commandlet to run
+        $build_editor_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+            "ThirdPersonShooterEditor", `
+            "Win64", `
+            "Development", `
+            "ThirdPersonShooter.uproject"
+        )
+        $build_editor_proc = $build_editor_proc.Handle
+        Wait-Process -Id (Get-Process -InputObject $build_editor_proc).id
+        if ($build_editor_proc.ExitCode -ne 0) {
+            Write-Log "Failed to build Win64 Development Editor. Error: $($build_editor_proc.ExitCode)"
+            Throw "Failed to build Win64 Development Editor"
+        }
+    Finish-Event "build-editor" "build-gdk-third-person-shooter-:windows:"
+
+    Start-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
         pushd "UnrealEngine/Engine/Binaries/Win64"
             Start-Process -Wait -PassThru -NoNewWindow -FilePath ((Convert-Path .) + "\UE4Editor.exe") -ArgumentList @(`
                 "$($game_home)/Game/ThirdPersonShooter.uproject", `
@@ -135,11 +154,9 @@ pushd "$($game_home)"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
         popd
-    Finish-Event "generate-schema" "generate-schema"
+    Finish-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "build-project" "build-project-:windows:"
-        # Allow the GDK plugin to find the engine
-        $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
+    Start-Event "build-project" "build-gdk-third-person-shooter-:windows:"
 
         $build_client_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooter", `
@@ -167,9 +184,9 @@ pushd "$($game_home)"
             Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
             Throw "Failed to build Linux Development Server"
         }
-    Finish-Event "build-unreal-gdk" "build-unreal-gdk-:windows:"
+    Finish-Event "build-unreal-gdk" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "deploy-game" "deploy-game"
+    Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
         pushd "spatial"
             $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
             $assembly_name = "$($deployment_name)_asm"
@@ -196,7 +213,7 @@ pushd "$($game_home)"
                 "--cluster_region=$($deployment_cluster_region)"
             )
         popd
-    Finish-Event "deploy-game" "deploy-game"
+    Finish-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
 
 popd
 
