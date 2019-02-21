@@ -126,7 +126,7 @@ pushd "$($game_home)"
 
     Start-Event "generate-schema" "generate-schema"
         pushd "UnrealEngine/Engine/Binaries/Win64"
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath "UE4Editor.exe" -ArgumentList @(`
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath (Convert-Path .) + "\UE4Editor.exe" -ArgumentList @(`
                 "$($game_home)/Game/ThirdPersonShooter.uproject", `
                 "-run=GenerateSchemaAndSnapshots", `
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
@@ -162,7 +162,7 @@ pushd "$($game_home)"
         )       
         $build_server_handle = $build_server_proc.Handle
         Wait-Process -Id (Get-Process -InputObject $build_server_proc).id
-        
+
         if ($build_server_proc.ExitCode -ne 0) {
             Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
             Throw "Failed to build Linux Development Server"
