@@ -21,9 +21,11 @@ public:
 	ATPSGameState();
 
 	// Adds a player to the game's score data with empty stats.
+	UFUNCTION(CrossServer, Reliable)
 	void AddPlayer(ETPSTeam Team, const FString& Player);
 
 	// Adds a death (and a corresponding kill, if necessary) to the game's score data.
+	UFUNCTION(CrossServer, Reliable)
 	void AddDeath(const FString& KillerName, ETPSTeam KillerTeam, const FString& VictimName, ETPSTeam VictimTeam);
 
 	// [client] Registers a listener for changes in the scoreboard.
