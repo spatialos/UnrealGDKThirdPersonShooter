@@ -4,7 +4,7 @@ param(
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production/UnrealEngine",
   [string] $gdk_branch_name = "master",
   [string] $deployment_launch_configuration = "one_worker_test.json",
-  [string] $map_names_to_cook = ""
+  [string] $map_names_to_cook = "",
   [string] $deployment_snapshot_path = "snapshots/TPS-Start_Small.snapshot",
   [string] $deployment_cluster_region = "eu"
 )
