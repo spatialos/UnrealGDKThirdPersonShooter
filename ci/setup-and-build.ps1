@@ -156,6 +156,13 @@ pushd "$($game_home)"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
         popd
+
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($gdk_home)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema_compiler" -ArgumentList @(`
+            "--schema_path=$($gdk_home)\spatial\schema", `
+            "--load_all_schema_on_schema_path", `
+            "--print_components"
+        )
+
     Finish-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
 
     Start-Event "build-project" "build-gdk-third-person-shooter-:windows:"
