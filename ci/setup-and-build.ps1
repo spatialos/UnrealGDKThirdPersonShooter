@@ -188,7 +188,7 @@ pushd "$($game_home)"
 
     Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
         pushd "spatial"
-            $deployment_name = "thirdpersonshooter-$($BUILDKITE_COMMIT)"
+            $deployment_name = "thirdpersonshooter_$($BUILDKITE_COMMIT)"
             $assembly_name = "$($deployment_name)_asm"
 
             Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
@@ -202,7 +202,7 @@ pushd "$($game_home)"
                 "cloud", `
                 "upload", `
                 "$($assembly_name)", `
-                "--force"
+                "--log_level=debug"
             )
 
             Write-Log "Executing spatial cloud launch $($assembly_name) $($deployment_launch_configuration) $($deployment_name) --snapshot=$($deployment_snapshot_path) --cluster_region=$($deployment_cluster_region)"
@@ -213,7 +213,8 @@ pushd "$($game_home)"
                 "$($deployment_launch_configuration)", `
                 "$($deployment_name)", `
                 "--snapshot=$($deployment_snapshot_path)", `
-                "--cluster_region=$($deployment_cluster_region)"
+                "--cluster_region=$($deployment_cluster_region)", `
+                "--log_level=debug"
             )
         popd
     Finish-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
