@@ -4,6 +4,7 @@ param(
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production/UnrealEngine",
   [string] $gdk_branch_name = "master",
   [string] $deployment_launch_configuration = "one_worker_test.json",
+  [string] $map_names_to_cook = ""
   [string] $deployment_snapshot_path = "snapshots/TPS-Start_Small.snapshot",
   [string] $deployment_cluster_region = "eu"
 )
@@ -107,7 +108,7 @@ pushd "$($game_home)"
                 "clone", `
                 "git@github.com:spatialos/UnrealGDK.git", `
                 "--depth 1", `
-                "-b $gdk_branch_name" # TODO: Remove this once we're on master
+                "-b $gdk_branch_name"
             )
             popd
         popd
@@ -143,6 +144,7 @@ pushd "$($game_home)"
         }
     Finish-Event "build-editor" "build-gdk-third-person-shooter-:windows:"
 
+    # Invoke the GDK commandlet to generate schema and snapshot. Note: this needs to be run prior to cooking 
     Start-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
         pushd "UnrealEngine/Engine/Binaries/Win64"
             Start-Process -Wait -PassThru -NoNewWindow -FilePath ((Convert-Path .) + "\UE4Editor.exe") -ArgumentList @(`
@@ -188,7 +190,7 @@ pushd "$($game_home)"
 
     Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
         pushd "spatial"
-            $commit_id = (get-item env:BUILDKITE_COMMIT).Value    
+            $commit_id = (get-item env:BUILDKITE_BUILD_NUMBER).Value    
             $deployment_name = "shooter_$($commit_id)"
             $assembly_name = "$($deployment_name)_asm"
 
