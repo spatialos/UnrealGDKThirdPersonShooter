@@ -4,7 +4,7 @@ param(
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production/UnrealEngine",
   [string] $gdk_branch_name = "master",
   [string] $deployment_launch_configuration = "one_worker_test.json",
-  [string] $deployment_snapshot_path = "snapshots/default.snapshot",
+  [string] $deployment_snapshot_path = "snapshots/TPS-Start_Small.snapshot",
   [string] $deployment_cluster_region = "eu"
 )
 
@@ -188,7 +188,8 @@ pushd "$($game_home)"
 
     Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
         pushd "spatial"
-            $deployment_name = "thirdpersonshooter_$($BUILDKITE_COMMIT)"
+            $commit_id = (get-item env:BUILDKITE_COMMIT).Value    
+            $deployment_name = "shooter_$($commit_id)"
             $assembly_name = "$($deployment_name)_asm"
 
             Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
