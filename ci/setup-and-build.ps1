@@ -214,7 +214,7 @@ pushd "$($game_home)"
                 "upload", `
                 "$($assembly_name)", `
                 "--log_level=debug", `
-                "--enable_pre_upload_check=false"
+                "--force"
             )
 
             Write-Log "Executing spatial cloud launch $($assembly_name) $($deployment_launch_configuration) $($deployment_name) --snapshot=$($deployment_snapshot_path) --cluster_region=$($deployment_cluster_region)"
