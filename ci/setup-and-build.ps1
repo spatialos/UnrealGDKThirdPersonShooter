@@ -92,9 +92,6 @@ Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
         Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
         [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$($unreal_path)", "Machine")
 
-        $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
-        Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
-        [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     popd
 Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
 
@@ -125,6 +122,9 @@ pushd "$($game_home)"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
+    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
+    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
 
