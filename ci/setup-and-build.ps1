@@ -125,7 +125,9 @@ pushd "$($game_home)"
     $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
     Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
-    
+    $retrieved_path = (get-item env:LINUX_MULTIARCH_ROOT).Value
+    Write-Log "Retrieved LINUX_MULTIARCH_ROOT: $($retrieved_path)"
+
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
 
