@@ -126,6 +126,7 @@ pushd "$($game_home)"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
     Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
+    refreshenv
     $retrieved_path = (get-item env:LINUX_MULTIARCH_ROOT).Value
     Write-Log "Retrieved LINUX_MULTIARCH_ROOT: $($retrieved_path)"
 
