@@ -153,9 +153,12 @@ pushd "$($game_home)"
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
             )
 
+            $core_gdk_schema_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\"
+            $schema_std_lib_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             New-Item -Path "$($game_home)\spatial" -Name "\build\dependencies\schema\standard_library" -ItemType Directory -Force
-            Copy-Item "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*" -Destination "$($game_home)\spatial\schema\unreal\gdk"
+            Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk"
+            Copy-Item "$($schema_std_lib_path)" -Destination "$($game_home)\spatial\build\dependencies\schema\standard_library" -Force -Recurse
         popd
 
         Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($gdk_home)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema_compiler" -ArgumentList @(`
