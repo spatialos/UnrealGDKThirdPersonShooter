@@ -123,6 +123,7 @@ pushd "$($game_home)"
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
     $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
     Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
     $retrieved_path = (get-item env:LINUX_MULTIARCH_ROOT).Value
