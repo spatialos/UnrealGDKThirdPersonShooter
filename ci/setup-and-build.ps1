@@ -122,9 +122,10 @@ pushd "$($game_home)"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
-    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain"
+    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
     Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
+    
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
 
@@ -153,16 +154,16 @@ pushd "$($game_home)"
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
             )
 
-            $core_gdk_schema_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\"
+            $core_gdk_schema_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*"
             $schema_std_lib_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             New-Item -Path "$($game_home)\spatial" -Name "\build\dependencies\schema\standard_library" -ItemType Directory -Force
-            Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk"
+            Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk" -Force -Recurse
             Copy-Item "$($schema_std_lib_path)" -Destination "$($game_home)\spatial\build\dependencies\schema\standard_library" -Force -Recurse
         popd
 
         Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($gdk_home)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema_compiler" -ArgumentList @(`
-            "--schema_path=$($gdk_home)\spatial\schema", `
+            "--schema_path=$($game_home)\spatial\schema", `
             "--load_all_schema_on_schema_path", `
             "--print_components"
         )
