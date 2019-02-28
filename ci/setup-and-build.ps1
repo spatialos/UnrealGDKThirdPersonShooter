@@ -215,6 +215,11 @@ pushd "$($game_home)"
                 "build-config"
             )
 
+            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
+                "prepare-for-run", `
+                "--log_level=debug"
+            )
+
             Write-Log "Executing spatial cloud upload $($assembly_name) --force"
 
             Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
