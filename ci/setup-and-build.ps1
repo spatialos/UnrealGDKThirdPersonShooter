@@ -4,55 +4,11 @@ param(
   [string] $gcs_publish_bucket = "io-internal-infra-unreal-artifacts-production/UnrealEngine",
   [string] $gdk_branch_name = "master",
   [string] $deployment_launch_configuration = "one_worker_test.json",
-  [string] $map_names_to_cook = "",
   [string] $deployment_snapshot_path = "snapshots/TPS-Start_Small.snapshot",
   [string] $deployment_cluster_region = "eu"
 )
 
-$ErrorActionPreference = 'Stop'
-
-function Write-Log() {
-  param(
-    [string] $msg,
-    [Parameter(Mandatory=$false)] [bool] $expand = $false
-  )
-  if ($expand) {
-      Write-Output "+++ $($msg)"
-  } else {
-      Write-Output "--- $($msg)"
-  }
-}
-
-function Start-Event() {
-    param(
-        [string] $event_name,
-        [string] $event_parent
-    )
-
-    # Start this tracing span.
-    Start-Process -NoNewWindow "imp-ci" -ArgumentList @(`
-        "events", "new", `
-        "--name", "$($event_name)", `
-        "--child-of", "$($event_parent)"
-    ) | Out-Null
-
-    Write-Log "--- $($event_name)"
-}
-
-function Finish-Event() {
-    param(
-        [string] $event_name,
-        [string] $event_parent
-    )
-
-    # Emit the end marker for this tracing span.
-    Start-Process -NoNewWindow "imp-ci"  -ArgumentList @(`
-        "events", "new", `
-        "--name", "$($event_name)", `
-        "--child-of", "$($event_parent)"
-    ) | Out-Null
-}
-
+. "$PSScriptRoot\common.ps1"
 
 # Fetch the version of Unreal Engine we need
 pushd "ci"
@@ -60,10 +16,10 @@ pushd "ci"
     Write-Log "Using Unreal Engine version: $($unreal_version)"
 popd
 
-## Create an UnrealEngine directory if it doesn't already exist
-New-Item -Name "UnrealEngine" -ItemType Directory -Force
-
 Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
+    ## Create an UnrealEngine directory if it doesn't already exist
+    New-Item -Name "UnrealEngine" -ItemType Directory -Force
+
     pushd "UnrealEngine"
         Write-Log "Downloading the Unreal Engine artifacts from GCS"
         $gcs_unreal_location = "$($unreal_version).zip"
@@ -133,9 +89,6 @@ pushd "$($game_home)"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
     Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
-    refreshenv
-    $retrieved_path = (get-item env:LINUX_MULTIARCH_ROOT).Value
-    Write-Log "Retrieved LINUX_MULTIARCH_ROOT: $($retrieved_path)"
 
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
@@ -172,17 +125,9 @@ pushd "$($game_home)"
             Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk" -Force -Recurse
             Copy-Item "$($schema_std_lib_path)" -Destination "$($game_home)\spatial\build\dependencies\schema\standard_library" -Force -Recurse
         popd
-
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($gdk_home)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema_compiler" -ArgumentList @(`
-            "--schema_path=$($game_home)\spatial\schema", `
-            "--load_all_schema_on_schema_path", `
-            "--print_components"
-        )
-
     Finish-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "build-project" "build-gdk-third-person-shooter-:windows:"
-
+    Start-Event "build-win64-client" "build-gdk-third-person-shooter-:windows:"
         $build_client_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooter", `
             "Win64", `
@@ -195,7 +140,9 @@ pushd "$($game_home)"
             Write-Log "Failed to build Win64 Development Client. Error: $($build_client_proc.ExitCode)"
             Throw "Failed to build Win64 Development Client"
         }
+    Finish-Event "build-win64-client" "build-gdk-third-person-shooter-:windows:"
 
+    Start-Event "build-linux-worker" "build-gdk-third-person-shooter-:windows:"
         $build_server_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
             "ThirdPersonShooterServer", `
             "Linux", `
@@ -209,47 +156,8 @@ pushd "$($game_home)"
             Write-Log "Failed to build Linux Development Server. Error: $($build_server_proc.ExitCode)"
             Throw "Failed to build Linux Development Server"
         }
-    Finish-Event "build-unreal-gdk" "build-gdk-third-person-shooter-:windows:"
+    Finish-Event "build-linux-worker" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
-        pushd "spatial"
-            $commit_id = (get-item env:BUILDKITE_BUILD_NUMBER).Value    
-            $deployment_name = "shooter_$($commit_id)"
-            $assembly_name = "$($deployment_name)_asm"
-
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-                "build", `
-                "build-config"
-            )
-
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-                "prepare-for-run", `
-                "--log_level=debug"
-            )
-
-            Write-Log "Executing spatial cloud upload $($assembly_name) --force"
-
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-                "cloud", `
-                "upload", `
-                "$($assembly_name)", `
-                "--log_level=debug", `
-                "--force"
-            )
-
-            Write-Log "Executing spatial cloud launch $($assembly_name) $($deployment_launch_configuration) $($deployment_name) --snapshot=$($deployment_snapshot_path) --cluster_region=$($deployment_cluster_region)"
-            Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
-                "cloud", `
-                "launch", `
-                "$($assembly_name)", `
-                "$($deployment_launch_configuration)", `
-                "$($deployment_name)", `
-                "--snapshot=$($deployment_snapshot_path)", `
-                "--cluster_region=$($deployment_cluster_region)", `
-                "--log_level=debug"
-            )
-        popd
-    Finish-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
-
+    &$PSScriptRoot"\deploy.ps1"
 popd
 
