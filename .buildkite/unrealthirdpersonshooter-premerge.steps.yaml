@@ -11,7 +11,7 @@ common: &common
     - "environment=production"
     - "platform=windows"
     # - "permission_set=builder" Temporary, since this will be changing to pusher soon.
-    - "queue=v2-1551802475-9ca0cb13e17abd34-------z"
+    - "queue=v2-1551960839-2fc9bbe6e15deffd-------z"
   retry:
     automatic:
       - <<: *agent_transients
