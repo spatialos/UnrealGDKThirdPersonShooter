@@ -1,9 +1,9 @@
 agent_queue_id: trigger-pipelines
 description: Build and Deploy Unreal Third Person Shooter
 github:
-  branch_configuration: !*
-  default_branch: master
-  pull_request_branch_filter_configuration: !*
+  branch_configuration: ['!*']
+  default_branch: feature/buildkite-setup
+  pull_request_branch_filter_configuration: ['!*']
 teams:
 - name: Everyone
   permission: BUILD_AND_READ
