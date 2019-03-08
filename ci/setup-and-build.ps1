@@ -13,7 +13,7 @@ param(
 # Fetch the version of Unreal Engine we need
 pushd "ci"
     $unreal_version = Get-Content -Path "unreal-engine.version" -Raw
-    Write-Log "Using Unreal Engine version: $($unreal_version)"
+    Write-Log "Using Unreal Engine version: $unreal_version"
 popd
 
 Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
@@ -45,8 +45,8 @@ Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
         } 
 
         $unreal_path = "$($game_home)\UnrealEngine"
-        Write-Log "Setting UNREAL_HOME environment variable to $($unreal_path)"
-        [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$($unreal_path)", "Machine")
+        Write-Log "Setting UNREAL_HOME environment variable to $unreal_path"
+        [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$unreal_path", "Machine")
 
     popd
 Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
@@ -59,7 +59,7 @@ Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shoote
     )
 Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
 
-pushd "$($game_home)"
+pushd "$game_home"
     Start-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
         pushd "Game"
             New-Item -Name "Plugins" -ItemType Directory -Force
@@ -86,9 +86,9 @@ pushd "$($game_home)"
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
     $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", "Machine")
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$($clang_path)", [System.EnvironmentVariableTarget]::Machine)
-    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $($clang_path)"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$clang_path", "Machine")
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$clang_path", [System.EnvironmentVariableTarget]::Machine)
+    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $clang_path"
 
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
