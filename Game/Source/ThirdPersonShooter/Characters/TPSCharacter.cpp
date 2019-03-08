@@ -41,8 +41,8 @@ ATPSCharacter::ATPSCharacter(const FObjectInitializer& ObjectInitializer)
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->JumpZVelocity = 1000.f;
+	GetCharacterMovement()->AirControl = 0.3f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -124,26 +124,26 @@ void ATPSCharacter::UpdateTeamColor()
 	switch (Team)
 	{
 	case ETPSTeam::Team_Red:
-		CharacterMesh->SetMaterial(0, RedTeamMaterial);
-		CharacterMesh->SetMaterial(1, RedTeamLodMaterial);
+		CharacterMesh->SetMaterial(2, RedTeamMaterial);
+		CharacterMesh->SetMaterial(0, RedTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Blue:
-		CharacterMesh->SetMaterial(0, BlueTeamMaterial);
-		CharacterMesh->SetMaterial(1, BlueTeamLodMaterial);
+		CharacterMesh->SetMaterial(2, BlueTeamMaterial);
+		CharacterMesh->SetMaterial(0, BlueTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Purple:
-		CharacterMesh->SetMaterial(0, PurpleTeamMaterial);
-		CharacterMesh->SetMaterial(1, PurpleTeamLodMaterial);
+		CharacterMesh->SetMaterial(2, PurpleTeamMaterial);
+		CharacterMesh->SetMaterial(0, PurpleTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Yellow:
-		CharacterMesh->SetMaterial(0, YellowTeamMaterial);
-		CharacterMesh->SetMaterial(1, YellowTeamLodMaterial);
+		CharacterMesh->SetMaterial(2, YellowTeamMaterial);
+		CharacterMesh->SetMaterial(0, YellowTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_None:
 	default:
 		// If team value has not yet replicated, use the temporary colors
-		CharacterMesh->SetMaterial(0, NoneTeamMaterial);
-		CharacterMesh->SetMaterial(1, NoneTeamLodMaterial);
+		CharacterMesh->SetMaterial(2, NoneTeamMaterial);
+		CharacterMesh->SetMaterial(0, NoneTeamLodMaterial);
 		break;
 	}
 }
@@ -377,6 +377,8 @@ void ATPSCharacter::StartRagdoll()
 		LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
 		LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
 		LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
+
+		ShowRespawnScreen();
 	}
 }
 
