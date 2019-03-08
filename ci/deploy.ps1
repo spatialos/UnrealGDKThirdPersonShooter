@@ -2,7 +2,7 @@
 
 Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
 pushd "spatial"
-    $commit_id = (get-item env:BUILDKITE_BUILD_NUMBER).Value
+    $commit_id = (get-item env:BUILDKITE_COMMIT).Value
     $deployment_name = "shooter_$($commit_id)"
     $assembly_name = "$($deployment_name)_asm"
 
@@ -26,7 +26,7 @@ pushd "spatial"
         "--force"
     )
 
-    Write-Log "Executing spatial cloud launch $($assembly_name) $($deployment_launch_configuration) $($deployment_name) --snapshot=$($deployment_snapshot_path) --cluster_region=$($deployment_cluster_region)"
+    Write-Log "Executing spatial cloud launch $assembly_name $deployment_launch_configuration $deployment_name --snapshot=$deployment_snapshot_path --cluster_region=$deployment_cluster_region"
     Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
         "cloud", `
         "launch", `
