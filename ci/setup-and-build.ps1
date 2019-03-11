@@ -10,54 +10,7 @@ param(
 
 . "$PSScriptRoot\common.ps1"
 
-# Fetch the version of Unreal Engine we need
-pushd "ci"
-    $unreal_version = Get-Content -Path "unreal-engine.version" -Raw
-    Write-Log "Using Unreal Engine version: $unreal_version"
-popd
-
-Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
-    ## Create an UnrealEngine directory if it doesn't already exist
-    New-Item -Name "UnrealEngine" -ItemType Directory -Force
-
-    pushd "UnrealEngine"
-        Write-Log "Downloading the Unreal Engine artifacts from GCS"
-        $gcs_unreal_location = "$($unreal_version).zip"
-
-        $gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
-            "cp", `
-            "gs://$($gcs_publish_bucket)/$($gcs_unreal_location)", `
-            "$($unreal_version).zip" `
-        )
-        if ($gsu_proc.ExitCode -ne 0) {
-            Write-Log "Failed to download Engine artifacts. Error: $($gsu_proc.ExitCode)"
-            Throw "Failed to download Engine artifacts"
-        }
-
-        Write-Log "Unzipping Unreal Engine"
-        $zip_proc = Start-Process -Wait -PassThru -NoNewWindow "7z" -ArgumentList @(`
-        "x", `  
-        "$($unreal_version).zip" `    
-        )   
-        if ($zip_proc.ExitCode -ne 0) { 
-            Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)" 
-            Throw "Failed to unzip Unreal Engine."  
-        } 
-
-        $unreal_path = "$($game_home)\UnrealEngine"
-        Write-Log "Setting UNREAL_HOME environment variable to $unreal_path"
-        [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$unreal_path", "Machine")
-
-    popd
-Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
-
-Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
-    # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
-    # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
-    Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
-        "/quiet" `
-    )
-Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
+$gdk_path = "$game_home\Game\Plugins\UnrealGDK"
 
 pushd "$game_home"
     Start-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
@@ -75,27 +28,74 @@ pushd "$game_home"
     Finish-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
     Start-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
-        pushd "Game/Plugins/UnrealGDK"
+        pushd $gdk_path
             # Set the required variables for the GDK's setup script to use
-            $gdk_home = Convert-Path .
             $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
 
             # Invoke the setup script
-            &"$($game_home)\Game\Plugins\UnrealGDK\ci\setup-gdk.ps1"
+            &"$($gdk_path)\ci\setup-gdk.ps1"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
+    # Fetch the version of Unreal Engine we need
+    pushd "$($gdk_path)/ci"
+        $unreal_version = Get-Content -Path "unreal-engine.version" -Raw
+        Write-Log "Using Unreal Engine version: $unreal_version"
+    popd
+
+    Start-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
+        ## Create an UnrealEngine directory if it doesn't already exist
+        New-Item -Name "UnrealEngine" -ItemType Directory -Force
+
+        pushd "UnrealEngine"
+            Write-Log "Downloading the Unreal Engine artifacts from GCS"
+            $gcs_unreal_location = "$($unreal_version).zip"
+
+            $gsu_proc = Start-Process -Wait -PassThru -NoNewWindow "gsutil" -ArgumentList @(`
+                "cp", `
+                "gs://$($gcs_publish_bucket)/$($gcs_unreal_location)", `
+                "$($unreal_version).zip" `
+            )
+            if ($gsu_proc.ExitCode -ne 0) {
+                Write-Log "Failed to download Engine artifacts. Error: $($gsu_proc.ExitCode)"
+                Throw "Failed to download Engine artifacts"
+            }
+
+            Write-Log "Unzipping Unreal Engine"
+            $zip_proc = Start-Process -Wait -PassThru -NoNewWindow "7z" -ArgumentList @(`
+            "x", `
+            "$($unreal_version).zip" `
+            )
+            if ($zip_proc.ExitCode -ne 0) {
+                Write-Log "Failed to unzip Unreal Engine. Error: $($zip_proc.ExitCode)"
+                Throw "Failed to unzip Unreal Engine."
+            }
+        popd
+    Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
+
+    Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
+        # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
+        # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
+            "/quiet" `
+        )
+    Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
+
+    # Allow the GDK plugin to find the engine
+    $unreal_path = "$($game_home)\UnrealEngine"
+    [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$unreal_path", "Machine")
+    $env:UNREAL_HOME = [System.Environment]::GetEnvironmentVariable("UNREAL_HOME", "Machine")
+
     # Set LINUX_MULTIARCH_ROOT and then reload it for this script
-    $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
+    $clang_path = "$($unreal_path)\ClangToolchain\"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", $clang_path, "Machine")
     $env:LINUX_MULTIARCH_ROOT = [System.Environment]::GetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "Machine")
 
-    # Allow the GDK plugin to find the engine
-    $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
+    $build_script_path = "$($gdk_path)\SpatialGDK\Build\Scripts\BuildWorker.bat"
 
     Start-Event "build-editor" "build-gdk-third-person-shooter-:windows:"
         # Build the project editor to allow the snapshot commandlet to run
-        $build_editor_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+        $build_editor_proc = Start-Process -PassThru -NoNewWindow -FilePath $build_script_path -ArgumentList @(`
             "ThirdPersonShooterEditor", `
             "Win64", `
             "Development", `
@@ -118,8 +118,8 @@ pushd "$game_home"
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
             )
 
-            $core_gdk_schema_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Extras\schema\*"
-            $schema_std_lib_path = "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
+            $core_gdk_schema_path = "$($gdk_path)\SpatialGDK\Extras\schema\*"
+            $schema_std_lib_path = "$($gdk_path)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             New-Item -Path "$($game_home)\spatial" -Name "\build\dependencies\schema\standard_library" -ItemType Directory -Force
             Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk" -Force -Recurse
@@ -128,7 +128,7 @@ pushd "$game_home"
     Finish-Event "generate-schema" "build-gdk-third-person-shooter-:windows:"
 
     Start-Event "build-win64-client" "build-gdk-third-person-shooter-:windows:"
-        $build_client_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+        $build_client_proc = Start-Process -PassThru -NoNewWindow -FilePath $build_script_path -ArgumentList @(`
             "ThirdPersonShooter", `
             "Win64", `
             "Development", `
@@ -143,7 +143,7 @@ pushd "$game_home"
     Finish-Event "build-win64-client" "build-gdk-third-person-shooter-:windows:"
 
     Start-Event "build-linux-worker" "build-gdk-third-person-shooter-:windows:"
-        $build_server_proc = Start-Process -PassThru -NoNewWindow -FilePath "$($game_home)\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" -ArgumentList @(`
+        $build_server_proc = Start-Process -PassThru -NoNewWindow -FilePath $build_script_path -ArgumentList @(`
             "ThirdPersonShooterServer", `
             "Linux", `
             "Development", `
