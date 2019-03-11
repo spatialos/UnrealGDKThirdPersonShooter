@@ -2,7 +2,8 @@
 
 Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
 pushd "spatial"
-    $commit_id = (get-item env:BUILDKITE_COMMIT).Value
+    # Get the short commit hash of this build
+    $commit_id = (get-item env:BUILDKITE_COMMIT).Value.Substring(0, 7)
     $deployment_name = "shooter_$($commit_id)"
     $assembly_name = "$($deployment_name)_asm"
 
