@@ -85,10 +85,10 @@ pushd "$game_home"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
+    # Set LINUX_MULTIARCH_ROOT and then reload it for this script
     $clang_path = "$($game_home)\UnrealEngine\ClangToolchain\"
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$clang_path", "Machine")
-    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "$clang_path", [System.EnvironmentVariableTarget]::Machine)
-    Write-Log "Setting LINUX_MULTIARCH_ROOT environment variable to $clang_path"
+    [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", $clang_path, "Machine")
+    $env:LINUX_MULTIARCH_ROOT = [System.Environment]::GetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "Machine")
 
     # Allow the GDK plugin to find the engine
     $env:UNREAL_HOME = "$($game_home)\UnrealEngine\"
@@ -158,6 +158,7 @@ pushd "$game_home"
         }
     Finish-Event "build-linux-worker" "build-gdk-third-person-shooter-:windows:"
 
+    # Deploy the project to SpatialOS
     &$PSScriptRoot"\deploy.ps1"
 popd
 
