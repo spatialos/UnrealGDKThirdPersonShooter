@@ -10,7 +10,7 @@ param(
 
 . "$PSScriptRoot\common.ps1"
 
-$gdk_path = "$game_home\Game\Plugins\UnrealGDK"
+$gdk_home = "$game_home\Game\Plugins\UnrealGDK"
 
 pushd "$game_home"
     Start-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
@@ -28,17 +28,17 @@ pushd "$game_home"
     Finish-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
     Start-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
-        pushd $gdk_path
+        pushd $gdk_home
             # Set the required variables for the GDK's setup script to use
             $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
 
             # Invoke the setup script
-            &"$($gdk_path)\ci\setup-gdk.ps1"
+            &"$($gdk_home)\ci\setup-gdk.ps1"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
     # Fetch the version of Unreal Engine we need
-    pushd "$($gdk_path)/ci"
+    pushd "$($gdk_home)/ci"
         $unreal_version = Get-Content -Path "unreal-engine.version" -Raw
         Write-Log "Using Unreal Engine version: $unreal_version"
     popd
@@ -91,7 +91,7 @@ pushd "$game_home"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", $clang_path, "Machine")
     $env:LINUX_MULTIARCH_ROOT = [System.Environment]::GetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "Machine")
 
-    $build_script_path = "$($gdk_path)\SpatialGDK\Build\Scripts\BuildWorker.bat"
+    $build_script_path = "$($gdk_home)\SpatialGDK\Build\Scripts\BuildWorker.bat"
 
     Start-Event "build-editor" "build-gdk-third-person-shooter-:windows:"
         # Build the project editor to allow the snapshot commandlet to run
@@ -118,8 +118,8 @@ pushd "$game_home"
                 "-MapPaths=`"/Maps/TPS-Start_Small`""
             )
 
-            $core_gdk_schema_path = "$($gdk_path)\SpatialGDK\Extras\schema\*"
-            $schema_std_lib_path = "$($gdk_path)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
+            $core_gdk_schema_path = "$($gdk_home)\SpatialGDK\Extras\schema\*"
+            $schema_std_lib_path = "$($gdk_home)\SpatialGDK\Binaries\ThirdParty\Improbable\Programs\schema\*"
             New-Item -Path "$($game_home)\spatial\schema\unreal" -Name "gdk" -ItemType Directory -Force
             New-Item -Path "$($game_home)\spatial" -Name "\build\dependencies\schema\standard_library" -ItemType Directory -Force
             Copy-Item "$($core_gdk_schema_path)" -Destination "$($game_home)\spatial\schema\unreal\gdk" -Force -Recurse
