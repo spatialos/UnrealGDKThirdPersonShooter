@@ -17,8 +17,6 @@ pushd "spatial"
         "--log_level=debug"
     )
 
-    Write-Log "Executing spatial cloud upload $assembly_name --force"
-
     Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
         "cloud", `
         "upload", `
@@ -27,7 +25,6 @@ pushd "spatial"
         "--force"
     )
 
-    Write-Log "Executing spatial cloud launch $assembly_name $deployment_launch_configuration $deployment_name --snapshot=$deployment_snapshot_path --cluster_region=$deployment_cluster_region"
     Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
         "cloud", `
         "launch", `
