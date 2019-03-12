@@ -23,6 +23,10 @@
         {
           "name": "qos_max_unacked_pings_rate",
           "value": "10"
+        },
+        {
+          "name": "enable_chunk_interest",
+          "value": "false"
         }
       ],
     "snapshots": {
