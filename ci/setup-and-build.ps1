@@ -32,12 +32,15 @@ pushd "$game_home"
             # Set the required variables for the GDK's setup script to use
             $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
 
-            # Invoke the setup script
+            # Get the short commit hash of this gdk build for later use in assembly name
+            $gdk_commit_hash = (git rev-parse HEAD).Substring(0,7)
+
+            # Invoke the GDK's setup script
             &"$($gdk_path)\ci\setup-gdk.ps1"
         popd
     Finish-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
-    # Fetch the version of Unreal Engine we need
+    # Fetch the version of Unreal Engine we need from the GDK
     pushd "$($gdk_path)/ci"
         $unreal_version = Get-Content -Path "unreal-engine.version" -Raw
         Write-Log "Using Unreal Engine version: $unreal_version"
@@ -73,14 +76,6 @@ pushd "$game_home"
         popd
     Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
-        # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
-        # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
-            "/quiet" `
-        )
-    Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
-
     # Allow the GDK plugin to find the engine
     $unreal_path = "$($game_home)\UnrealEngine"
     [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$unreal_path", "Machine")
@@ -90,6 +85,14 @@ pushd "$game_home"
     $clang_path = "$($unreal_path)\ClangToolchain\"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", $clang_path, "Machine")
     $env:LINUX_MULTIARCH_ROOT = [System.Environment]::GetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "Machine")
+
+    Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
+        # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
+        # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
+            "/quiet" `
+        )
+    Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
 
     $build_script_path = "$($gdk_path)\SpatialGDK\Build\Scripts\BuildWorker.bat"
 
@@ -101,7 +104,11 @@ pushd "$game_home"
             "Development", `
             "ThirdPersonShooter.uproject"
         )
+
+        # Explicitly hold on to the process handle. 
+        # This works around an issue whereby Wait-Process would fail to find build_editor_proc 
         $build_editor_handle = $build_editor_proc.Handle
+
         Wait-Process -Id (Get-Process -InputObject $build_editor_proc).id
         if ($build_editor_proc.ExitCode -ne 0) {
             Write-Log "Failed to build Win64 Development Editor. Error: $($build_editor_proc.ExitCode)"

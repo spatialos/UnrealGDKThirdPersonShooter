@@ -1,12 +1,11 @@
 . "$PSScriptRoot\common.ps1"
 
 Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
-pushd "spatial"
-    # Get the short commit hash of this build
-    $commit_id = (get-item env:BUILDKITE_COMMIT).Value.Substring(0, 7)
-    $deployment_name = "shooter_$($commit_id)"
+    # Use the shortened commit hash gathered during GDK plugin clone 
+    $deployment_name = "shooter_$($gdk_commit_hash)"
     $assembly_name = "$($deployment_name)_asm"
 
+pushd "spatial"
     Start-Process -Wait -PassThru -NoNewWindow -FilePath "spatial" -ArgumentList @(`
         "build", `
         "build-config"
