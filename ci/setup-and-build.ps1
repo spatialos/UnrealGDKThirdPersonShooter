@@ -73,14 +73,6 @@ pushd "$game_home"
         popd
     Finish-Event "download-unreal-engine" "build-gdk-third-person-shooter-:windows:"
 
-    Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
-        # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
-        # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
-        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
-            "/quiet" `
-        )
-    Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
-
     # Allow the GDK plugin to find the engine
     $unreal_path = "$($game_home)\UnrealEngine"
     [Environment]::SetEnvironmentVariable("UNREAL_HOME", "$unreal_path", "Machine")
@@ -90,6 +82,15 @@ pushd "$game_home"
     $clang_path = "$($unreal_path)\ClangToolchain\"
     [Environment]::SetEnvironmentVariable("LINUX_MULTIARCH_ROOT", $clang_path, "Machine")
     $env:LINUX_MULTIARCH_ROOT = [System.Environment]::GetEnvironmentVariable("LINUX_MULTIARCH_ROOT", "Machine")
+
+
+    Start-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
+        # This runs an opaque exe downloaded in the previous step that does *some stuff* that UE needs to occur.
+        # Trapping error codes on this is tricky, because it doesn't always return 0 on success, and frankly, we just don't know what it _will_ return.
+        Start-Process -Wait -PassThru -NoNewWindow -FilePath "$($unreal_path)\Engine\Extras\Redist\en-us\UE4PrereqSetup_x64.exe" -ArgumentList @(`
+            "/quiet" `
+        )
+    Finish-Event "install-unreal-engine-prerequisites" "build-gdk-third-person-shooter-:windows:"
 
     $build_script_path = "$($gdk_home)\SpatialGDK\Build\Scripts\BuildWorker.bat"
 
