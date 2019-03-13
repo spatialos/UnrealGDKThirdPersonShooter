@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Engine/NetDriver.h"
-#include "EntityRegistry.h"
 #include "GameFramework/Actor.h"
 #include "SpatialNetDriver.h"
 #include "Connection/SpatialWorkerConnection.h"
@@ -19,7 +18,7 @@ FString TPSLogging::LogPrefix(AActor* Actor)
 	if (USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(Actor->GetNetDriver()))
 	{
 		WorkerId = SpatialNetDriver->Connection->GetWorkerId();
-		EntityId = SpatialNetDriver->GetEntityRegistry()->GetEntityIdFromActor(Actor);
+		EntityId = SpatialNetDriver->PackageMap->GetEntityIdFromObject(Actor);
 	}
 	else
 	{

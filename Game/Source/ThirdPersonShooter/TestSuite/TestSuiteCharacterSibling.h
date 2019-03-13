@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EntityRegistry.h"
 #include "GameFramework/Character.h"
-#include "TestsuiteCharacterSibling.generated.h"
+#include "TestSuiteCharacterSibling.generated.h"
 
 
 UCLASS(config=Game)

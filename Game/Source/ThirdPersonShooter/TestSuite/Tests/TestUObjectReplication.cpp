@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "UnrealNetwork.h"
 #include "SpatialNetDriver.h"
-#include "Utils/EntityRegistry.h"
+#include "SpatialPackageMapClient.h"
 
 #include <improbable/c_worker.h>
 
@@ -142,8 +142,8 @@ void ATestUObjectReplication::ValidateRPC_Server(ATestActor*  TestDynamicallyCre
 	//Get the net driver
 	USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetWorld()->GetNetDriver());
 	check(NetDriver);
-	Worker_EntityId RPCEntityId = NetDriver->GetEntityRegistry()->GetEntityIdFromActor(TestDynamicallyCreatedActor);
-	Worker_EntityId ServerEntityId = NetDriver->GetEntityRegistry()->GetEntityIdFromActor(DynamicallyCreatedActor);
+	Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestDynamicallyCreatedActor);
+	Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(DynamicallyCreatedActor);
 	check(RPCEntityId == ServerEntityId);
 
 	// TODO: UNR-238 Add tests.

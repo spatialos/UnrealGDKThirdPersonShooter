@@ -1,8 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "TestsuitePlayerController.h"
+#include "TestSuitePlayerController.h"
 #include "SpatialNetDriver.h"
-#include "EntityRegistry.h"
 
 #include <improbable/c_worker.h>
 

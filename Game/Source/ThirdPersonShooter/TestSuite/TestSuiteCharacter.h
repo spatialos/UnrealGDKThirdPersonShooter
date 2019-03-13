@@ -3,12 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EntityRegistry.h"
 #include "GameFramework/Character.h"
 #include "TestSuite/Tests/GDKTestRunner.h"
 #include "TestSuite/Tests/ReplicationTestCase.h"
 #include "TestSuite/Tests/ReplicationTestHelperClasses.h"
-#include "TestsuiteCharacter.generated.h"
+#include "TestSuiteCharacter.generated.h"
 
 UCLASS(SpatialType, config = Game)
 class ATestSuiteCharacter : public ACharacter

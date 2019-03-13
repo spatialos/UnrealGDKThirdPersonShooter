@@ -3,9 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EntityRegistry.h"
 #include "GameFramework/Character.h"
-#include "TestsuiteTestClasses.generated.h"
+#include "TestSuiteTestClasses.generated.h"
 
 
 USTRUCT()
