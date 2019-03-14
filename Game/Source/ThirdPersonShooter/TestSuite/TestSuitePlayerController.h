@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
-#include "TestsuitePlayerController.generated.h"
+#include "TestSuitePlayerController.generated.h"
 
 /**
  * 

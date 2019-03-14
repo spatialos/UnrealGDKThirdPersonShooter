@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "TestsuiteGameMode.generated.h"
+#include "TestSuiteGameMode.generated.h"
 
 UCLASS(minimalapi, SpatialType=(Singleton, ServerOnly))
 class ATestSuiteGameMode : public AGameModeBase

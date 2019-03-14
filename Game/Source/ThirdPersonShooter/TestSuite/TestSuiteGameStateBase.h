@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
-#include "TestsuiteGameStateBase.generated.h"
+#include "TestSuiteGameStateBase.generated.h"
 
 UCLASS(SpatialType=Singleton)
 class THIRDPERSONSHOOTER_API ATestSuiteGameStateBase : public AGameStateBase

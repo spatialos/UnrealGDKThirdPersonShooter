@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "ReplicationTestCase.h"
 #include "Components/ActorComponent.h"
-#include "TeststaticComponentReplication.generated.h"
+#include "TestStaticComponentReplication.generated.h"
 
 UCLASS(SpatialType)
 class THIRDPERSONSHOOTER_API UTestComponent : public UActorComponent

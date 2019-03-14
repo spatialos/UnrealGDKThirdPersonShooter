@@ -1,5 +1,5 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
-#include "TeststaticComponentReplication.h"
+#include "TestStaticComponentReplication.h"
 
 #include "GameFramework/GameModeBase.h"
 #include "UnrealNetwork.h"

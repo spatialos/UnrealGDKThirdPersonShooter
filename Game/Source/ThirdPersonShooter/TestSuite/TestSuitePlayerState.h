@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerState.h"
-#include "TestsuitePlayerState.generated.h"
+#include "TestSuitePlayerState.generated.h"
 
 UCLASS(SpatialType)
 class ATestSuitePlayerState : public APlayerState

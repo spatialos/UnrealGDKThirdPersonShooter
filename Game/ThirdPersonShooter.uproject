@@ -21,10 +21,14 @@
 			"LoadingPhase": "Default"
 		}
 	],
-	"Plugins": [
-		{
-			"Name": "SpatialGDK",
-			"Enabled": true
-		}
-	]
+  "Plugins": [
+    {
+      "Name": "SpatialGDK",
+      "Enabled": true
+    },
+    {
+      "Name": "GameplayAbilities",
+      "Enabled": true
+    }
+  ]
 }

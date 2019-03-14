@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "TestsuiteCharacterSibling.h"
+#include "TestSuiteCharacterSibling.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,7 +9,7 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "TestsuiteGameStateBase.h"
+#include "TestSuiteGameStateBase.h"
 #include "SpatialNetDriver.h"
 
 #include "UnrealNetwork.h"

@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "TestsuiteCharacter.h"
+#include "TestSuiteCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -9,10 +9,19 @@
 #include "GameFramework/Controller.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/GameplayStatics.h"
-#include "TestsuiteGameStateBase.h"
+#include "TestSuiteGameStateBase.h"
 #include "SpatialNetDriver.h"
 
 #include "UnrealNetwork.h"
+
+
+UTestCharacterAttributeSet::UTestCharacterAttributeSet()
+	: Health(100.f)
+	, Mana(100.f)
+	, Power(1.f)
+{
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // ATestSuiteCharacter
@@ -50,6 +59,9 @@ ATestSuiteCharacter::ATestSuiteCharacter()
 
 												   // Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 												   // are set in the derived blueprint asset named MyCharacter (to avoid direct content references in C++)
+
+	AbilitySystem = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystem"));
+	AttributeSet = CreateDefaultSubobject<UTestCharacterAttributeSet>(TEXT("AttributeSet"));
 }
 
 void ATestSuiteCharacter::BeginPlay()
@@ -60,6 +72,22 @@ void ATestSuiteCharacter::BeginPlay()
 	if (World && GetNetMode() == NM_DedicatedServer)
 	{
 		TestRunner = World->SpawnActor<AGDKTestRunner>();
+	}
+
+	if (AbilitySystem)
+	{
+		if (HasAuthority())
+		{
+			for (auto Ability : DefaultAbilities)
+			{
+				if (Ability)
+				{
+					AbilitySystem->GiveAbility(FGameplayAbilitySpec(Ability.GetDefaultObject()));
+				}
+			}
+		}
+
+		AbilitySystem->InitAbilityActorInfo(this, this);
 	}
 }
 
@@ -132,6 +160,11 @@ void ATestSuiteCharacter::DebugCmd()
 	}
 }
 
+int32 ATestSuiteCharacter::GetActiveGameplayEffectsCount()
+{
+	return AbilitySystem->GetGameplayEffectCount(UGameplayEffect::StaticClass(), AbilitySystem);
+}
+
 void ATestSuiteCharacter::TurnAtRate(float Rate)
 {
 	// calculate delta for this frame from the rate information
@@ -184,4 +217,16 @@ void ATestSuiteCharacter::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME_CONDITION(ATestSuiteCharacter, TestRunner, COND_InitialOnly);
+}
+
+void ATestSuiteCharacter::PossessedBy(AController* NewController)
+{
+	Super::PossessedBy(NewController);
+	AbilitySystem->RefreshAbilityActorInfo();
+}
+
+void ATestSuiteCharacter::OnRep_Controller()
+{
+	Super::OnRep_Controller();
+	AbilitySystem->RefreshAbilityActorInfo();
 }

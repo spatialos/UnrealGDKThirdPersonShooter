@@ -1,6 +1,6 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "TestsuitePlayerState.h"
+#include "TestSuitePlayerState.h"
 
 ATestSuitePlayerState::ATestSuitePlayerState()
 {

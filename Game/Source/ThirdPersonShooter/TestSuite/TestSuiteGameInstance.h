@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SpatialGameInstance.h"
-#include "TestsuiteGameInstance.generated.h"
+#include "TestSuiteGameInstance.generated.h"
 
 UCLASS()
 class THIRDPERSONSHOOTER_API UTestSuiteGameInstance : public USpatialGameInstance

@@ -23,7 +23,10 @@ public class ThirdPersonShooter : ModuleRules
 				"SlateCore",
 				"SpatialGDK",
                 "Json",
-                "HTTP"
-			});
+                "HTTP",
+                "GameplayAbilities",
+                "GameplayTags",
+                "GameplayTasks"
+            });
 	}
 }

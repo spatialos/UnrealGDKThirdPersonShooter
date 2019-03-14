@@ -1,9 +1,9 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
-#include "TestsuiteGameMode.h"
-#include "TestsuitePlayerController.h"
-#include "TestsuiteGameStateBase.h"
-#include "TestsuitePlayerState.h"
+#include "TestSuiteGameMode.h"
+#include "TestSuitePlayerController.h"
+#include "TestSuiteGameStateBase.h"
+#include "TestSuitePlayerState.h"
 #include "UObject/ConstructorHelpers.h"
 
 ATestSuiteGameMode::ATestSuiteGameMode()
