@@ -3,7 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "EntityRegistry.h"
 #include "GameFramework/Character.h"
 #include "Teams/TPSTeams.h"
 #include "TPSCharacter.generated.h"
