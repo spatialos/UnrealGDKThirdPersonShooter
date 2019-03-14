@@ -27,13 +27,18 @@ pushd "$game_home"
         popd
     Finish-Event "clone-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
 
+    Start-Event "get-gdk-head-commit" "build-gdk-third-person-shooter-:windows:"
+        pushd $gdk_home
+            # Get the short commit hash of this gdk build for later use in assembly name
+            $gdk_commit_hash = (git rev-parse HEAD).Substring(0,7)
+            Write-Log "GDK at commit: $gdk_commit_hash on branch $gdk_branch_name"
+        popd
+    Finish-Event "get-gdk-head-commit" "build-gdk-third-person-shooter-:windows:"
+
     Start-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
         pushd $gdk_home
             # Set the required variables for the GDK's setup script to use
             $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
-
-            # Get the short commit hash of this gdk build for later use in assembly name
-            $gdk_commit_hash = (git rev-parse HEAD).Substring(0,7)
 
             # Invoke the GDK's setup script
             &"$($gdk_home)\ci\setup-gdk.ps1"
