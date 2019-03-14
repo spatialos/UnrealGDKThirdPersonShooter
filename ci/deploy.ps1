@@ -35,10 +35,10 @@ Start-Event "deploy-game" "build-gdk-third-person-shooter-:windows:"
             "--log_level=debug"
         ) | Tee-Object -FilePath "deploy.log"
 
-        $deployment_url = Select-String -Path "deploy.log" -Pattern '.*Console URL:(.*)\\n"'
-        if ($deployment_url)
+        $deployment_url = Select-String -Path "deploy.log" -Pattern 'Console URL:\s*(.*)\\n'
+        if (($deployment_url).Matches.Length -gt 0)
         {
-            buildkite-agent annotate --style "success" "Deployment URL: $deployment_url"
+            buildkite-agent annotate --style "success" "Deployment URL: $(($deployment_url).Matches[0].Groups[1].Value)"
         }
         else{
             buildkite-agent annotate --style "warning" "Could not parse deployment URL from launch log."
