@@ -97,6 +97,8 @@
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
         "RakNet",
+        "-SaveToUserDir",
+        "-UserDir=/data/improbable/logs/${IMPROBABLE_WORKER_NAME}/${IMPROBABLE_WORKER_ID}",
         "-NoVerifyGC"
       ]
     }
