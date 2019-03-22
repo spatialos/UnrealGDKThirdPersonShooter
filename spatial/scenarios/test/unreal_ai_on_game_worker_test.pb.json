@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "set --override_assembly_name"
+        "name": "tps_unified_proj_setup"
     },
     "tags": [
     {
@@ -22,43 +22,11 @@
         "name": "error_log_count"
     },
     {
-        "prometheusExpressionTemplate": "rate(improbable_db_loadtest_client_operations_sent{dpl=\"%deployment%\"}[30s])",
-        "name": "ops_sent_per_s"
-    },
-    {
-        "prometheusExpressionTemplate": "rate(improbable_db_loadtest_client_updates_received{dpl=\"%deployment%\"}[30s])",
-        "name": "updates_received_per_s"
-    },
-    {
-        "prometheusExpressionTemplate": "rate(improbable_db_loadtest_update_latency_ns_bucket{dpl=\"%deployment%\"}[30s])",
-        "name": "update_latency_histogram_ns"
-    },
-    {
-        "prometheusExpressionTemplate": "sum(rate(node_cpu{dpl=\"%deployment%\",mode=\"user\"}[30s])) by (node)",
-        "name": "cpu"
-    },
-    {
-        "prometheusExpressionTemplate": "node_memory_MemUsed{dpl=\"%deployment%\"}",
-        "name": "ram"
-    },
-    {
-        "prometheusExpressionTemplate": "rate(node_network_receive_bytes{dpl=\"%deployment%\",device=\"ens4v1\"}[30s])",
-        "name": "network_rx"
-    },
-    {
-        "prometheusExpressionTemplate": "rate(node_network_transmit_bytes{dpl=\"%deployment%\",device=\"ens4v1\"}[30s])",
-        "name": "network_tx"
-    },
-    {
-        "prometheusExpressionTemplate": "sum(rate(jvm_gc_collection_seconds_sum{dpl=\"%deployment%\"}[30s])) by (node)",
-        "name": "gc"
-    },
-    {
-        "prometheusExpressionTemplate": "spatialos_node_cpu_used:ratio{project='%project%',dpl='%deployment%',node='worker_nanny'} or vector(0)",
+        "prometheusExpressionTemplate": "spatialos_node_cpu_used:ratio{project='%project%',dpl='%deployment%'} or vector(0)",
         "name": "node_cpu_used_detail"
     },
     {
-        "prometheusExpressionTemplate": "spatialos_node_memory_used:ratio{project=%project%,dpl='%deployment%',node='worker_nanny'} or vector(0)",
+        "prometheusExpressionTemplate": "spatialos_node_memory_used:ratio{project=%project%,dpl='%deployment%'} or vector(0)",
         "name": "node_memory_used_detail"
     },
     {
