@@ -37,8 +37,8 @@ launchScenario() {
     regisseur run \
         --scenarios ${scenario_path} \
         --visualizers dump-errors,file-csv-matrix \
-        --raw_logs_download_at_end_of_deployment true \
-        --raw_logs_download_if_scenario_passes true \
+        --raw_logs_download_at_end_of_deployment \
+        --raw_logs_download_if_scenario_passes \
         --raw_logs_max_size_megabytes 1024
 }
 
