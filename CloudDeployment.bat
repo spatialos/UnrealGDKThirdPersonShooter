@@ -1,5 +1,6 @@
 @echo off
 
+call "%~dp0\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" ThirdPersonShooter Win64 Development ThirdPersonShooter.uproject
 call "%~dp0\Game\Plugins\UnrealGDK\SpatialGDK\Build\Scripts\BuildWorker.bat" ThirdPersonShooterServer Linux Development ThirdPersonShooter.uproject
 
 pushd "%~dp0\spatial"
