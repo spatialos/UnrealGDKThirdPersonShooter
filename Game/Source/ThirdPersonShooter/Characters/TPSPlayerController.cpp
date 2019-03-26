@@ -418,6 +418,29 @@ void ATPSPlayerController::DeleteCharacter()
 	}
 }
 
+void ATPSPlayerController::BroadcastStat(const FString& StatCommand)
+{
+	BroadcastStat_ServerWorker(StatCommand);
+}
+
+bool ATPSPlayerController::BroadcastStat_ServerWorker_Validate(const FString& StatCommand)
+{
+	return true;
+}
+
+void ATPSPlayerController::BroadcastStat_ServerWorker_Implementation(const FString& StatCommand)
+{
+	UWorld* World = GetWorld();
+	if(World != nullptr)
+	{
+		ATPSGameState* GS = Cast<ATPSGameState>(World->GetGameState());
+		if (GS != nullptr)
+		{
+			GS->BroadcastStat_CrossServer(StatCommand);
+		}
+	}
+}
+
 void ATPSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

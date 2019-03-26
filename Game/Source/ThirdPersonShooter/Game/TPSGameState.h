@@ -29,12 +29,17 @@ public:
 	// [client] Registers a listener for changes in the scoreboard.
 	void RegisterScoreChangeListener(FSGTeamScoresUpdatedDelegate Callback);
 
+	UFUNCTION(CrossServer, Reliable)
+	void BroadcastStat_CrossServer(const FString& StatCommand);
 protected:
 	virtual void BeginPlay() override;
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 private:
+	UFUNCTION(NetMulticast, Reliable)
+	void BroadcastStat(const FString& StatCommand);
+
 	UFUNCTION()
 	void OnRep_TeamScores();
 

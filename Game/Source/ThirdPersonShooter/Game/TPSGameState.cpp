@@ -101,6 +101,42 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(ATPSGameState, TeamScores);
 }
 
+void ATPSGameState::BroadcastStat_CrossServer_Implementation(const FString& StatCommand)
+{
+	BroadcastStat(StatCommand);
+}
+
+void ATPSGameState::BroadcastStat_Implementation(const FString& StatCommand)
+{
+	FString NetModeString;
+
+	switch (GetNetMode())
+	{
+	case NM_Standalone:
+		NetModeString = "NM_Standalone";
+		break;
+	case NM_Client:
+		NetModeString = "NM_Client";
+		break;
+	case NM_DedicatedServer:
+		NetModeString = "NM_DedicatedServer";
+		break;
+	case NM_ListenServer:
+		NetModeString = "NM_ListenServer";
+		break;
+	default:;
+	}
+
+	const UEnum* NetRoleType = FindObjectChecked<UEnum>(ANY_PACKAGE, TEXT("ENetRole"));
+
+	UE_LOG(LogTPS, Log, TEXT("Executing \"STAT %s\", NetMode: %s, Role: %s"), 
+		*StatCommand, 
+		*NetModeString,
+		*NetRoleType->GetNameByValue((int64)Role).ToString());
+
+	GEngine->Exec(nullptr, *FString::Printf(TEXT("STAT %s"), *StatCommand), *GLog);
+}
+
 void ATPSGameState::OnRep_TeamScores()
 {
 	TeamScoresUpdatedCallback.ExecuteIfBound(TeamScores);
