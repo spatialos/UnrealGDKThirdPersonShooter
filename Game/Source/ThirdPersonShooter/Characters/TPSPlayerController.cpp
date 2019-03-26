@@ -430,9 +430,14 @@ bool ATPSPlayerController::BroadcastStat_ServerWorker_Validate(const FString& St
 
 void ATPSPlayerController::BroadcastStat_ServerWorker_Implementation(const FString& StatCommand)
 {
-	if (ATPSGameState* GS = Cast<ATPSGameState>(GetWorld()->GetGameState()))
+	UWorld* World = GetWorld();
+	if(World != nullptr)
 	{
-		GS->BroadcastStat_CrossServer(StatCommand);
+		ATPSGameState* GS = Cast<ATPSGameState>(World->GetGameState());
+		if (GS != nullptr)
+		{
+			GS->BroadcastStat_CrossServer(StatCommand);
+		}
 	}
 }
 

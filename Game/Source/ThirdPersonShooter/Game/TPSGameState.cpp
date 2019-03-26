@@ -5,8 +5,6 @@
 #include "TPSLogging.h"
 #include "Teams/TPSTeams.h"
 #include "UnrealNetwork.h"
-#include "Engine/Engine.h"
-
 
 ATPSGameState::ATPSGameState()
 {
@@ -109,46 +107,33 @@ void ATPSGameState::BroadcastStat_CrossServer_Implementation(const FString& Stat
 
 void ATPSGameState::BroadcastStat_Implementation(const FString& StatCommand)
 {
-	FString netMode;
+	FString NetModeString;
 
 	switch (GetNetMode())
 	{
 	case NM_Standalone:
-		netMode = "NM_Standalone";
+		NetModeString = "NM_Standalone";
 		break;
 	case NM_Client:
-		netMode = "NM_Client";
+		NetModeString = "NM_Client";
 		break;
 	case NM_DedicatedServer:
-		netMode = "NM_DedicatedServer";
+		NetModeString = "NM_DedicatedServer";
 		break;
 	case NM_ListenServer:
-		netMode = "NM_ListenServer";
+		NetModeString = "NM_ListenServer";
 		break;
 	default:;
 	}
 
-	FString role;
+	const UEnum* NetRoleType = FindObjectChecked<UEnum>(ANY_PACKAGE, TEXT("ENetRole"));
 
-	switch (Role)
-	{
-	case ROLE_Authority:
-		role = "ROLE_Authority";
-		break;
-	case ROLE_AutonomousProxy:
-		role = "ROLE_AutonomousProxy";
-		break;
-	case ROLE_SimulatedProxy:
-		role = "ROLE_SimulatedProxy";
-		break;
-	default:;
-	}
+	UE_LOG(LogTPS, Log, TEXT("Executing \"STAT %s\", NetMode: %s, Role: %s"), 
+		*StatCommand, 
+		*NetModeString,
+		*NetRoleType->GetNameByValue((int64)Role).ToString());
 
-	UE_LOG(LogTPS, Warning, TEXT("Executing \"STAT %s\", Netmode: %s, Role: %s"), *StatCommand, *netMode, *role);
-
-	FString const fullCommand = TEXT("STAT ") + StatCommand;
-
-	GEngine->Exec(nullptr, *fullCommand, *GLog);
+	GEngine->Exec(nullptr, *FString::Printf(TEXT("STAT %s"), *StatCommand), *GLog);
 }
 
 void ATPSGameState::OnRep_TeamScores()
