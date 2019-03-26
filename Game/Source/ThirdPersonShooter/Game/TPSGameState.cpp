@@ -5,6 +5,7 @@
 #include "TPSLogging.h"
 #include "Teams/TPSTeams.h"
 #include "UnrealNetwork.h"
+#include "Engine/Engine.h"
 
 
 ATPSGameState::ATPSGameState()
@@ -99,6 +100,55 @@ void ATPSGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATPSGameState, TeamScores);
+}
+
+void ATPSGameState::BroadcastStat_CrossServer_Implementation(const FString& StatCommand)
+{
+	BroadcastStat(StatCommand);
+}
+
+void ATPSGameState::BroadcastStat_Implementation(const FString& StatCommand)
+{
+	FString netMode;
+
+	switch (GetNetMode())
+	{
+	case NM_Standalone:
+		netMode = "NM_Standalone";
+		break;
+	case NM_Client:
+		netMode = "NM_Client";
+		break;
+	case NM_DedicatedServer:
+		netMode = "NM_DedicatedServer";
+		break;
+	case NM_ListenServer:
+		netMode = "NM_ListenServer";
+		break;
+	default:;
+	}
+
+	FString role;
+
+	switch (Role)
+	{
+	case ROLE_Authority:
+		role = "ROLE_Authority";
+		break;
+	case ROLE_AutonomousProxy:
+		role = "ROLE_AutonomousProxy";
+		break;
+	case ROLE_SimulatedProxy:
+		role = "ROLE_SimulatedProxy";
+		break;
+	default:;
+	}
+
+	UE_LOG(LogTPS, Warning, TEXT("Executing \"STAT %s\", Netmode: %s, Role: %s"), *StatCommand, *netMode, *role);
+
+	FString const fullCommand = TEXT("STAT ") + StatCommand;
+
+	GEngine->Exec(nullptr, *fullCommand, *GLog);
 }
 
 void ATPSGameState::OnRep_TeamScores()

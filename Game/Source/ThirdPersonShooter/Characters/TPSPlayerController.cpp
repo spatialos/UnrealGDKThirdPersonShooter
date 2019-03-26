@@ -418,6 +418,24 @@ void ATPSPlayerController::DeleteCharacter()
 	}
 }
 
+void ATPSPlayerController::BroadcastStat(const FString& StatCommand)
+{
+	BroadcastStat_ServerWorker(StatCommand);
+}
+
+bool ATPSPlayerController::BroadcastStat_ServerWorker_Validate(const FString& StatCommand)
+{
+	return true;
+}
+
+void ATPSPlayerController::BroadcastStat_ServerWorker_Implementation(const FString& StatCommand)
+{
+	if (ATPSGameState* GS = Cast<ATPSGameState>(GetWorld()->GetGameState()))
+	{
+		GS->BroadcastStat_CrossServer(StatCommand);
+	}
+}
+
 void ATPSPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);

@@ -128,6 +128,12 @@ private:
 	FTimerHandle RespawnTimerHandle;
 	FTimerHandle DeleteCharacterTimerHandle;
 
+	UFUNCTION(Exec)
+	void BroadcastStat(const FString& StatCommand);
+
+	UFUNCTION(Server, Reliable, WithValidation)
+	void BroadcastStat_ServerWorker(const FString& StatCommand);
+
 // HACK for login state (Unreal issue, not GDK issue)
 //=================================================//
 public:
