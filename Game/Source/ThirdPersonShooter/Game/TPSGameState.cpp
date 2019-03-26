@@ -6,6 +6,7 @@
 #include "Teams/TPSTeams.h"
 #include "UnrealNetwork.h"
 
+
 ATPSGameState::ATPSGameState()
 {
 	PrimaryActorTick.bCanEverTick = false;
