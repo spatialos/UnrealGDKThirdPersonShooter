@@ -26,7 +26,7 @@
       },
       {
           "name": "enable_chunk_interest",
-          "value": "false"
+          "value": "true"
       }
     ],
     "snapshots": {
