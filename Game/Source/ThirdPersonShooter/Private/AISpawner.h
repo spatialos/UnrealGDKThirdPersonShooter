@@ -15,6 +15,9 @@ class AAISpawner : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AAISpawner();
+	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -22,6 +25,8 @@ protected:
 	virtual void OnAuthorityGained() override;
 
 	void SpawnInitial();
+	void UpdateParameters();
+	void SpawnActor();
 
 	UPROPERTY(EditInstanceOnly)
 	int NumAIToSpawn;
@@ -29,17 +34,20 @@ protected:
 	UPROPERTY(EditInstanceOnly)
 	float MinSecondsBetweenSpawns = 2.0f;
 
+	UPROPERTY(EditInstanceOnly)
+	// When set to 0 doesn't update parameters
+	float UpdateParametersIntervalSeconds = 0.f;
 
 	UPROPERTY(EditInstanceOnly)
 	TSubclassOf<ACharacter> AICharacterTemplate;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+	bool bCanSpawn;
+	bool bSpawningEnabled;
 private:
 	TArray<FTransform> SpawnPoints;
+	TArray<ACharacter*> AICharacterHandles;
 
 	int NumSpawned = 0;
 	float SecondsSinceLastSpawn = 0.f;
+	float SecondsSinceLastUpdateParameters = 0.f;
 };
