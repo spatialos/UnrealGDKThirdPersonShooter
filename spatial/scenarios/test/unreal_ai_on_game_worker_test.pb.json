@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "tps_unified_proj_setup"
+        "name": "unr-1158-wanderers"
     },
     "tags": [
     {
@@ -36,7 +36,7 @@
     "initialState": {
         "taggedSnapshot": {
             "historyName": "ai_perf_base_history",
-            "snapshotTag": "default_snapshot"
+            "snapshotTag": "wanderer_snapshot"
         }
     },
     "lifetime": {
@@ -71,7 +71,19 @@
         "workers": [
         {
             "workerType": "UnrealWorker",
-            "flags": [],
+            "flags": [
+            {
+                "name": "ai_spawning_enabled",
+                "value": "False"
+            },
+            {
+                "name": "ai_min_seconds_between_spawns",
+                "value": "1.0"
+            },
+            {
+                "name": "ai_num_to_spawn",
+                "value": "0"
+            }],
             "loadBalancing": {
               "autoHexGrid": {
                 "numWorkers": 1
