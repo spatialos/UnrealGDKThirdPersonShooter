@@ -6,6 +6,10 @@
 #include "Net/UnrealNetwork.h"
 #include "SpatialNetDriver.h"
 
+ATPSPlayerState::ATPSPlayerState()
+{
+	CheckoutRadius = 1000.0f;
+}
 
 void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

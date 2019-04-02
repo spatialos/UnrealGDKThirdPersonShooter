@@ -15,7 +15,8 @@ UCLASS(SpatialType)
 class THIRDPERSONSHOOTER_API ATPSPlayerState : public APlayerState
 {
 	GENERATED_BODY()
-
+public:
+	ATPSPlayerState();
 protected:
 	UPROPERTY(Transient, Replicated)
 	ETPSTeam SelectedTeam;
