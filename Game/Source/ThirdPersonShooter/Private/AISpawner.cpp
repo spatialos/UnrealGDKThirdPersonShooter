@@ -74,9 +74,9 @@ void AAISpawner::SpawnActor()
 	SecondsSinceLastSpawn = 0;
 
 	FActorSpawnParameters SpawnParams;
-	int spawnPointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
+	int SpawnPointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
 
-	ACharacter* SpawnedActor = GetWorld()->SpawnActor<ACharacter>(AICharacterTemplate, SpawnPoints[spawnPointIndex], SpawnParams);
+	ACharacter* SpawnedActor = GetWorld()->SpawnActor<ACharacter>(AICharacterTemplate, SpawnPoints[SpawnPointIndex], SpawnParams);
 	AICharacterHandles.Push(SpawnedActor);
 
 	NumSpawned++;
