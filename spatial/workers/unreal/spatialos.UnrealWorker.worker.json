@@ -73,7 +73,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
         "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
@@ -96,7 +96,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
         "-NoVerifyGC"
       ]
     }
