@@ -1,6 +1,6 @@
 {
 	"FileVersion": 3,
-	"EngineAssociation": "{6396D808-40D7-6477-D069-D6B211065150}",
+	"EngineAssociation": "{3E3F846F-4FD2-6558-2E5A-D7AE0B4F93BB}",
 	"Category": "",
 	"Description": "",
 	"Modules": [
@@ -10,25 +10,19 @@
 			"LoadingPhase": "Default",
 			"AdditionalDependencies": [
 				"Engine",
-				"SpatialGDK",
 				"UMG",
-				"CoreUObject"
+                "CoreUObject"
 			]
-		},
-		{
-			"Name": "SpatialGDK",
-			"Type": "Runtime",
-			"LoadingPhase": "Default"
 		}
 	],
-  "Plugins": [
-    {
-      "Name": "SpatialGDK",
-      "Enabled": true
-    },
-    {
-      "Name": "GameplayAbilities",
-      "Enabled": true
-    }
-  ]
+	"Plugins": [
+		{
+			"Name": "SpatialGDK",
+			"Enabled": true
+		},
+		{
+			"Name": "GameplayAbilities",
+			"Enabled": true
+		}
+	]
 }
