@@ -12,6 +12,9 @@ AAISpawner::AAISpawner()
 	PrimaryActorTick.bCanEverTick = true;
 	SetActorTickEnabled(false);
 
+	// An entity is needed so that the correct server gains authority
+	bReplicates = true;
+
 	bSpawningEnabled = false;
 
 	NumSpawned = 0;
