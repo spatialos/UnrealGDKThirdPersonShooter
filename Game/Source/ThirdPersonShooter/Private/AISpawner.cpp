@@ -8,9 +8,9 @@
 // Sets default values
 AAISpawner::AAISpawner()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// This actor only ticks in the authoritative server
 	PrimaryActorTick.bCanEverTick = true;
-	bReplicates = true;
+	SetActorTickEnabled(false);
 
 	bSpawningEnabled = false;
 
@@ -24,8 +24,6 @@ void AAISpawner::BeginPlay()
 {
 	Super::BeginPlay();
 
-	bSpawningEnabled = false;
-
 	NumSpawned = 0;
 	SecondsSinceLastSpawn = 0.f;
 	SecondsSinceLastUpdateParameters = 0.f;
@@ -34,6 +32,7 @@ void AAISpawner::BeginPlay()
 void AAISpawner::OnAuthorityGained()
 {
 	SpawnInitial();
+	SetActorTickEnabled(true);
 
 	// force parameters update so that spawning starts with correct data
 	if (UpdateParametersIntervalSeconds > 0)
@@ -84,7 +83,6 @@ void AAISpawner::SpawnActor()
 	NumSpawned++;
 }
 
-// Called every frame
 void AAISpawner::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -113,7 +111,7 @@ void AAISpawner::Tick(float DeltaTime)
 	}
 	
 	// interval based spawning
-	if (bCanSpawn && bSpawningEnabled && NumSpawned < NumAIToSpawn && SecondsSinceLastSpawn >= MinSecondsBetweenSpawns)
+	if (bSpawningEnabled && NumSpawned < NumAIToSpawn && SecondsSinceLastSpawn >= MinSecondsBetweenSpawns)
 	{
 		SpawnActor();
 	}
