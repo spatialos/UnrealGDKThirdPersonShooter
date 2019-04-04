@@ -1,0 +1,122 @@
+{
+    "identifier": {
+        "name": "ai_offloaded"
+    },
+    "projectId": {
+        "name": "unreal_gdk"
+    },
+    "assembly": {
+        "name": "unr-1158-wanderers"
+    },
+    "tags": [
+    {
+        "name": "ai_perf"
+    },
+    {
+        "name": "ai_offloaded"
+    }],
+    "comment": "Offloading scenario with one game logic worker and one offload worker",
+    "metrics": [
+    {
+        "prometheusExpressionTemplate": "max(improbable_logging_logged_errors::sum{app='%project%',dpl='%deployment%',node_cat=''} or vector(0))",
+        "name": "error_log_count"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_node_cpu_used:ratio{project='%project%',dpl='%deployment%'} or vector(0)",
+        "name": "node_cpu_used_detail"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_node_memory_used:ratio{project=%project%,dpl='%deployment%'} or vector(0)",
+        "name": "node_memory_used_detail"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
+        "name": "from_unreal_worker_update_size_rate1m"
+    }],
+    "initialState": {
+        "taggedSnapshot": {
+            "historyName": "ai_perf_base_history",
+            "snapshotTag": "wanderer_snapshot"
+        }
+    },
+    "lifetime": {
+        "seconds": "600"
+    },
+    "launchConfiguration": {
+        "template": "small",
+        "world": {
+            "chunkEdgeLengthMeters": "50",
+            "legacyFlags": [
+            {
+              "name": "bridge_soft_handover_enabled",
+              "value": "false"
+            },
+            {
+                "name": "enable_chunk_interest",
+                "value": "true"
+            },
+            {
+                "name": "streaming_query_diff",
+                "value": "true"
+            },
+            {
+                "name": "load_snapshot_at_startup",
+                "value": "true"
+            }],
+            "dimensions": {
+                "xMeters": "2000",
+                "zMeters": "2000"
+            }
+        },
+        "workers": [
+        {
+            "workerType": "UnrealWorker",
+            "loadBalancing": {
+              "autoHexGrid": {
+                "numWorkers": 1
+              }
+            },
+            "permissions": [
+            {
+                "all": {}
+            }]
+        },
+        {
+            "workerType": "AIWorker",
+            "flags": [
+            {
+                "name": "ai_spawning_enabled",
+                "value": "False"
+            },
+            {
+                "name": "ai_min_seconds_between_spawns",
+                "value": "1.0"
+            },
+            {
+                "name": "ai_num_to_spawn",
+                "value": "0"
+            },
+            {
+                "name": "ai_sim_path_distance",
+                "value": "0"
+            }],
+            "loadBalancing": {
+              "autoHexGrid": {
+                "numWorkers": 1
+              }
+            },
+            "permissions": [
+            {
+                "all": {}
+            }]
+        },
+        {
+            "workerType": "UnrealClient",
+            "flags": [],
+            "permissions": [
+            {
+                "all": {}
+            }]
+        }]
+    }
+}
