@@ -8,7 +8,6 @@
 #include "TestSuite/Tests/TestIntReplication.h"
 #include "TestSuite/Tests/TestFloatReplication.h"
 #include "TestSuite/Tests/TestBoolReplication.h"
-#include "TestSuite/Tests/TestCharReplication.h"
 #include "TestSuite/Tests/TestFStringReplication.h"
 #include "TestSuite/Tests/TestCArrayReplication.h"
 #include "TestSuite/Tests/TestTArrayReplication.h"
@@ -143,7 +142,6 @@ void AGDKTestRunner::Server_SetupTestCases()
 	AddTestCase<ATestIntReplication>();
 	AddTestCase<ATestFloatReplication>();
 	AddTestCase<ATestBoolReplication>();
-	AddTestCase<ATestCharReplication>();
 	AddTestCase<ATestFStringReplication>();
 	AddTestCase<ATestCArrayReplication>();
 	AddTestCase<ATestTArrayReplication>();
