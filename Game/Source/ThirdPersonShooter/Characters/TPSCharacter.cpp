@@ -8,17 +8,23 @@
 #include "Characters/TPSCharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "EngineUtils.h"
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/Controller.h"
+#include "GameFramework/PlayerStart.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Game/TPSGameState.h"
 #include "Interactable.h"
 #include "Kismet/GameplayStatics.h"
+#include "MessageLog.h"
+#include "NavigationSystem.h"
 #include "TPSLogging.h"
 #include "SpatialNetDriver.h"
 #include "UnrealNetwork.h"
 #include "Weapons/InstantWeapon.h"
+#include "Navigation/PathFollowingComponent.h"
+#include "AIController.h"
 
 
 static const FName kRightGunSocketName("GunSocket_r");
@@ -104,6 +110,96 @@ void ATPSCharacter::Tick(float DeltaSeconds)
 	}
 
 	Super::Tick(DeltaSeconds);
+}
+
+namespace
+{
+	UPathFollowingComponent* InitNavigationControl(AController& Controller)
+	{
+		AAIController* AsAIController = Cast<AAIController>(&Controller);
+		UPathFollowingComponent* PathFollowingComp = nullptr;
+
+		if (AsAIController)
+		{
+			PathFollowingComp = AsAIController->GetPathFollowingComponent();
+		}
+		else
+		{
+			PathFollowingComp = Controller.FindComponentByClass<UPathFollowingComponent>();
+			if (PathFollowingComp == nullptr)
+			{
+				PathFollowingComp = NewObject<UPathFollowingComponent>(&Controller);
+				PathFollowingComp->RegisterComponentWithWorld(Controller.GetWorld());
+				PathFollowingComp->Initialize();
+			}
+		}
+
+		return PathFollowingComp;
+	}
+}
+
+void ATPSCharacter::OnAuthorityGained()
+{
+	InitializeSimulatedPathGoals();
+	Super::OnAuthorityGained();
+}
+
+void ATPSCharacter::SimulateFindPath(float MinDistance)
+{
+	if (CachedPathGoals.Num() == 0)
+	{
+		return;
+	}
+
+	UNavigationSystemV1* NavSys = Controller ? FNavigationSystem::GetCurrent<UNavigationSystemV1>(Controller->GetWorld()) : nullptr;
+	if (NavSys == nullptr || Controller == nullptr || Controller->GetPawn() == nullptr)
+	{
+		UE_LOG(LogNavigation, Warning, TEXT("UNavigationSystemV1::SimpleMoveToActor called for NavSys:%s Controller:%s controlling Pawn:%s (if any of these is None then there's your problem"),
+			*GetNameSafe(NavSys), *GetNameSafe(Controller), Controller ? *GetNameSafe(Controller->GetPawn()) : TEXT("NULL"));
+		return;
+	}
+
+	UPathFollowingComponent* PFollowComp = InitNavigationControl(*Controller);
+
+	if (PFollowComp == nullptr)
+	{
+		return;
+	}
+
+	if (!PFollowComp->IsPathFollowingAllowed())
+	{
+		return;
+	}
+
+	const ANavigationData* NavData = NavSys->GetNavDataForProps(Controller->GetNavAgentPropertiesRef());
+	if (NavData)
+	{
+		FVector Location = GetActorLocation();
+		float DistanceTotal = 0.f;
+		uint32 Iterations = 0;
+
+		while (MinDistance > DistanceTotal)
+		{
+			int GoalIndex = FMath::RandRange(0, CachedPathGoals.Num() - 1);
+			AActor* Goal = CachedPathGoals[GoalIndex];
+			FPathFindingQuery Query(Controller, *NavData, Controller->GetNavAgentLocation(), Goal->GetActorLocation());
+			FPathFindingResult Result = NavSys->FindPathSync(Query);
+			DistanceTotal += FVector::Distance(Location, Goal->GetActorLocation());
+			Iterations++;
+		}
+
+		UE_LOG(LogNavigation, Warning, TEXT("Simulated pathfinding %.2f m completed in %u iterations"), MinDistance, Iterations);
+	}
+
+	return;
+}
+
+void ATPSCharacter::InitializeSimulatedPathGoals()
+{
+	for (TActorIterator<APlayerStart> Itr(GetWorld()); Itr; ++Itr)
+	{
+		CachedPathGoals.Add(*Itr);
+	}
 }
 
 void ATPSCharacter::UpdateTeamColor()
