@@ -10,7 +10,7 @@ AAISpawner::AAISpawner()
 {
 	// This actor only ticks in the authoritative server
 	PrimaryActorTick.bCanEverTick = true;
-	SetActorTickEnabled(false);
+	PrimaryActorTick.bStartWithTickEnabled = false;
 
 	// An entity is needed so that the correct server gains authority
 	bReplicates = true;
@@ -114,7 +114,7 @@ void AAISpawner::Tick(float DeltaTime)
 	}
 	
 	// interval based spawning
-	if (bSpawningEnabled && NumSpawned < NumAIToSpawn && SecondsSinceLastSpawn >= MinSecondsBetweenSpawns)
+	if (bCanSpawn && bSpawningEnabled && NumSpawned < NumAIToSpawn && SecondsSinceLastSpawn >= MinSecondsBetweenSpawns)
 	{
 		SpawnActor();
 	}
