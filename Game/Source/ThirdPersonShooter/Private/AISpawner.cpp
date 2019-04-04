@@ -40,6 +40,8 @@ void AAISpawner::OnAuthorityGained()
 	{
 		UpdateParameters();
 	}
+
+	Super::OnAuthorityGained();
 }
 
 void AAISpawner::SpawnInitial()
