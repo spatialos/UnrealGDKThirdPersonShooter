@@ -11,6 +11,7 @@ public class ThirdPersonShooter : ModuleRules
 		PublicDependencyModuleNames.AddRange(
 			new string[]
 			{
+                "AIModule",
 				"Core",
 				"CoreUObject",
 				"Engine",
@@ -26,7 +27,8 @@ public class ThirdPersonShooter : ModuleRules
                 "HTTP",
                 "GameplayAbilities",
                 "GameplayTags",
-                "GameplayTasks"
+                "GameplayTasks",
+                "NavigationSystem"
             });
 	}
 }
