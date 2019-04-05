@@ -22,22 +22,3 @@ ABigGymGameMode::ABigGymGameMode()
 	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
 	bUseSeamlessTravel = false;
 }
-
-//void ABigGymGameMode::Tick(float DeltaSeconds)
-//{
-//	if (GetNetMode() == NM_DedicatedServer && !bHasUpdatedMaxActorsToReplicate)
-//	{
-//		if (USpatialNetDriver* SND = Cast<USpatialNetDriver>(GetWorld()->GetNetDriver()))
-//		{
-//			if (SND->Connection && SND->Connection->IsConnected())
-//			{
-//				if (USpatialNetConnection* SNC = SND->GetSpatialOSNetConnection())
-//				{
-//					SNC->SetMaxActorsToReplicatePerFrame(MaxActorsToReplicate);
-//					bHasUpdatedMaxActorsToReplicate = true;
-//				}
-//			}
-//		}
-//	}
-//}
-

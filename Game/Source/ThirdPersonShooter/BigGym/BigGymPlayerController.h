@@ -22,9 +22,4 @@ class ABigGymPlayerController : public APlayerController
 
 	UFUNCTION(BlueprintCallable)
 	void DoClientTravel(FString URLString);
-
-public:
-
-	virtual void InitPlayerState() override;
-
 };

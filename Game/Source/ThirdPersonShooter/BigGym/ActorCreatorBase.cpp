@@ -10,22 +10,8 @@
 AActorCreatorBase::AActorCreatorBase()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	SetReplicates(true);
-}
-
-// Called when the game starts or when spawned
-void AActorCreatorBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AActorCreatorBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AActorCreatorBase::CreateActors()
