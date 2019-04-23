@@ -5,6 +5,7 @@
 #include "GameFramework/PlayerStart.h"
 #include "Interop/SpatialWorkerFlags.h"
 #include "Engine/Engine.h"
+#include "NavigationSystem.h"
 
 // Sets default values
 AAISpawner::AAISpawner()
@@ -52,9 +53,13 @@ void AAISpawner::OnAuthorityGained()
 
 void AAISpawner::SpawnInitial()
 {
+	UNavigationSystemV1* NavSys = FNavigationSystem::GetCurrent<UNavigationSystemV1>(GetWorld());
+
 	for (TActorIterator<APlayerStart> Itr(GetWorld()); Itr; ++Itr)
 	{
-		SpawnPoints.Add(Itr->GetActorTransform());
+		FNavLocation SpawnPointOnNavMesh;
+		NavSys->ProjectPointToNavigation(Itr->GetActorLocation(), SpawnPointOnNavMesh);
+		SpawnPoints.Add(SpawnPointOnNavMesh.Location);
 	}
 
 	bCanSpawn = SpawnPoints.Num() > 0;
@@ -86,7 +91,7 @@ void AAISpawner::SpawnActor()
 	FActorSpawnParameters SpawnParams;
 	int SpawnPointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
 
-	ACharacter* SpawnedActor = GetWorld()->SpawnActor<ACharacter>(AICharacterTemplate, SpawnPoints[SpawnPointIndex], SpawnParams);
+	APawn* SpawnedActor = GetWorld()->SpawnActor<APawn>(AICharacterTemplate, SpawnPoints[SpawnPointIndex], FRotator::ZeroRotator, SpawnParams);
 	AICharacterHandles.Push(SpawnedActor);
 
 	NumSpawned++;
@@ -112,7 +117,7 @@ void AAISpawner::Tick(float DeltaTime)
 	// batch clean up
 	while (NumSpawned > NumAIToSpawn && AICharacterHandles.Num() > 0)
 	{
-		if (ACharacter* ActorToRemove = AICharacterHandles.Pop())
+		if (APawn* ActorToRemove = AICharacterHandles.Pop())
 		{
 			GetWorld()->DestroyActor(ActorToRemove);
 			NumSpawned--;

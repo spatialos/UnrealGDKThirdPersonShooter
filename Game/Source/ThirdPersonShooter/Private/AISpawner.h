@@ -39,13 +39,13 @@ protected:
 	float UpdateParametersIntervalSeconds = 0.f;
 
 	UPROPERTY(EditInstanceOnly)
-	TSubclassOf<ACharacter> AICharacterTemplate;
+	TSubclassOf<APawn> AICharacterTemplate;
 
 	bool bCanSpawn;
 	bool bSpawningEnabled;
 private:
-	TArray<FTransform> SpawnPoints;
-	TArray<ACharacter*> AICharacterHandles;
+	TArray<FVector> SpawnPoints;
+	TArray<APawn*> AICharacterHandles;
 
 	int NumSpawned = 0;
 	float SecondsSinceLastSpawn = 0.f;
