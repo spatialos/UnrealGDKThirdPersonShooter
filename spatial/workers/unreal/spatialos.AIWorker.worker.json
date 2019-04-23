@@ -73,7 +73,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
         "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
@@ -83,8 +83,9 @@
       "command": "StartWorker.sh",
       "arguments": [
         "${IMPROBABLE_WORKER_ID}",
+        "${IMPROBABLE_WORKER_NAME}",
         "${IMPROBABLE_LOG_FILE}",
-        "ThirdPersonExampleMap",
+        "TPS-AI_Large",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
         "+receptionistHost",
@@ -96,7 +97,9 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
+        "-SaveToUserDir",
+        "-UserDir=/data/improbable/logs/${IMPROBABLE_WORKER_NAME}/${IMPROBABLE_WORKER_ID}",
         "-NoVerifyGC"
       ]
     }
