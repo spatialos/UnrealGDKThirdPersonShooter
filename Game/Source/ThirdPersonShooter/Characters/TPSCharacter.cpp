@@ -187,8 +187,6 @@ void ATPSCharacter::SimulateFindPath(float MinDistance)
 			DistanceTotal += FVector::Distance(Location, Goal->GetActorLocation());
 			Iterations++;
 		}
-
-		UE_LOG(LogNavigation, Warning, TEXT("Simulated pathfinding %.2f m completed in %u iterations"), MinDistance, Iterations);
 	}
 
 	return;
