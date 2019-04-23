@@ -4,6 +4,7 @@
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
 #include "Interop/SpatialWorkerFlags.h"
+#include "Engine/Engine.h"
 
 // Sets default values
 AAISpawner::AAISpawner()
@@ -25,11 +26,14 @@ AAISpawner::AAISpawner()
 // Called when the game starts or when spawned
 void AAISpawner::BeginPlay()
 {
+	UE_LOG(LogTemp, Warning, TEXT("AISpawner BeginPlay"));
 	Super::BeginPlay();
 
 	NumSpawned = 0;
 	SecondsSinceLastSpawn = 0.f;
 	SecondsSinceLastUpdateParameters = 0.f;
+
+	StartStat();
 }
 
 void AAISpawner::OnAuthorityGained()
@@ -55,6 +59,8 @@ void AAISpawner::SpawnInitial()
 
 	bCanSpawn = SpawnPoints.Num() > 0;
 	bSpawningEnabled = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("AISpawner initialised using %d points"), SpawnPoints.Num());
 }
 
 void AAISpawner::UpdateParameters()
@@ -117,6 +123,37 @@ void AAISpawner::Tick(float DeltaTime)
 	if (bCanSpawn && bSpawningEnabled && NumSpawned < NumAIToSpawn && SecondsSinceLastSpawn >= MinSecondsBetweenSpawns)
 	{
 		SpawnActor();
+	}
+}
+
+void AAISpawner::StartStat()
+{
+	UWorld* World = GetWorld();
+	if (World != nullptr)
+	{
+
+		FString FlagValue;
+		USpatialWorkerFlags::GetWorkerFlag("stat_duration", FlagValue);
+		float StatDuration = FCString::Atof(*FlagValue);
+
+		UE_LOG(LogTemp, Warning, TEXT("stat duration %f"), StatDuration);
+		if (StatDuration > 0.f)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Executing startfile"));
+			GEngine->Exec(World, TEXT("Stat StartFile"));
+
+			World->GetTimerManager().SetTimer(StatTimer, this, &AAISpawner::StopStat, StatDuration, false);
+		}
+	}
+}
+
+void AAISpawner::StopStat()
+{
+	UWorld* World = GetWorld();
+	if (World != nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Executing stopfile"));
+		GEngine->Exec(World, TEXT("Stat StopFile"));
 	}
 }
 

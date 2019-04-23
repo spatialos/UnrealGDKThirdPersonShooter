@@ -50,4 +50,8 @@ private:
 	int NumSpawned = 0;
 	float SecondsSinceLastSpawn = 0.f;
 	float SecondsSinceLastUpdateParameters = 0.f;
+
+	void StartStat();
+	void StopStat();
+	FTimerHandle StatTimer;
 };
