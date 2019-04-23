@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "unr-1158-wanderers"
+        "name": "unr-1158-wanderers-gs"
     },
     "tags": [
     {
@@ -40,7 +40,7 @@
         }
     },
     "lifetime": {
-        "seconds": "600"
+        "seconds": "780"
     },
     "launchConfiguration": {
         "template": "small",
@@ -74,19 +74,23 @@
             "flags": [
             {
                 "name": "ai_spawning_enabled",
-                "value": "False"
+                "value": "True"
             },
             {
                 "name": "ai_min_seconds_between_spawns",
-                "value": "1.0"
+                "value": "0.1"
             },
             {
                 "name": "ai_num_to_spawn",
-                "value": "0"
+                "value": "100"
             },
             {
                 "name": "ai_sim_path_distance",
                 "value": "0"
+            },
+            {
+                "name": "stat_duration",
+                "value": "600"
             }],
             "loadBalancing": {
               "autoHexGrid": {

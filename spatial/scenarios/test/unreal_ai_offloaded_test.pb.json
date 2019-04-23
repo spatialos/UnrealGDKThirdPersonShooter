@@ -36,11 +36,11 @@
     "initialState": {
         "taggedSnapshot": {
             "historyName": "ai_perf_base_history",
-            "snapshotTag": "wanderer_snapshot"
+            "snapshotTag": "wanderer_snapshot_offload"
         }
     },
     "lifetime": {
-        "seconds": "600"
+        "seconds": "780"
     },
     "launchConfiguration": {
         "template": "small",
@@ -56,10 +56,6 @@
                 "value": "true"
             },
             {
-                "name": "streaming_query_diff",
-                "value": "true"
-            },
-            {
                 "name": "load_snapshot_at_startup",
                 "value": "true"
             }],
@@ -71,6 +67,11 @@
         "workers": [
         {
             "workerType": "UnrealWorker",
+            "flags": [
+            {
+                "name": "stat_duration",
+                "value": "600"
+            }],
             "loadBalancing": {
               "autoHexGrid": {
                 "numWorkers": 1
@@ -86,19 +87,23 @@
             "flags": [
             {
                 "name": "ai_spawning_enabled",
-                "value": "False"
+                "value": "True"
             },
             {
                 "name": "ai_min_seconds_between_spawns",
-                "value": "1.0"
+                "value": "0.1"
             },
             {
                 "name": "ai_num_to_spawn",
-                "value": "0"
+                "value": "100"
             },
             {
                 "name": "ai_sim_path_distance",
                 "value": "0"
+            },
+            {
+                "name": "stat_duration",
+                "value": "600"
             }],
             "loadBalancing": {
               "autoHexGrid": {
