@@ -58,8 +58,13 @@ void AAISpawner::SpawnInitial()
 	for (TActorIterator<APlayerStart> Itr(GetWorld()); Itr; ++Itr)
 	{
 		FNavLocation SpawnPointOnNavMesh;
-		NavSys->ProjectPointToNavigation(Itr->GetActorLocation(), SpawnPointOnNavMesh);
-		SpawnPoints.Add(SpawnPointOnNavMesh.Location);
+		if (NavSys->GetRandomPointInNavigableRadius(Itr->GetActorLocation(), 10000.f, SpawnPointOnNavMesh))
+		{
+			SpawnPoints.Add(SpawnPointOnNavMesh.Location);
+
+			// move the player start actors on the nav mesh so that AI can move to them
+			Itr->SetActorLocation(SpawnPointOnNavMesh.Location);
+		}
 	}
 
 	bCanSpawn = SpawnPoints.Num() > 0;
@@ -89,6 +94,8 @@ void AAISpawner::SpawnActor()
 	SecondsSinceLastSpawn = 0;
 
 	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
 	int SpawnPointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
 
 	APawn* SpawnedActor = GetWorld()->SpawnActor<APawn>(AICharacterTemplate, SpawnPoints[SpawnPointIndex], FRotator::ZeroRotator, SpawnParams);
