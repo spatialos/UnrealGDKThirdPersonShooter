@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "unr-1158-wanderers-gs"
+        "name": "unr-1160-wanderers-gs-f4733"
     },
     "tags": [
     {
@@ -56,10 +56,6 @@
                 "value": "true"
             },
             {
-                "name": "streaming_query_diff",
-                "value": "true"
-            },
-            {
                 "name": "load_snapshot_at_startup",
                 "value": "true"
             }],
@@ -85,8 +81,32 @@
                 "value": "100"
             },
             {
-                "name": "ai_sim_path_distance",
-                "value": "0"
+                "name": "pf_min_distance",
+                "value": "10000.0"
+            },
+            {
+                "name": "pf_tick_interval",
+                "value": "5.0"
+            },
+            {
+                "name": "pf_tick_rand_delta",
+                "value": "4.0"
+            },
+            {
+                "name": "ray_count",
+                "value": "60"
+            },
+            {
+                "name": "ray_length",
+                "value": "1000.0"
+            },
+            {
+                "name": "ray_tick_interval",
+                "value": "0.2"
+            },
+            {
+                "name": "ray_tick_rand_delta",
+                "value": "0.0"
             },
             {
                 "name": "stat_duration",
