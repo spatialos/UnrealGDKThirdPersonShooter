@@ -33,12 +33,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category=Camera)
 	float BaseLookUpRate;
 
-	/** Called to simulate CPU load in pathfinding for AI characters */
-	UFUNCTION(BlueprintCallable)
-	void SimulateFindPath(float MinDistance);
-
-	virtual void OnAuthorityGained() override;
-
 protected:
 
 	/** Called for forwards/backward input */
@@ -62,9 +56,6 @@ protected:
 	void StartSprinting();
 
 	void StopSprinting();
-
-	void InitializeSimulatedPathGoals();
-	TArray<AActor*> CachedPathGoals;
 
 public:
 	// Returns a position from which to start a line trace.
