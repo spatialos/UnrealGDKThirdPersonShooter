@@ -43,7 +43,7 @@
         "seconds": "780"
     },
     "launchConfiguration": {
-        "template": "small",
+        "template": "w4_r0500_e5",
         "world": {
             "chunkEdgeLengthMeters": "50",
             "legacyFlags": [
