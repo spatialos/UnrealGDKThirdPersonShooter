@@ -8,7 +8,9 @@
 #include "GameFramework/PlayerStart.h"
 #include "NavigationSystem.h"
 #include "Navigation/PathFollowingComponent.h"
+#include "Stats/Stats.h"
 
+DECLARE_CYCLE_STAT(TEXT("Simulated Pathfinding Load Time"), STAT_SimulatedFindPathLoadTime, STATGROUP_Game, );
 
 // Sets default values for this component's properties
 USimulatedFindPathLoadComponent::USimulatedFindPathLoadComponent()
@@ -17,8 +19,6 @@ USimulatedFindPathLoadComponent::USimulatedFindPathLoadComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-
-	// ...
 }
 
 
@@ -57,6 +57,8 @@ namespace
 // Called every frame
 void USimulatedFindPathLoadComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SCOPE_CYCLE_COUNTER(STAT_SimulatedFindPathLoadTime);
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (bUpdatePropertiesFromWorkerFlags)

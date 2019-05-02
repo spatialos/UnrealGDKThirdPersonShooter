@@ -6,6 +6,9 @@
 #include "GameFramework/Actor.h"
 #include "Interop/SpatialWorkerFlags.h"
 #include "Runtime/Engine/Public/DrawDebugHelpers.h"
+#include "Stats/Stats.h"
+
+DECLARE_CYCLE_STAT(TEXT("Simulated Tracing Load Time"), STAT_SimulatedTracingLoadTime, STATGROUP_Game, );
 
 // Sets default values for this component's properties
 USimulatedTracingLoadComponent::USimulatedTracingLoadComponent()
@@ -14,8 +17,6 @@ USimulatedTracingLoadComponent::USimulatedTracingLoadComponent()
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = false;
-
-	// ...
 }
 
 
@@ -23,15 +24,14 @@ USimulatedTracingLoadComponent::USimulatedTracingLoadComponent()
 void USimulatedTracingLoadComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
 }
 
 
 // Called every frame
 void USimulatedTracingLoadComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	SCOPE_CYCLE_COUNTER(STAT_SimulatedTracingLoadTime);
+
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (bUpdatePropertiesFromWorkerFlags)
