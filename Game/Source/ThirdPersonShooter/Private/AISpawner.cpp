@@ -63,9 +63,6 @@ void AAISpawner::SpawnInitial()
 		if (NavSys->GetRandomPointInNavigableRadius(Itr->GetActorLocation(), 10000.f, SpawnPointOnNavMesh))
 		{
 			SpawnPoints.Add(SpawnPointOnNavMesh.Location);
-
-			// move the player start actors on the nav mesh so that AI can move to them
-			Itr->SetActorLocation(SpawnPointOnNavMesh.Location);
 		}
 	}
 
