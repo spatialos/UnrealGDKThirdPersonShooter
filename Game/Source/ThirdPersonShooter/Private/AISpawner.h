@@ -27,6 +27,7 @@ protected:
 	void SpawnInitial();
 	void UpdateParameters();
 	void SpawnActor();
+	void PrintParameters();
 
 	UPROPERTY(EditInstanceOnly)
 	int NumAIToSpawn;

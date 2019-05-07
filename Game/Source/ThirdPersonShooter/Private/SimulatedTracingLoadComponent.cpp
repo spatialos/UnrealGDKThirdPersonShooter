@@ -10,6 +10,8 @@
 
 DECLARE_CYCLE_STAT(TEXT("Simulated Tracing Load Time"), STAT_SimulatedTracingLoadTime, STATGROUP_Game, );
 
+bool USimulatedTracingLoadComponent::bHasPrintedPropertiesForClass = false;
+
 // Sets default values for this component's properties
 USimulatedTracingLoadComponent::USimulatedTracingLoadComponent()
 {
@@ -26,7 +28,6 @@ void USimulatedTracingLoadComponent::BeginPlay()
 	Super::BeginPlay();
 }
 
-
 // Called every frame
 void USimulatedTracingLoadComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -36,11 +37,7 @@ void USimulatedTracingLoadComponent::TickComponent(float DeltaTime, ELevelTick T
 
 	if (bUpdatePropertiesFromWorkerFlags)
 	{
-		FString FlagValue;
-		TraceCount = USpatialWorkerFlags::GetWorkerFlag("ray_count", FlagValue) ? FCString::Atoi(*FlagValue) : TraceCount;
-		TraceLength = USpatialWorkerFlags::GetWorkerFlag("ray_length", FlagValue) ? FCString::Atof(*FlagValue) : TraceLength;
-		TickInterval = USpatialWorkerFlags::GetWorkerFlag("ray_tick_interval", FlagValue) ? FCString::Atof(*FlagValue) : TickInterval;
-		TickIntervalRandomDeviation = USpatialWorkerFlags::GetWorkerFlag("ray_tick_rand_delta", FlagValue) ? FCString::Atof(*FlagValue) : TickIntervalRandomDeviation;
+		UpdatePropertiesFromWorkerFlags();
 	}
 
 	SimulateLineTrace(GetOwner()->GetActorForwardVector());
@@ -78,5 +75,36 @@ void USimulatedTracingLoadComponent::SimulateLineTrace(const FVector& TraceDirec
 void USimulatedTracingLoadComponent::Initialize()
 {
 	SetComponentTickEnabled(true);
+
+	if (bUpdatePropertiesFromWorkerFlags)
+	{
+		UpdatePropertiesFromWorkerFlags();
+	}
+
+	PrintProperties();
 }
 
+void USimulatedTracingLoadComponent::UpdatePropertiesFromWorkerFlags()
+{
+		FString FlagValue;
+		TraceCount = USpatialWorkerFlags::GetWorkerFlag("ray_count", FlagValue) ? FCString::Atoi(*FlagValue) : TraceCount;
+		TraceLength = USpatialWorkerFlags::GetWorkerFlag("ray_length", FlagValue) ? FCString::Atof(*FlagValue) : TraceLength;
+		TickInterval = USpatialWorkerFlags::GetWorkerFlag("ray_tick_interval", FlagValue) ? FCString::Atof(*FlagValue) : TickInterval;
+		TickIntervalRandomDeviation = USpatialWorkerFlags::GetWorkerFlag("ray_tick_rand_delta", FlagValue) ? FCString::Atof(*FlagValue) : TickIntervalRandomDeviation;
+}
+
+void USimulatedTracingLoadComponent::PrintProperties()
+{
+	if (USimulatedTracingLoadComponent::bHasPrintedPropertiesForClass)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("SimulatedTracingLoadComponent parameters:"));
+	UE_LOG(LogTemp, Warning, TEXT("  TraceCount = %d"), TraceCount);
+	UE_LOG(LogTemp, Warning, TEXT("  TraceLength = %f"), TraceLength);
+	UE_LOG(LogTemp, Warning, TEXT("  TickInterval = %f"), TickInterval);
+	UE_LOG(LogTemp, Warning, TEXT("  TickIntervalRandomDeviation = %f"), TickIntervalRandomDeviation);
+
+	USimulatedTracingLoadComponent::bHasPrintedPropertiesForClass = true;
+}

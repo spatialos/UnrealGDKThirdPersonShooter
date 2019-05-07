@@ -48,6 +48,8 @@ void AAISpawner::OnAuthorityGained()
 		UpdateParameters();
 	}
 
+	PrintParameters();
+
 	Super::OnAuthorityGained();
 }
 
@@ -71,6 +73,14 @@ void AAISpawner::SpawnInitial()
 	bSpawningEnabled = true;
 
 	UE_LOG(LogTemp, Warning, TEXT("AISpawner initialised using %d points"), SpawnPoints.Num());
+}
+
+void AAISpawner::PrintParameters()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AISpawner parameters:"));
+	UE_LOG(LogTemp, Warning, TEXT("  bSpawningEnabled = %s"), bSpawningEnabled ? TEXT("true") : TEXT("false"));
+	UE_LOG(LogTemp, Warning, TEXT("  MinSecondsBetweenSpawns = %f"), MinSecondsBetweenSpawns);
+	UE_LOG(LogTemp, Warning, TEXT("  NumAIToSpawn = %d"), NumAIToSpawn);
 }
 
 void AAISpawner::UpdateParameters()

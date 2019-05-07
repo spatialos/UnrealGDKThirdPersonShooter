@@ -38,6 +38,10 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	void UpdatePropertiesFromWorkerFlags();
+
+	static bool bHasPrintedPropertiesForClass;
+	void PrintProperties();
 
 public:	
 	// Called every frame

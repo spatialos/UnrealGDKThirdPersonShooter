@@ -12,6 +12,8 @@
 
 DECLARE_CYCLE_STAT(TEXT("Simulated Pathfinding Load Time"), STAT_SimulatedFindPathLoadTime, STATGROUP_Game, );
 
+bool USimulatedFindPathLoadComponent::bHasPrintedPropertiesForClass = false;
+
 // Sets default values for this component's properties
 USimulatedFindPathLoadComponent::USimulatedFindPathLoadComponent()
 {
@@ -63,11 +65,7 @@ void USimulatedFindPathLoadComponent::TickComponent(float DeltaTime, ELevelTick 
 
 	if (bUpdatePropertiesFromWorkerFlags)
 	{
-		FString FlagValue;
-
-		MinDistanceToSimulate = USpatialWorkerFlags::GetWorkerFlag("pf_min_distance", FlagValue) ? FCString::Atof(*FlagValue) : MinDistanceToSimulate;
-		TickInterval = USpatialWorkerFlags::GetWorkerFlag("pf_tick_interval", FlagValue) ? FCString::Atof(*FlagValue) : TickInterval;
-		TickIntervalRandomDeviation = USpatialWorkerFlags::GetWorkerFlag("pf_tick_rand_delta", FlagValue) ? FCString::Atof(*FlagValue) : TickIntervalRandomDeviation;
+		UpdatePropertiesFromWorkerFlags();
 	}
 
 	SimulateFindPath(MinDistanceToSimulate);
@@ -79,7 +77,7 @@ void USimulatedFindPathLoadComponent::SimulateFindPath(float MinDistance)
 {
 	if (!CanSimulateFindPath)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Tried to simulate pathfinding but coudln't do it for this actor"));
+		UE_LOG(LogTemp, Error, TEXT("Tried to simulate pathfinding but coudln't do it for this actor"));
 		return;
 	}
 
@@ -107,6 +105,13 @@ void USimulatedFindPathLoadComponent::SimulateFindPath(float MinDistance)
 
 void USimulatedFindPathLoadComponent::Initialize()
 {
+	if (bUpdatePropertiesFromWorkerFlags)
+	{
+		UpdatePropertiesFromWorkerFlags();
+	}
+
+	PrintProperties();
+
 	APawn* Owner = Cast<APawn>(GetOwner());
 	AController* Controller = Owner->Controller;
 
@@ -145,4 +150,29 @@ void USimulatedFindPathLoadComponent::Initialize()
 
 	SetComponentTickEnabled(true);
 	CanSimulateFindPath = true;
+}
+
+void USimulatedFindPathLoadComponent::UpdatePropertiesFromWorkerFlags()
+{
+	FString FlagValue;
+	MinDistanceToSimulate = USpatialWorkerFlags::GetWorkerFlag("pf_min_distance", FlagValue) ? FCString::Atof(*FlagValue) : MinDistanceToSimulate;
+	TickInterval = USpatialWorkerFlags::GetWorkerFlag("pf_tick_interval", FlagValue) ? FCString::Atof(*FlagValue) : TickInterval;
+	TickIntervalRandomDeviation = USpatialWorkerFlags::GetWorkerFlag("pf_tick_rand_delta", FlagValue) ? FCString::Atof(*FlagValue) : TickIntervalRandomDeviation;
+}
+
+void USimulatedFindPathLoadComponent::PrintProperties()
+{
+	if (USimulatedFindPathLoadComponent::bHasPrintedPropertiesForClass)
+	{
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("SimulatedFindPathLoadComponent properties:"));
+
+	UE_LOG(LogTemp, Warning, TEXT("  MinDistanceToSimulate = %f"), MinDistanceToSimulate);
+	UE_LOG(LogTemp, Warning, TEXT("  TickInterval = %f"), TickInterval);
+	UE_LOG(LogTemp, Warning, TEXT("  TickIntervalRandomDeviation = %f"), TickIntervalRandomDeviation);
+
+
+	USimulatedFindPathLoadComponent::bHasPrintedPropertiesForClass = true;
 }
