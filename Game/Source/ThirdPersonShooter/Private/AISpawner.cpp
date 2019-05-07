@@ -60,8 +60,9 @@ void AAISpawner::SpawnInitial()
 	for (TActorIterator<APlayerStart> Itr(GetWorld()); Itr; ++Itr)
 	{
 		FNavLocation SpawnPointOnNavMesh;
-		if (NavSys->GetRandomPointInNavigableRadius(Itr->GetActorLocation(), 10000.f, SpawnPointOnNavMesh))
+		if (NavSys->GetRandomPointInNavigableRadius(Itr->GetActorLocation(), 1000.f, SpawnPointOnNavMesh))
 		{
+			SpawnPointOnNavMesh.Location.Z += 35;
 			SpawnPoints.Add(SpawnPointOnNavMesh.Location);
 		}
 	}
