@@ -8,7 +8,7 @@
 #include "Runtime/Engine/Public/DrawDebugHelpers.h"
 #include "Stats/Stats.h"
 
-DECLARE_CYCLE_STAT(TEXT("Simulated Tracing Load Time"), STAT_SimulatedTracingLoadTime, STATGROUP_Game, );
+DECLARE_CYCLE_STAT(TEXT("Simulated Tracing Load Time"), STAT_SimulatedTracingLoadTime, STATGROUP_Game);
 
 bool USimulatedTracingLoadComponent::bHasPrintedPropertiesForClass = false;
 

@@ -10,7 +10,7 @@
 #include "Navigation/PathFollowingComponent.h"
 #include "Stats/Stats.h"
 
-DECLARE_CYCLE_STAT(TEXT("Simulated Pathfinding Load Time"), STAT_SimulatedFindPathLoadTime, STATGROUP_Game, );
+DECLARE_CYCLE_STAT(TEXT("Simulated Pathfinding Load Time"), STAT_SimulatedFindPathLoadTime, STATGROUP_Game);
 
 bool USimulatedFindPathLoadComponent::bHasPrintedPropertiesForClass = false;
 
