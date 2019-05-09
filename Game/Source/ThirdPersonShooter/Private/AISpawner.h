@@ -24,6 +24,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnAuthorityGained() override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 	void SpawnInitial();
 	void UpdateParameters();
 	void SpawnActor();
@@ -47,6 +49,12 @@ protected:
 private:
 	TArray<FVector> SpawnPoints;
 	TArray<APawn*> AICharacterHandles;
+
+	UPROPERTY(ReplicatedUsing = OnRep_HasCompletedSpawning)
+	bool HasCompletedSpawning;
+
+	UFUNCTION()
+	void OnRep_HasCompletedSpawning();
 
 	int NumSpawned = 0;
 	float SecondsSinceLastSpawn = 0.f;

@@ -36,6 +36,13 @@ void AAISpawner::BeginPlay()
 	SecondsSinceLastUpdateParameters = 0.f;
 }
 
+void AAISpawner::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AAISpawner, HasCompletedSpawning);
+}
+
 void AAISpawner::OnAuthorityGained()
 {
 	SpawnInitial();
@@ -131,11 +138,8 @@ void AAISpawner::Tick(float DeltaTime)
 
 	if (NumSpawned == NumAIToSpawn)
 	{
-		// Only start recording stats when all required AI are spawned
-		if (!bStatStarted)
-		{
-			StartStat();
-		}
+		HasCompletedSpawning = true;
+		StartStat();
 		return;
 	}
 
@@ -158,6 +162,11 @@ void AAISpawner::Tick(float DeltaTime)
 
 void AAISpawner::StartStat()
 {
+	if (bStatStarted)
+	{
+		return;
+	}
+
 	bStatStarted = true;
 
 	UWorld* World = GetWorld();
@@ -195,6 +204,14 @@ void AAISpawner::StopStat()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Executing stopfile"));
 		GEngine->Exec(World, TEXT("Stat StopFile"));
+	}
+}
+
+void AAISpawner::OnRep_HasCompletedSpawning()
+{
+	if (HasCompletedSpawning)
+	{
+		StartStat();
 	}
 }
 
