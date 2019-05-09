@@ -32,6 +32,18 @@
     {
         "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
         "name": "from_unreal_worker_update_size_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
+        "name": "from_unreal_worker_messages_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.WandererAICharacterC'} or vector(0)",
+        "name": "from_unreal_worker_update_size_rate1m_WandererAICharacterC"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.subobjects.CharMoveCompHandover'} or vector(0)",
+        "name": "from_unreal_worker_messages_rate1m_CharMoveCompHandover"
     }],
     "initialState": {
         "taggedSnapshot": {

@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "unr-1160-wanderers-ofl-172a0"
+        "name": "unr-1160-wanderers-ofl-31434"
     },
     "tags": [
     {
@@ -30,8 +30,36 @@
         "name": "node_memory_used_detail"
     },
     {
-        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
-        "name": "from_unreal_worker_update_size_rate1m"
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='AIWorker', direction='from_worker'} or vector(0)",
+        "name": "from_ai_worker_update_size_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='AIWorker', direction='from_worker'} or vector(0)",
+        "name": "from_ai_worker_messages_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='AIWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.WandererAICharacterC'} or vector(0)",
+        "name": "from_ai_worker_update_size_rate1m_WandererAICharacterC"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='AIWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.subobjects.CharMoveCompHandover'} or vector(0)",
+        "name": "from_ai_worker_messages_rate1m_CharMoveCompHandover"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='to_worker'} or vector(0)",
+        "name": "to_unreal_worker_update_size_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='to_worker'} or vector(0)",
+        "name": "to_unreal_worker_messages_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='to_worker' component_type='unreal.generated.wandereraicharacterc.WandererAICharacterC'} or vector(0)",
+        "name": "to_unreal_worker_update_size_rate1m_WandererAICharacterC"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='to_worker' component_type='unreal.generated.wandereraicharacterc.subobjects.CharMoveCompHandover'} or vector(0)",
+        "name": "to_unreal_worker_messages_rate1m_CharMoveCompHandover"
     }],
     "initialState": {
         "taggedSnapshot": {
