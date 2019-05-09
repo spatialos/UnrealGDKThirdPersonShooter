@@ -7,7 +7,7 @@
 #include "GameFramework/Character.h"
 #include "AISpawner.generated.h"
 
-UCLASS(SpatialType = (Singleton, ServerOnly), WorkerAssociation = "AIWorker")
+UCLASS(SpatialType = (Singleton, ServerOnly), WorkerAssociation = "UnrealWorker")
 class AAISpawner : public AActor
 {
 	GENERATED_BODY()
