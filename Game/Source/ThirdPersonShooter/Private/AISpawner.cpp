@@ -102,11 +102,17 @@ void AAISpawner::SpawnActor()
 	SecondsSinceLastSpawn = 0;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
 
 	int SpawnPointIndex = FMath::RandRange(0, SpawnPoints.Num() - 1);
 
 	APawn* SpawnedActor = GetWorld()->SpawnActor<APawn>(AICharacterTemplate, SpawnPoints[SpawnPointIndex], FRotator::ZeroRotator, SpawnParams);
+	if (!SpawnedActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("AISpawner: Failed to spawn actor. NumSpawned will not be incremented so this will be retried"));
+		return;
+	}
+
 	AICharacterHandles.Push(SpawnedActor);
 
 	NumSpawned++;
