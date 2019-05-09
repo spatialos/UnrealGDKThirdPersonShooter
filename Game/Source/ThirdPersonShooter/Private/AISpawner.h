@@ -52,6 +52,7 @@ private:
 	float SecondsSinceLastSpawn = 0.f;
 	float SecondsSinceLastUpdateParameters = 0.f;
 
+	bool bStatStarted;
 	void StartStat();
 	void StopStat();
 	FTimerHandle StatTimer;

@@ -3,6 +3,7 @@
 #include "AISpawner.h"
 #include "EngineUtils.h"
 #include "GameFramework/PlayerStart.h"
+#include "Runtime/Engine/Classes/Kismet/GameplayStatics.h"
 #include "Interop/SpatialWorkerFlags.h"
 #include "Engine/Engine.h"
 #include "NavigationSystem.h"
@@ -33,8 +34,6 @@ void AAISpawner::BeginPlay()
 	NumSpawned = 0;
 	SecondsSinceLastSpawn = 0.f;
 	SecondsSinceLastUpdateParameters = 0.f;
-
-	StartStat();
 }
 
 void AAISpawner::OnAuthorityGained()
@@ -132,6 +131,11 @@ void AAISpawner::Tick(float DeltaTime)
 
 	if (NumSpawned == NumAIToSpawn)
 	{
+		// Only start recording stats when all required AI are spawned
+		if (!bStatStarted)
+		{
+			StartStat();
+		}
 		return;
 	}
 
@@ -154,18 +158,29 @@ void AAISpawner::Tick(float DeltaTime)
 
 void AAISpawner::StartStat()
 {
+	bStatStarted = true;
+
 	UWorld* World = GetWorld();
 	if (World != nullptr)
 	{
-
 		FString FlagValue;
 		USpatialWorkerFlags::GetWorkerFlag("stat_duration", FlagValue);
 		float StatDuration = FCString::Atof(*FlagValue);
 
-		UE_LOG(LogTemp, Warning, TEXT("stat duration %f"), StatDuration);
+		UE_LOG(LogTemp, Warning, TEXT("AISpawner: Requested stat duration: %f"), StatDuration);
 		if (StatDuration > 0.f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Executing startfile"));
+			float WorldSeconds = UGameplayStatics::GetRealTimeSeconds(World); // the time it took to spawn all AI
+			float ScenarioLifetime = 600; // this is configured in the scenario JSON
+			float SafetyBufferSeconds = 60; // need to make sure stat file is saved before deployment stops
+			float TimeLeft = ScenarioLifetime - WorldSeconds - SafetyBufferSeconds;
+			if (TimeLeft < StatDuration)
+			{
+				StatDuration = TimeLeft;
+				UE_LOG(LogTemp, Warning, TEXT("AISpawner: stat duration override to %f"), StatDuration);
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("Executing startfile at %f"), WorldSeconds);
 			GEngine->Exec(World, TEXT("Stat StartFile"));
 
 			World->GetTimerManager().SetTimer(StatTimer, this, &AAISpawner::StopStat, StatDuration, false);
