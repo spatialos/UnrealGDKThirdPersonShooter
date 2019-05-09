@@ -79,6 +79,12 @@ void ATPSCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (!IsPlayerControlled())
+	{
+		FollowCamera->DestroyComponent();
+		CameraBoom->DestroyComponent();
+	}
+
 	// Only spawn a new starter weapon if we're authoritative and don't already have one.
 	if (HasAuthority())
 	{
