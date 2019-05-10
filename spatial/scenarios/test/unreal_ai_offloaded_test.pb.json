@@ -6,7 +6,7 @@
         "name": "unreal_gdk"
     },
     "assembly": {
-        "name": "unr-1160-wanderers-ofl-31434"
+        "name": "unr-1160-wanderers-ofl-af3c7"
     },
     "tags": [
     {
@@ -68,7 +68,7 @@
         }
     },
     "lifetime": {
-        "seconds": "780"
+        "seconds": "600"
     },
     "launchConfiguration": {
         "template": "w4_r0500_e5",
@@ -98,7 +98,7 @@
             "flags": [
             {
                 "name": "stat_duration",
-                "value": "600"
+                "value": "480"
             }],
             "loadBalancing": {
               "autoHexGrid": {
@@ -123,7 +123,7 @@
             },
             {
                 "name": "ai_num_to_spawn",
-                "value": "100"
+                "value": "250"
             },
             {
                 "name": "pf_min_distance",
@@ -131,19 +131,19 @@
             },
             {
                 "name": "pf_tick_interval",
-                "value": "5.0"
+                "value": "3.0"
             },
             {
                 "name": "pf_tick_rand_delta",
-                "value": "4.0"
+                "value": "0"
             },
             {
                 "name": "ray_count",
-                "value": "60"
+                "value": "100"
             },
             {
                 "name": "ray_length",
-                "value": "1000.0"
+                "value": "4000.0"
             },
             {
                 "name": "ray_tick_interval",
@@ -155,7 +155,7 @@
             },
             {
                 "name": "stat_duration",
-                "value": "600"
+                "value": "480"
             }],
             "loadBalancing": {
               "autoHexGrid": {
