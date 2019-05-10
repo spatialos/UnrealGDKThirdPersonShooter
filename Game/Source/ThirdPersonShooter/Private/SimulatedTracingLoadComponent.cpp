@@ -48,11 +48,15 @@ void USimulatedTracingLoadComponent::TickComponent(float DeltaTime, ELevelTick T
 
 void USimulatedTracingLoadComponent::SimulateLineTraceCircle()
 {
+	if (TraceCount == 0)
+	{
+		return;
+	}
+
 	float Angle = FMath::DegreesToRadians(360 / TraceCount);
 
 	for (int k = 0; k < TraceCount; k++)
 	{
-
 		FVector TraceDirection = FVector{ FMath::Cos(k * Angle), FMath::Sin(k * Angle), 0 };
 		SimulateLineTrace(TraceDirection);
 	}
