@@ -1,0 +1,30 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Platform)' == 'x64' And ('$(Configuration)' == 'DebugWindows' Or '$(Configuration)' == 'DebugMacOS' Or '$(Configuration)' == 'DebugLinux')">
+    <DebugSymbols>true</DebugSymbols>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Platform)' == 'x64' And ('$(Configuration)' == 'ReleaseWindows' Or '$(Configuration)' == 'ReleaseMacOS' Or '$(Configuration)' == 'ReleaseLinux')">
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <UseVSHostingProcess>false</UseVSHostingProcess>
+  </PropertyGroup>
+
+  <Target Name="AfterBuild">
+    <PropertyGroup>
+      <OutputArtifact>&quot;../../build/assembly/worker/$(AssemblyName)&quot;</OutputArtifact>
+      <!-- Avoiding shell globbing on *nix -->
+      <InputGlob>&quot;*&quot;</InputGlob>
+      <WorkerPackageCommand>spatial</WorkerPackageCommand>
+    </PropertyGroup>    
+    <Exec Command="xcopy /y ..\..\scenarios\utils\run_test_linux.sh $(TargetDir)"/>
+    <Exec Command="xcopy /y /i $(TargetDir)* ..\..\build\dependencies\WorkerCoordinator\"/>
+  </Target>
+</Project>
