@@ -5,10 +5,11 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Teams/TPSTeams.h"
+#include "SimulatedPlayer/SimulatableCharacter.h"
 #include "TPSCharacter.generated.h"
 
 UCLASS(SpatialType, config = Game)
-class ATPSCharacter : public ACharacter
+class ATPSCharacter : public ASimulatableCharacter
 {
 	GENERATED_BODY()
 
