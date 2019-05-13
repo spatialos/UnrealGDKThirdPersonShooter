@@ -1,0 +1,176 @@
+{
+    "identifier": {
+        "name": "ai_on_game_worker_players"
+    },
+    "projectId": {
+        "name": "unreal_gdk"
+    },
+    "assembly": {
+        "name": "unr-1160-wanderers-gs-3eb31"
+    },
+    "tags": [
+    {
+        "name": "ai_perf"
+    },
+    {
+        "name": "ai_on_game_worker_players"
+    }],
+    "comment": "Baseline scenario with a single game logic worker and simulated players",
+    "metrics": [
+    {
+        "prometheusExpressionTemplate": "max(improbable_logging_logged_errors::sum{app='%project%',dpl='%deployment%',node_cat=''} or vector(0))",
+        "name": "error_log_count"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_node_cpu_used:ratio{project='%project%',dpl='%deployment%'} or vector(0)",
+        "name": "node_cpu_used_detail"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_node_memory_used:ratio{project=%project%,dpl='%deployment%'} or vector(0)",
+        "name": "node_memory_used_detail"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
+        "name": "from_unreal_worker_update_size_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker'} or vector(0)",
+        "name": "from_unreal_worker_messages_rate1m"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_size_bytes::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.WandererAICharacterC'} or vector(0)",
+        "name": "from_unreal_worker_update_size_rate1m_WandererAICharacterC"
+    },
+    {
+        "prometheusExpressionTemplate": "spatialos_worker_update_messages::rate1m{project='%project%',dpl='%deployment%',worker_type='UnrealWorker', direction='from_worker' component_type='unreal.generated.wandereraicharacterc.subobjects.CharMoveCompHandover'} or vector(0)",
+        "name": "from_unreal_worker_messages_rate1m_CharMoveCompHandover"
+    }],
+    "initialState": {
+        "taggedSnapshot": {
+            "historyName": "ai_perf_base_history",
+            "snapshotTag": "wanderer_snapshot"
+        }
+    },
+    "lifetime": {
+        "seconds": "600"
+    },
+    "launchConfiguration": {
+        "template": "w4_r0500_e5",
+        "world": {
+            "chunkEdgeLengthMeters": "50",
+            "legacyFlags": [
+            {
+              "name": "bridge_soft_handover_enabled",
+              "value": "false"
+            },
+            {
+                "name": "enable_chunk_interest",
+                "value": "true"
+            },
+            {
+                "name": "load_snapshot_at_startup",
+                "value": "true"
+            }],
+            "dimensions": {
+                "xMeters": "2000",
+                "zMeters": "2000"
+            }
+        },
+        "workers": [
+        {
+            "workerType": "UnrealWorker",
+            "flags": [
+            {
+                "name": "ai_spawning_enabled",
+                "value": "True"
+            },
+            {
+                "name": "ai_min_seconds_between_spawns",
+                "value": "0.1"
+            },
+            {
+                "name": "ai_num_to_spawn",
+                "value": "0"
+            },
+            {
+                "name": "pf_min_distance",
+                "value": "10000.0"
+            },
+            {
+                "name": "pf_tick_interval",
+                "value": "5.0"
+            },
+            {
+                "name": "pf_tick_rand_delta",
+                "value": "4.0"
+            },
+            {
+                "name": "ray_count",
+                "value": "60"
+            },
+            {
+                "name": "ray_length",
+                "value": "1000.0"
+            },
+            {
+                "name": "ray_tick_interval",
+                "value": "0.2"
+            },
+            {
+                "name": "ray_tick_rand_delta",
+                "value": "0.0"
+            },
+            {
+                "name": "stat_duration",
+                "value": "480"
+            }],
+            "loadBalancing": {
+              "autoHexGrid": {
+                "numWorkers": 1
+              }
+            },
+            "permissions": [
+            {
+                "all": {}
+            }]
+        },
+        {
+            "workerType": "UnrealClient",
+            "flags": [],
+            "permissions": [
+            {
+                "all": {}
+            }]
+        }]
+    },
+    "genericClientNodes": [
+        {
+            "name": "sim_player_node_0",
+            "size": "double",
+            "config": {
+            "command": {
+                "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                "path": "./run_test_linux.sh",
+                "args": [
+                    "simulated_player_spawn_count=8",
+                    "coordinator_spawn_interval_millis=3000}",
+                    "coordinator_start_delay_millis=1000",
+                    "<IMPROBABLE_WORKER_ID>",
+                    "ThirdPersonShooter",
+                    "{receptionist_ip}?useExternalIpForBridge",
+                    "+workerType",
+                    "UnrealClient",
+                    "+workerId",
+                    "<IMPROBABLE_WORKER_ID>",
+                    "-abslog=${IMPROBABLE_LOG_FILE}",
+                    "-NoVerifyGC",
+                    "-nullRHI",
+                    "-simulatedplayer",
+                    "-OverrideSpatialNetworking"
+                    ]
+                },
+                "instances": 1
+            }
+        }
+    ]
+}
