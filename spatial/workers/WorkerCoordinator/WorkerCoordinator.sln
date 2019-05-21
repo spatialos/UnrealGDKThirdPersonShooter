@@ -1,0 +1,33 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerCoordinator", "WorkerCoordinator.csproj", "{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DebugLinux|x64 = DebugLinux|x64
+		DebugMacOS|x64 = DebugMacOS|x64
+		DebugWindows|x64 = DebugWindows|x64
+		ReleaseLinux|x64 = ReleaseLinux|x64
+		ReleaseMacOS|x64 = ReleaseMacOS|x64
+		ReleaseWindows|x64 = ReleaseWindows|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugLinux|x64.ActiveCfg = DebugLinux|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugLinux|x64.Build.0 = DebugLinux|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugMacOS|x64.ActiveCfg = DebugMacOS|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugMacOS|x64.Build.0 = DebugMacOS|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugWindows|x64.ActiveCfg = DebugWindows|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.DebugWindows|x64.Build.0 = DebugWindows|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseLinux|x64.ActiveCfg = ReleaseLinux|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseLinux|x64.Build.0 = ReleaseLinux|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseMacOS|x64.ActiveCfg = ReleaseMacOS|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseMacOS|x64.Build.0 = ReleaseMacOS|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseWindows|x64.ActiveCfg = ReleaseWindows|x64
+		{C41625B0-CDB7-4480-B2E4-AEB27AF3B198}.ReleaseWindows|x64.Build.0 = ReleaseWindows|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

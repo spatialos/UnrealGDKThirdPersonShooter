@@ -24,3 +24,4 @@ Game/Plugins/UnrealGDK/
 spatial/schema
 spatial/snapshots
 Game/Content/Spatial/SchemaDatabase.uasset
+!spatial/workers/WorkerCoordinator/*.sln
