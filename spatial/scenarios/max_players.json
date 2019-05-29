@@ -1,0 +1,585 @@
+{
+  "identifier":{
+    "name":"performancetest"
+  },
+  "project_id":{
+    "name":"demo"
+  },
+  "lifetime":{
+    "seconds":"6000"
+  },
+  "launch_configuration":{
+    "template": "large",
+    "world": {
+      "dimensions": {
+        "x_meters": 2000,
+        "z_meters": 2000
+      },
+      "chunkEdgeLengthMeters": 50,
+      "streaming_query_interval": 4,
+      "legacy_flags":[
+        {
+          "name": "bridge_qos_max_timeout",
+          "value": "0"
+        },
+        {
+          "name": "bridge_soft_handover_enabled",
+          "value": "false"
+        },
+        {
+          "name": "enable_chunk_interest",
+          "value": "false"
+        },
+        {
+          "name": "load_snapshot_at_startup",
+          "value": "true"
+        }
+      ],
+      "snapshots": {
+        "snapshotWritePeriodSeconds": 0
+      }
+    },
+    "load_balancing": {
+      "layer_configurations": [
+        {
+          "layer": "UnrealWorker",
+          "rectangle_grid": {
+            "cols": 1,
+            "rows": 1
+          }
+        }
+      ]
+    },
+    "workers": [
+      {
+        "worker_type": "UnrealClient",
+        "permissions": [
+          {
+            "all": {}
+          }
+        ]
+      },
+      {
+        "worker_type": "UnrealWorker",
+        "flags": [],
+        "permissions": [
+          {
+            "all": {}
+          }
+        ]
+      }
+    ]
+  },
+  "genericClientNodes": [
+    {
+      "name": "sim_player_node1",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=10000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node2",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=130000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node3",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=250000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node4",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=370000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node5",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=490000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node6",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=610000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node7",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=730000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node8",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=850000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node9",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=970000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node10",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1090000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node11",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1210000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node12",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1330000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node13",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1450000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node14",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1570000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node15",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1690000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node16",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=6",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1810000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    },
+    {
+      "name": "sim_player_node17",
+      "size": "double",
+      "config": {
+        "command": {
+          "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+          "path": "./run_test_linux.sh",
+          "args": [
+            "simulated_player_spawn_count=4",
+            "coordinator_spawn_interval_millis=20000",
+            "coordinator_start_delay_millis=1930000",
+
+            "<IMPROBABLE_WORKER_ID>",
+            "ThirdPersonShooter",
+            "{receptionist_ip}?useExternalIpForBridge",
+            "+workerType",
+            "UnrealClient",
+            "+workerId",
+            "<IMPROBABLE_WORKER_ID>",
+            "-abslog=${IMPROBABLE_LOG_FILE}",
+            "-NoVerifyGC",
+            "-nullRHI",
+            "-simulatedplayer",
+            "-useQBI",
+            "true"
+          ]
+        },
+        "instances": 1
+      }
+    }
+  ]
+}
