@@ -7,8 +7,7 @@
 #include "TimerManager.h"
 #include "ScaleTestableCharacter.generated.h"
 
-DECLARE_LOG_CATEGORY_EXTERN(LogBattleNonsense, Log, All);
-
+DECLARE_LOG_CATEGORY_EXTERN(LogSpatialLatencyTest, Log, All);
 
 UCLASS(config = Game, SpatialType)
 class AScaleTestableCharacter : public ACharacter
@@ -42,8 +41,6 @@ public:
 	// RPC for communicating fake shots to the server.
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerShoot();
-	bool ServerShoot_Validate();
-	void ServerShoot_Implementation();
 
 	// RPC for notifying clients of fake shots.
 	UFUNCTION(NetMulticast, Unreliable)

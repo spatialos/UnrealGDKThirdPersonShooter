@@ -1,16 +1,13 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "ScaleTestableCharacter.h"
-#include "c_worker.h"
+#include "Logging/LogMacros.h"
 #include "Misc/Parse.h"
 #include "PlatformTime.h"
-#include "Stats/Stats2.h"
 #include "SpatialNetDriver.h"
 #include "SpatialWorkerConnection.h"
-#include "Logging/LogMacros.h"
-
-#include "CoreMinimal.h"
-DEFINE_LOG_CATEGORY(LogBattleNonsense);
+#include "Stats/Stats2.h"
+#include "c_worker.h"
 
 #if PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
@@ -20,43 +17,45 @@ DEFINE_LOG_CATEGORY(LogBattleNonsense);
 #include "time.h"
 #endif
 
+DEFINE_LOG_CATEGORY(LogSpatialLatencyTest);
+
 inline void PrintTimestamp()
 {
 #if PLATFORM_WINDOWS
-	LARGE_INTEGER perfCount;
-	QueryPerformanceCounter(&perfCount);
-	UE_LOG(LogBattleNonsense, Display, TEXT("%lld"), perfCount.QuadPart);
+	LARGE_INTEGER PerfCount;
+	QueryPerformanceCounter(&PerfCount);
+	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld"), PerfCount.QuadPart);
 #elif PLATFORM_UNIX
-	timespec time;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &time);
-	UE_LOG(LogBattleNonsense, Display, TEXT("%lld %d"), time.tv_sec, time.tv_nsec);
+	timespec Time;
+	clock_gettime(CLOCK_MONOTONIC_RAW, &Time);
+	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld %d"), Time.tv_sec, Time.tv_nsec);
 #else
 #error Function not implemented on this platform.
 #endif
 }
 
-static TAutoConsoleVariable<int32> CVarBattleNonsenseDoJump(
-	TEXT("battle_nonsense.DoJump"),
+static TAutoConsoleVariable<int32> CVarSpatialLatencyTestDoJump(
+	TEXT("SpatialLatencyTest.DoJump"),
 	0,
 	TEXT("Whether to stimulate a jump for the purposes of lag testing"),
 	ECVF_Default);
 
-static TAutoConsoleVariable<int32> CVarBattleNonsenseListenForJump(
-	TEXT("battle_nonsense.ListenForJump"),
+static TAutoConsoleVariable<int32> CVarSpatialLatencyTestListenForJump(
+	TEXT("SpatialLatencyTest.ListenForJump"),
 	0,
 	TEXT("Whether to listen for jumps for the purposes of lag testing"),
 	ECVF_Default);
 
-static TAutoConsoleVariable<int32> CVarBattleNonsenseListenForShoot(
-	TEXT("battle_nonsense.ListenForShoot"),
-	0,
-	TEXT("Whether to listen for shots for the purposes of lag testing"),
-	ECVF_Default);
-
-static TAutoConsoleVariable<int32> CVarBattleNonsenseDoShoot(
-	TEXT("battle_nonsense.DoShoot"),
+static TAutoConsoleVariable<int32> CVarSpatialLatencyTestDoShoot(
+	TEXT("SpatialLatencyTest.DoShoot"),
 	0,
 	TEXT("Whether to stimulate shots for the purposes of lag testing"),
+	ECVF_Default);
+
+static TAutoConsoleVariable<int32> CVarSpatialLatencyTestListenForShoot(
+	TEXT("SpatialLatencyTest.ListenForShoot"),
+	0,
+	TEXT("Whether to listen for shots for the purposes of lag testing"),
 	ECVF_Default);
 
 // Sets default values
@@ -110,7 +109,7 @@ void AScaleTestableCharacter::MulticastNotifyHit_Implementation()
 		return;
 	}
 
-	if (CVarBattleNonsenseListenForShoot.GetValueOnGameThread())
+	if (CVarSpatialLatencyTestListenForShoot.GetValueOnGameThread())
 	{
 		// Notify we have recieved the shot
 		PrintTimestamp();
@@ -130,12 +129,12 @@ void AScaleTestableCharacter::BeginPlay()
 	GetWorldTimerManager().SetTimer(TimerHandler, this, &AScaleTestableCharacter::TurnRight, 1.0f,
 									true, 0.0f);
 
-	if (CVarBattleNonsenseDoJump.GetValueOnGameThread())
+	if (CVarSpatialLatencyTestDoJump.GetValueOnGameThread())
 	{
 		GetWorldTimerManager().SetTimer(TimerHandler, this, &AScaleTestableCharacter::StimulateJump, 2.0f, true);
 	}
 
-	if (CVarBattleNonsenseDoShoot.GetValueOnGameThread())
+	if (CVarSpatialLatencyTestDoShoot.GetValueOnGameThread())
 	{
 		GetWorldTimerManager().SetTimer(TimerHandler, this, &AScaleTestableCharacter::StimulateShoot, 2.0f, true);
 	}
@@ -151,7 +150,7 @@ void AScaleTestableCharacter::Tick(float DeltaTime)
 		AddMovementInput(Directions[DirectionIndex] * Speed);
 	}
 
-	if (CVarBattleNonsenseListenForJump.GetValueOnGameThread())
+	if (CVarSpatialLatencyTestListenForJump.GetValueOnGameThread())
 	{
 		if (Role == ROLE_SimulatedProxy)
 		{
