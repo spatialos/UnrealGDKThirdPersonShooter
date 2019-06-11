@@ -7,6 +7,8 @@
 #include "TimerManager.h"
 #include "ScaleTestableCharacter.generated.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogSpatialLatencyTest, Log, All);
+
 UCLASS(config = Game, SpatialType)
 class AScaleTestableCharacter : public ACharacter
 {
@@ -26,11 +28,24 @@ protected:
 	// Called for side to side input
 	void MoveRight(float Value);
 
+	// Automatically jump and record a time stamp for latency testing
+	void StimulateJump();
+
+	// Automatically shoot and record a time stamp for latency testing
+	void StimulateShoot(); 
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-	
+
+	// RPC for communicating fake shots to the server.
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerShoot();
+
+	// RPC for notifying clients of fake shots.
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastNotifyHit();
+
 private:
 	// Whether or not this is a fake client, to be determined by command line args
 	bool bIsSimulatedPlayer = false;
@@ -46,4 +61,6 @@ private:
 
 	// Magnitude multiplier used on movement impulses
 	float Speed = 0.5f;
+
+	bool bHasHitGround = false;
 };
