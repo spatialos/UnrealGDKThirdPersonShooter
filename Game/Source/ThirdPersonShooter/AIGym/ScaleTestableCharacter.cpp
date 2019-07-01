@@ -12,7 +12,7 @@
 #if PLATFORM_WINDOWS
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include "Windows.h"
+#include "Windows/MinWindows.h"
 #elif PLATFORM_UNIX
 #include "time.h"
 #endif
