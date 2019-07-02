@@ -17,7 +17,7 @@
 // for details on the build issue.
 #define ENABLE_WINDOWS_LATENCY_OUTPUT 0
 
-#if PLATFORM_WINDOWS && ENABLE_WINDOWS_LATENCY_OUTPUT
+#if PLATFORM_WINDOWS && ENABLE_WINDOWS_LATENCY_OUTPUT == 1
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
 #include "Windows.h"
@@ -30,7 +30,7 @@ DEFINE_LOG_CATEGORY(LogSpatialLatencyTest);
 inline void PrintTimestamp()
 {
 #if PLATFORM_WINDOWS
-#if ENABLE_WINDOWS_LATENCY_OUTPUT
+#if ENABLE_WINDOWS_LATENCY_OUTPUT == 1
 	UE_LOG(LogSpatialLatencyTest, Display, TEXT("Latency timestamps have been disabled on Windows."));
 #else
 	LARGE_INTEGER PerfCount;
