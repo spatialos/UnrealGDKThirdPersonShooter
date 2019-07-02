@@ -9,7 +9,19 @@
 #include "Stats/Stats2.h"
 #include "c_worker.h"
 
-#if PLATFORM_UNIX
+// Windows latency measurements do not build in CI.
+// If you are running latency measurements locally on Windows you will
+// have to enable this definition.
+//
+// See https://answers.unrealengine.com/questions/813258/updated-to-420-now-i-cant-build-error-c4668.html
+// for details on the build issue.
+#define ENABLE_WINDOWS_LATENCY_OUTPUT 0
+
+#if PLATFORM_WINDOWS && ENABLE_WINDOWS_LATENCY_OUTPUT
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include "Windows.h"
+#elif PLATFORM_UNIX
 #include "time.h"
 #endif
 
@@ -18,9 +30,13 @@ DEFINE_LOG_CATEGORY(LogSpatialLatencyTest);
 inline void PrintTimestamp()
 {
 #if PLATFORM_WINDOWS
+#if ENABLE_WINDOWS_LATENCY_OUTPUT
+	UE_LOG(LogSpatialLatencyTest, Display, TEXT("Latency timestamps have been disabled on Windows."));
+#else
 	LARGE_INTEGER PerfCount;
 	QueryPerformanceCounter(&PerfCount);
 	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld"), PerfCount.QuadPart);
+#endif
 #elif PLATFORM_UNIX
 	timespec Time;
 	clock_gettime(CLOCK_MONOTONIC_RAW, &Time);
