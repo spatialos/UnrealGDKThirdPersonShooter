@@ -9,29 +9,29 @@
 #include "Stats/Stats2.h"
 #include "c_worker.h"
 
-#if PLATFORM_WINDOWS
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include "Windows/MinWindows.h"
-#elif PLATFORM_UNIX
-#include "time.h"
-#endif
+// #if PLATFORM_WINDOWS
+// #define WIN32_LEAN_AND_MEAN
+// #define NOMINMAX
+// #include "Windows/MinWindows.h"
+// #elif PLATFORM_UNIX
+// #include "time.h"
+// #endif
 
 DEFINE_LOG_CATEGORY(LogSpatialLatencyTest);
 
 inline void PrintTimestamp()
 {
-#if PLATFORM_WINDOWS
-	LARGE_INTEGER PerfCount;
-	QueryPerformanceCounter(&PerfCount);
-	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld"), PerfCount.QuadPart);
-#elif PLATFORM_UNIX
-	timespec Time;
-	clock_gettime(CLOCK_MONOTONIC_RAW, &Time);
-	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld %d"), Time.tv_sec, Time.tv_nsec);
-#else
-#error Function not implemented on this platform.
-#endif
+// #if PLATFORM_WINDOWS
+// 	LARGE_INTEGER PerfCount;
+// 	QueryPerformanceCounter(&PerfCount);
+// 	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld"), PerfCount.QuadPart);
+// #elif PLATFORM_UNIX
+// 	timespec Time;
+// 	clock_gettime(CLOCK_MONOTONIC_RAW, &Time);
+// 	UE_LOG(LogSpatialLatencyTest, Display, TEXT("%lld %d"), Time.tv_sec, Time.tv_nsec);
+// #else
+// #error Function not implemented on this platform.
+// #endif
 }
 
 static TAutoConsoleVariable<int32> CVarSpatialLatencyTestDoJump(
