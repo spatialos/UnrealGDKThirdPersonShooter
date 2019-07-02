@@ -30,7 +30,7 @@ DEFINE_LOG_CATEGORY(LogSpatialLatencyTest);
 inline void PrintTimestamp()
 {
 #if PLATFORM_WINDOWS
-#if ENABLE_WINDOWS_LATENCY_OUTPUT == 1
+#if ENABLE_WINDOWS_LATENCY_OUTPUT == 0
 	UE_LOG(LogSpatialLatencyTest, Display, TEXT("Latency timestamps have been disabled on Windows."));
 #else
 	LARGE_INTEGER PerfCount;
