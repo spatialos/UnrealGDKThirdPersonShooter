@@ -1,7 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "Game/TPSGameInstance.h"
-#include "EngineUtils.h"
+#include "EngineMinimal.h"
 
 void UTPSGameInstance::Init() 
 {
