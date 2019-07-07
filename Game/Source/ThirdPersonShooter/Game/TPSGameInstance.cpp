@@ -1,6 +1,7 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "Game/TPSGameInstance.h"
+
 #include "EngineMinimal.h"
 
 void UTPSGameInstance::Init() 
@@ -19,9 +20,12 @@ bool UTPSGameInstance::Tick(float DeltaSeconds)
 
 	SecondsSinceFPSLog += DeltaSeconds;
 
-	if (SecondsSinceFPSLog > 1.0) {
+	if (SecondsSinceFPSLog > 1.0) 
+	{
 		SecondsSinceFPSLog = 0.0f;
 
-		UE_LOG(LogOnline, Display, TEXT("FramesPerSecond is %f"), AverageFPS);
+		UE_LOG(LogTPS, Display, TEXT("FramesPerSecond is %f"), AverageFPS);
 	}
+
+	return true;
 }
