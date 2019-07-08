@@ -214,7 +214,6 @@ void ATPSCharacter::Interact()
 
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("TPS_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
-	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = false;
 
 	FHitResult HitResult(ForceInit);
@@ -476,7 +475,7 @@ FVector ATPSCharacter::GetLineTraceDirection() const
 
 FString ATPSCharacter::GetPlayerName() const
 {
-	if (ATPSPlayerState* PS = Cast<ATPSPlayerState>(PlayerState))
+	if (ATPSPlayerState* PS = GetPlayerState<ATPSPlayerState>())
 	{
 		return PS->GetPlayerName();
 	}
