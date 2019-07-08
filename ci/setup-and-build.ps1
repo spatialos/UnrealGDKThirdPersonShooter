@@ -38,7 +38,7 @@ pushd "$game_home"
     Start-Event "set-up-gdk-plugin" "build-gdk-third-person-shooter-:windows:"
         pushd $gdk_home
             # Set the required variables for the GDK's setup script to use
-            $msbuild_exe = "${env:ProgramFiles(x86)}\MSBuild\14.0\bin\MSBuild.exe"
+            $msbuild_exe = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2017\BuildTools\MSBuild\15.0\Bin\MSBuild.exe"
 
             # Invoke the GDK's setup script
             &"$($gdk_home)\ci\setup-gdk.ps1"
