@@ -145,6 +145,12 @@ void ATPSPlayerController::SetPlayerUIVisible(bool bIsVisible)
 	}
 }
 
+FString ATPSPlayerController::GetWorkerId()
+{
+	USpatialNetDriver* SpatialNetDriver = Cast<USpatialNetDriver>(GetNetDriver());
+	return *SpatialNetDriver->Connection->GetWorkerId();
+}
+
 void ATPSPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();

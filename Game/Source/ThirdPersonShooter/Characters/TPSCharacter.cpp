@@ -89,7 +89,19 @@ void ATPSCharacter::BeginPlay()
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, 0.2f, false);
 
 		CurrentHealth = MaxHealth;
+
+		UE_LOG(LogTPS, Error, TEXT("BeginPlay Character"));
 	}
+}
+
+void ATPSCharacter::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	if (HasAuthority())
+	{
+		UE_LOG(LogTPS, Error, TEXT("EndPlay Character"));
+	}	
 }
 
 void ATPSCharacter::Tick(float DeltaSeconds)
@@ -119,7 +131,7 @@ void ATPSCharacter::UpdateTeamColor()
 
 	USkeletalMeshComponent* CharacterMesh = GetMesh();
 
-	switch (Team)
+	/*switch (Team)
 	{
 	case ETPSTeam::Team_Red:
 		CharacterMesh->SetMaterial(0, RedTeamMaterial);
@@ -147,7 +159,7 @@ void ATPSCharacter::UpdateTeamColor()
 		// If team value has not yet replicated, use the temporary colors
 		CharacterMesh->SetMaterial(0, NoneTeamMaterial);
 		break;
-	}
+	}*/
 }
 
 void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent)

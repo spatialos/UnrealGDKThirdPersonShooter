@@ -1,0 +1,1951 @@
+{
+    "identifier": {
+        "name": "16_25_zones"
+    },
+    "project_id": {
+        "name": "demo"
+    },
+    "lifetime": {
+        "seconds": "3600"
+    },
+    "deployment_configuration": {
+        "flagz": [
+            {
+                "name": "entity_id_reservation_cache_size",
+                "value": "20000"
+            },
+            {
+                "name": "enable_worker_system_entities",
+                "value": "false"
+            },
+            {
+                "name": "bridge_executors_num_single_threads",
+                "value": "32"
+            },
+            {
+                "name": "bridge_migration_enabled",
+                "value": "false"
+            },
+            {
+                "name": "bridge_qos_max_timeout",
+                "value": "0"
+            },
+            {
+                "name": "bridge_soft_handover_enabled",
+                "value": "false"
+            },
+            {
+                "name": "db_shard_processing_threads",
+                "value": "0"
+            },
+            {
+                "name": "db_shards_per_module",
+                "value": "1"
+            },
+            {
+                "name": "deployment_node_roles",
+                "value": "{\"nodeRoles\":[{\"nodeName\":\"master\",\"roles\":[\"MASTER\",\"RECEPTIONIST\"]},{\"node_name\": \"bridge1\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge2\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge3\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge4\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge5\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge6\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge7\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge8\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge9\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge10\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge11\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge12\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge13\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge14\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge15\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge16\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge17\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge18\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge19\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge20\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge21\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge22\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge23\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge24\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge25\",\"roles\":[\"BRIDGE\"]},{\"nodeName\":\"database1\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database2\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database3\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database4\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database5\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database6\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database7\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database8\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database9\",\"roles\":[\"ENTITY_DB\"]},{\"node_name\":\"turf1\",\"roles\":[\"AUTHORITY_ASSIGNER\",\"TURF_ENFORCER\"]},{\"nodeName\":\"inspection\",\"roles\":[\"INSPECTION\"]}]}"
+            },
+            {
+                "name": "enable_chunk_interest",
+                "value": "false"
+            },
+            {
+                "name": "enable_db_cache",
+                "value": "true"
+            },
+            {
+                "name": "db_cache_threads",
+                "value": "32"
+            },
+            {
+                "name": "db_cache_refresh_hz",
+                "value": "0.5"
+            },
+            {
+                "name": "enable_query_based_interest",
+                "value": "true"
+            },
+            {
+                "name": "enable_single_node_deployment",
+                "value": "false"
+            },
+            {
+                "name": "game_chunk_size",
+                "value": "50"
+            },
+            {
+                "name": "grpc_channel_event_loop_group_size",
+                "value": "0"
+            },
+            {
+                "name": "grpc_server_worker_event_loop_group_size",
+                "value": "0"
+            },
+            {
+                "name": "gsim_grid_enabled",
+                "value": "true"
+            },
+            {
+                "name": "gsim_grid_total_height",
+                "value": "2000"
+            },
+            {
+                "name": "gsim_grid_total_width",
+                "value": "2000"
+            },
+            {
+                "name": "load_snapshot_at_startup",
+                "value": "true"
+            },
+            {
+                "name": "loadbalancer_config_json",
+                "value": "{\"workerConfig\":[]}"
+            },
+            {
+                "name": "loadbalancer_v2_config_json",
+                "value": "{\"layerConfigurations\":[{\"layer\":\"UnrealWorker\",\"rectangleGrid\":{\"cols\":5,\"rows\":5}}]}"
+            },
+            {
+                "name": "minimum_worker_nodes_available_at_startup",
+                "value": "1"
+            },
+            {
+                "name": "num_turf_enforcement_service_threads",
+                "value": "4"
+            },
+            {
+                "name": "player_engine_type",
+                "value": "UnityClient"
+            },
+            {
+                "name": "qos_max_unacked_pings_rate",
+                "value": "0.999"
+            },
+            {
+                "name": "snapshot_write_period_seconds",
+                "value": "0"
+            },
+            {
+                "name": "streaming_query_interval",
+                "value": "4"
+            },
+            {
+                "name": "turf_enforcers_per_turf_enforcer_service",
+                "value": "9"
+            },
+            {
+                "name": "worker_permissions_config_json",
+                "value": "{\"workerPermission\":[{\"workerType\":\"UnrealClient\",\"permission\":[{\"specific\":{\"serviceName\":\"/sys/CreateEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/DeleteEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/cmd/SystemEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/EntityQuery\",\"permission\":\"{\\\"component\\\":[\\\"*\\\"]}\"}}]},{\"workerType\":\"UnrealWorker\",\"permission\":[{\"specific\":{\"serviceName\":\"/sys/CreateEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/DeleteEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/cmd/SystemEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/EntityQuery\",\"permission\":\"{\\\"component\\\":[\\\"*\\\"]}\"}}]}]}"
+            },
+            {
+                "name": "snapshot_tags",
+                "value": "regisseur"
+            }
+        ],
+        "nodes": [
+            {
+                "name": "master",
+                "size": "octa"
+            },
+            {
+                "name": "turf1",
+                "size": "quad"
+            },
+            {
+                "name": "bridge1",
+                "size": "quad"
+            },
+            {
+                "name": "bridge2",
+                "size": "quad"
+            },
+            {
+                "name": "bridge3",
+                "size": "quad"
+            },
+            {
+                "name": "bridge4",
+                "size": "quad"
+            },
+            {
+                "name": "bridge5",
+                "size": "quad"
+            },
+            {
+                "name": "bridge6",
+                "size": "quad"
+            },
+            {
+                "name": "bridge7",
+                "size": "quad"
+            },
+            {
+                "name": "bridge8",
+                "size": "quad"
+            },
+            {
+                "name": "bridge9",
+                "size": "quad"
+            },
+            {
+                "name": "bridge10",
+                "size": "quad"
+            },
+            {
+                "name": "bridge11",
+                "size": "quad"
+            },
+            {
+                "name": "bridge12",
+                "size": "quad"
+            },
+            {
+                "name": "bridge13",
+                "size": "quad"
+            },
+            {
+                "name": "bridge14",
+                "size": "quad"
+            },
+            {
+                "name": "bridge15",
+                "size": "quad"
+            },
+            {
+                "name": "bridge16",
+                "size": "quad"
+            },
+            {
+                "name": "bridge17",
+                "size": "quad"
+            },
+            {
+                "name": "bridge18",
+                "size": "quad"
+            },
+            {
+                "name": "bridge19",
+                "size": "quad"
+            },
+            {
+                "name": "bridge20",
+                "size": "quad"
+            },
+            {
+                "name": "bridge21",
+                "size": "quad"
+            },
+            {
+                "name": "bridge22",
+                "size": "quad"
+            },
+            {
+                "name": "bridge23",
+                "size": "quad"
+            },
+            {
+                "name": "bridge24",
+                "size": "quad"
+            },
+            {
+                "name": "bridge25",
+                "size": "quad"
+            },
+            {
+                "name": "database1",
+                "size": "quad"
+            },
+            {
+                "name": "database2",
+                "size": "quad"
+            },
+            {
+                "name": "database3",
+                "size": "quad"
+            },
+            {
+                "name": "database4",
+                "size": "quad"
+            },
+            {
+                "name": "database5",
+                "size": "quad"
+            },
+            {
+                "name": "database6",
+                "size": "quad"
+            },
+            {
+                "name": "database7",
+                "size": "quad"
+            },
+            {
+                "name": "database8",
+                "size": "quad"
+            },
+            {
+                "name": "database9",
+                "size": "quad"
+            },
+            {
+                "name": "inspection",
+                "size": "single"
+            }
+        ],
+        "workerFlagz": [
+            {
+                "workerType": "UnrealClient"
+            },
+            {
+                "workerType": "UnrealWorker",
+                "flagz": [
+                    {
+                        "name": "lb_cols",
+                        "value": "5"
+                    },
+                    {
+                        "name": "lb_rows",
+                        "value": "5"
+                    },
+                    {
+                        "name": "lb_world_size",
+                        "value": "2000"
+                    }
+                ]
+            }
+        ],
+        "workerNodes": [
+            {
+                "name": "worker_nanny1",
+                "size": "octa"
+            },
+            {
+                "name": "worker_nanny2",
+                "size": "octa"
+            }
+        ]
+    },
+    "genericClientNodes": [
+        {
+            "name": "sim_player_node600",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=10000",
+                        "node_index=0",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node590",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=40000",
+                        "node_index=1",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node580",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=70000",
+                        "node_index=2",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node570",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=100000",
+                        "node_index=3",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node560",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=130000",
+                        "node_index=4",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node550",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=160000",
+                        "node_index=5",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node540",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=190000",
+                        "node_index=6",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node530",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=220000",
+                        "node_index=7",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node520",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=250000",
+                        "node_index=8",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node510",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=280000",
+                        "node_index=9",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node500",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=310000",
+                        "node_index=10",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node490",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=340000",
+                        "node_index=11",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node480",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=370000",
+                        "node_index=12",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node470",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=400000",
+                        "node_index=13",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node460",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=430000",
+                        "node_index=14",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node450",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=460000",
+                        "node_index=15",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node440",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=490000",
+                        "node_index=16",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node430",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=520000",
+                        "node_index=17",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node420",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=550000",
+                        "node_index=18",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node410",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=580000",
+                        "node_index=19",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node400",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=610000",
+                        "node_index=20",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node390",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=640000",
+                        "node_index=21",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node380",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=670000",
+                        "node_index=22",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node370",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=700000",
+                        "node_index=23",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node360",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=730000",
+                        "node_index=24",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node350",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=760000",
+                        "node_index=25",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node340",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=790000",
+                        "node_index=26",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node330",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=820000",
+                        "node_index=27",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node320",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=850000",
+                        "node_index=28",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node310",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=880000",
+                        "node_index=29",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node300",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=910000",
+                        "node_index=30",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node290",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=940000",
+                        "node_index=31",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node280",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=970000",
+                        "node_index=32",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node270",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1000000",
+                        "node_index=33",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node260",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1030000",
+                        "node_index=34",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node250",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1060000",
+                        "node_index=35",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node240",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1090000",
+                        "node_index=36",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node230",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1120000",
+                        "node_index=37",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node220",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1150000",
+                        "node_index=38",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node210",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1180000",
+                        "node_index=39",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node200",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1210000",
+                        "node_index=40",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node190",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1240000",
+                        "node_index=41",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node180",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1270000",
+                        "node_index=42",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node170",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1300000",
+                        "node_index=43",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node160",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1330000",
+                        "node_index=44",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node150",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1360000",
+                        "node_index=45",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node140",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1390000",
+                        "node_index=46",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node130",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1420000",
+                        "node_index=47",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node120",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1450000",
+                        "node_index=48",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node110",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1480000",
+                        "node_index=49",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node100",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1510000",
+                        "node_index=50",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node90",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1540000",
+                        "node_index=51",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node80",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1570000",
+                        "node_index=52",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node70",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1600000",
+                        "node_index=53",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node60",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1630000",
+                        "node_index=54",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node50",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1660000",
+                        "node_index=55",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node40",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1690000",
+                        "node_index=56",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node30",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1720000",
+                        "node_index=57",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node20",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1750000",
+                        "node_index=58",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        },
+        {
+            "name": "sim_player_node10",
+            "size": "quad",
+            "config": {
+                "command": {
+                    "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+                    "path": "./StartCoordinator.sh",
+                    "args": [
+                        "simulated_player_spawn_count=10",
+                        "coordinator_spawn_interval_millis=3000",
+                        "coordinator_start_delay_millis=1780000",
+                        "node_index=59",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "{receptionist_ip}?useExternalIpForBridge",
+                        "+workerType",
+                        "UnrealClient",
+                        "+workerId",
+                        "<IMPROBABLE_WORKER_ID>",
+                        "-abslog=${IMPROBABLE_LOG_FILE}",
+                        "-NoVerifyGC",
+                        "-nullRHI",
+                        "-simulatedplayer"
+                    ]
+                },
+                "instances": 1
+            }
+        }
+    ]
+}

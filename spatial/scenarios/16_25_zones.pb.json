@@ -1,0 +1,359 @@
+{
+    "identifier":{
+      "name":"16_25_zones"
+    },
+    "project_id":{
+      "name":"demo"
+    },
+    "lifetime":{
+      "seconds":"3600"
+    },
+    "deployment_configuration": {
+      "flagz": [
+        {
+          "name": "entity_id_reservation_cache_size",
+          "value": "20000"
+        },
+        {
+          "name": "enable_worker_system_entities",
+          "value": "false"
+        },
+          {
+              "name": "bridge_executors_num_single_threads",
+              "value": "32"
+          },
+          {
+              "name": "bridge_migration_enabled",
+              "value": "false"
+          },
+          {
+              "name": "bridge_qos_max_timeout",
+              "value": "0"
+          },
+          {
+              "name": "bridge_soft_handover_enabled",
+              "value": "false"
+          },
+          {
+              "name": "db_shard_processing_threads",
+              "value": "0"
+          },
+          {
+            "name": "db_shards_per_module",
+            "value": "1"
+          },
+          {
+              "name": "deployment_node_roles",
+              "value": "{\"nodeRoles\":[{\"nodeName\":\"master\",\"roles\":[\"MASTER\",\"RECEPTIONIST\"]},{\"node_name\": \"bridge1\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge2\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge3\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge4\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge5\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge6\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge7\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge8\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge9\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge10\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge11\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge12\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge13\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge14\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge15\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge16\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge17\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge18\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge19\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge20\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge21\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge22\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge23\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge24\",\"roles\":[\"BRIDGE\"]},{\"node_name\": \"bridge25\",\"roles\":[\"BRIDGE\"]},{\"nodeName\":\"database1\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database2\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database3\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database4\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database5\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database6\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database7\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database8\",\"roles\":[\"ENTITY_DB\"]},{\"nodeName\":\"database9\",\"roles\":[\"ENTITY_DB\"]},{\"node_name\":\"turf1\",\"roles\":[\"AUTHORITY_ASSIGNER\",\"TURF_ENFORCER\"]},{\"nodeName\":\"inspection\",\"roles\":[\"INSPECTION\"]}]}"
+          },
+          {
+              "name": "enable_chunk_interest",
+              "value": "false"
+          },
+          {
+              "name": "enable_db_cache",
+              "value": "true"
+          },
+          {
+            "name": "db_cache_threads",
+            "value": "32"
+          },
+          {
+            "name": "db_cache_refresh_hz",
+            "value": "0.5"
+          },
+          {
+              "name": "enable_query_based_interest",
+              "value": "true"
+          },
+          {
+              "name": "enable_single_node_deployment",
+              "value": "false"
+          },
+          {
+              "name": "game_chunk_size",
+              "value": "50"
+          },
+          {
+              "name": "grpc_channel_event_loop_group_size",
+              "value": "0"
+          },
+          {
+              "name": "grpc_server_worker_event_loop_group_size",
+              "value": "0"
+          },
+          {
+              "name": "gsim_grid_enabled",
+              "value": "true"
+          },
+          {
+              "name": "gsim_grid_total_height",
+              "value": "2000"
+          },
+          {
+              "name": "gsim_grid_total_width",
+              "value": "2000"
+          },
+          {
+              "name": "load_snapshot_at_startup",
+              "value": "true"
+          },
+          {
+              "name": "loadbalancer_config_json",
+              "value": "{\"workerConfig\":[]}"
+          },
+          {
+              "name": "loadbalancer_v2_config_json",
+              "value": "{\"layerConfigurations\":[{\"layer\":\"UnrealWorker\",\"rectangleGrid\":{\"cols\":5,\"rows\":5}}]}"
+          },
+          {
+              "name": "minimum_worker_nodes_available_at_startup",
+              "value": "1"
+          },
+          {
+              "name": "num_turf_enforcement_service_threads",
+              "value": "4"
+          },
+          {
+              "name": "player_engine_type",
+              "value": "UnityClient"
+          },
+          {
+              "name": "qos_max_unacked_pings_rate",
+              "value": "0.999"
+          },
+          {
+              "name": "snapshot_write_period_seconds",
+              "value": "0"
+          },
+          {
+              "name": "streaming_query_interval",
+              "value": "4"
+          },
+          {
+              "name": "turf_enforcers_per_turf_enforcer_service",
+              "value": "9"
+          },
+          {
+              "name": "worker_permissions_config_json",
+              "value": "{\"workerPermission\":[{\"workerType\":\"UnrealClient\",\"permission\":[{\"specific\":{\"serviceName\":\"/sys/CreateEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/DeleteEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/cmd/SystemEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/EntityQuery\",\"permission\":\"{\\\"component\\\":[\\\"*\\\"]}\"}}]},{\"workerType\":\"UnrealWorker\",\"permission\":[{\"specific\":{\"serviceName\":\"/sys/CreateEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/DeleteEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/cmd/SystemEntity\",\"permission\":\"\"}},{\"specific\":{\"serviceName\":\"/sys/EntityQuery\",\"permission\":\"{\\\"component\\\":[\\\"*\\\"]}\"}}]}]}"
+          },
+          {
+              "name": "snapshot_tags",
+              "value": "regisseur"
+          }
+      ],
+      "nodes": [
+          {
+            "name": "master",
+            "size": "octa"
+          },
+          {
+            "name": "turf1",
+            "size": "quad"
+          },
+          {
+            "name": "bridge1",
+            "size": "quad"
+          },
+          {
+            "name": "bridge2",
+            "size": "quad"
+          },
+          {
+            "name": "bridge3",
+            "size": "quad"
+          },
+          {
+            "name": "bridge4",
+            "size": "quad"
+          },
+          {
+            "name": "bridge5",
+            "size": "quad"
+          },
+          {
+            "name": "bridge6",
+            "size": "quad"
+          },
+          {
+            "name": "bridge7",
+            "size": "quad"
+          },
+          {
+            "name": "bridge8",
+            "size": "quad"
+          },
+          {
+            "name": "bridge9",
+            "size": "quad"
+          },
+          {
+            "name": "bridge10",
+            "size": "quad"
+          },
+          {
+            "name": "bridge11",
+            "size": "quad"
+          },
+          {
+            "name": "bridge12",
+            "size": "quad"
+          },
+          {
+            "name": "bridge13",
+            "size": "quad"
+          },
+          {
+            "name": "bridge14",
+            "size": "quad"
+          },
+          {
+            "name": "bridge15",
+            "size": "quad"
+          },
+          {
+            "name": "bridge16",
+            "size": "quad"
+          },
+          {
+            "name": "bridge17",
+            "size": "quad"
+          },
+          {
+            "name": "bridge18",
+            "size": "quad"
+          },
+          {
+            "name": "bridge19",
+            "size": "quad"
+          },
+          {
+            "name": "bridge20",
+            "size": "quad"
+          },
+          {
+            "name": "bridge21",
+            "size": "quad"
+          },
+          {
+            "name": "bridge22",
+            "size": "quad"
+          },
+          {
+            "name": "bridge23",
+            "size": "quad"
+          },
+          {
+            "name": "bridge24",
+            "size": "quad"
+          },
+          {
+            "name": "bridge25",
+            "size": "quad"
+          },
+          {
+            "name": "database1",
+            "size": "quad"
+          },
+          {
+            "name": "database2",
+            "size": "quad"
+          },
+          {
+            "name": "database3",
+            "size": "quad"
+          },
+          {
+            "name": "database4",
+            "size": "quad"
+          },
+          {
+            "name": "database5",
+            "size": "quad"
+          },
+          {
+            "name": "database6",
+            "size": "quad"
+          },
+          {
+            "name": "database7",
+            "size": "quad"
+          },
+          {
+            "name": "database8",
+            "size": "quad"
+          },
+          {
+            "name": "database9",
+            "size": "quad"
+          },
+          {
+            "name": "inspection",
+            "size": "single"
+          }
+      ],
+      "workerFlagz": [
+          {
+              "workerType": "UnrealClient"
+          },
+          {
+              "workerType": "UnrealWorker",
+              "flagz": [
+                  {
+                      "name": "lb_cols",
+                      "value": "5"
+                  },
+                  {
+                      "name": "lb_rows",
+                      "value": "5"
+                  },
+                  {
+                      "name": "lb_world_size",
+                      "value": "2000"
+                  }
+              ]
+          }
+      ],
+      "workerNodes": [
+          {
+              "name": "worker_nanny1",
+              "size": "octa"
+          },
+          {
+            "name": "worker_nanny2",
+            "size": "octa"
+        }
+      ]
+    },
+    "genericClientNodes": [
+      {
+        "name": "sim_player_node1",
+        "size": "quad",
+        "config": {
+          "command": {
+            "assemblyZip": "UnrealSimulatedPlayer@Linux.zip",
+            "path": "./StartCoordinator.sh",
+            "args": [
+              "simulated_player_spawn_count=6",
+              "coordinator_spawn_interval_millis=3000",
+              "coordinator_start_delay_millis=10000",
+              "node_index=0",
+              "<IMPROBABLE_WORKER_ID>",
+              
+              "{receptionist_ip}?useExternalIpForBridge",
+              "+workerType",
+              "UnrealClient",
+              "+workerId",
+              "<IMPROBABLE_WORKER_ID>",
+              "-abslog=${IMPROBABLE_LOG_FILE}",
+              "-NoVerifyGC",
+              "-nullRHI",
+              "-simulatedplayer"
+            ]
+          },
+          "instances": 1
+        }
+      }
+    ]
+  }

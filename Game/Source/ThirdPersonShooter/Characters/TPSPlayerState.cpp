@@ -12,4 +12,5 @@ void ATPSPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(ATPSPlayerState, SelectedTeam);
+	DOREPLIFETIME(ATPSPlayerState, SpawnIndex);
 }

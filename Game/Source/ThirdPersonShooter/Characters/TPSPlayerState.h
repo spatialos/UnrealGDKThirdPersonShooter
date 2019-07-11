@@ -24,6 +24,10 @@ protected:
 	CharacterListenerDelegate CharacterListenerSelectedTeam;
 	
 public:
+	UPROPERTY(Replicated, BlueprintReadWrite)
+	int32 SpawnIndex;
+
 	void SetSelectedTeam(const ETPSTeam& NewSelectedTeam) { SelectedTeam = NewSelectedTeam; }
+
 	const ETPSTeam GetSelectedTeam() const { return SelectedTeam; }
 };

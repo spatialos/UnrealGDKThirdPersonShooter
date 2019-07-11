@@ -31,7 +31,7 @@
           "layer": "UnrealWorker",
           "rectangle_grid": {
               "cols": 1,
-              "rows": 2
+              "rows": 1
           },
           "options": {
             "manual_worker_connection_only": true
@@ -42,7 +42,20 @@
   "workers": [
     {
       "worker_type": "UnrealWorker",
-      "flags" : [],
+      "flags" : [
+        {
+          "name": "lb_cols",
+          "value": "4"
+        },
+        {
+          "name": "lb_rows",
+          "value": "4"
+        },
+        {
+          "name": "lb_world_size",
+          "value": "2000"
+        }
+      ],
       "permissions": [
         {
           "all": {}
