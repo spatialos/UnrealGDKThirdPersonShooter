@@ -41,7 +41,7 @@ void AAIGymGameMode::InitGameState()
 		ParsePassedValues();
 		ClearExistingSpawnPoints();
 		GenerateSpawnPoints(Clusters);
-		SpawnBots();
+		SpawnNPCs();
 	}
 }
 
@@ -52,11 +52,11 @@ bool AAIGymGameMode::ShouldUseCustomSpawning()
 	return (WorkerValue.Equals(TEXT("true"), ESearchCase::IgnoreCase) || FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")));
 }
 
-void AAIGymGameMode::SpawnBots()
+void AAIGymGameMode::SpawnNPCs()
 {
 	if (Clusters > SpawnPoints.Num())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Couldn't spawn bots - the number of clusters (%d) is higher than the existing spawn points (%d)."), Clusters, SpawnPoints.Num());
+		UE_LOG(LogTemp, Error, TEXT("Couldn't spawn NPCs - the number of clusters (%d) is higher than the existing spawn points (%d)."), Clusters, SpawnPoints.Num());
 		return;
 	}
 
@@ -65,26 +65,24 @@ void AAIGymGameMode::SpawnBots()
 		AActor* SpawnPoint = SpawnPoints[i];
 
 		FVector SpawnLocation = SpawnPoint->GetActorLocation();
-		for (int32 j = 0; j < BotsToPlayerRatio; j++)
+		for (int32 j = 0; j < NPCsToPlayerRatio; j++)
 		{
-			SpawnBot(SpawnLocation);
+			SpawnNPC(SpawnLocation);
 		}
 	}
 }
 
-void AAIGymGameMode::SpawnBot(FVector SpawnLocation)
+void AAIGymGameMode::SpawnNPC(FVector SpawnLocation)
 {
 	UWorld* const World = GetWorld();
 	
-	UE_LOG(LogTemp, Warning, TEXT("Spawning a bot at %s."), *SpawnLocation.ToString());
+	UE_LOG(LogTemp, Log, TEXT("Spawning a NPC at %s."), *SpawnLocation.ToString());
 
 	if (World && NPCPawnClass != NULL) {
 		FActorSpawnParameters SpawnParams;
 		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		APawn* NPC = World->SpawnActor<APawn>(NPCPawnClass.GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator, SpawnParams);
-
-		UE_LOG(LogTemp, Warning, TEXT("Successfully spawned a bot at %s."), *SpawnLocation.ToString());
 	}
 }
 
@@ -95,7 +93,7 @@ void AAIGymGameMode::ParsePassedValues()
 	{
 		if (FParse::Param(FCommandLine::Get(), TEXT("PlayerDensity=")))
 		{
-			FParse::Value(FCommandLine::Get(), TEXT("PlayerDensity="), Density);
+			FParse::Value(FCommandLine::Get(), TEXT("PlayerDensity="), PlayerDensity);
 		}
 
 		if (FParse::Param(FCommandLine::Get(), TEXT("TotalPlayers=")))
@@ -103,17 +101,17 @@ void AAIGymGameMode::ParsePassedValues()
 			FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
 		}
 
-		if (FParse::Param(FCommandLine::Get(), TEXT("BotsToPlayerRatio=")))
+		if (FParse::Param(FCommandLine::Get(), TEXT("NPCsToPlayerRatio=")))
 		{
-			FParse::Value(FCommandLine::Get(), TEXT("BotsToPlayerRatio="), BotsToPlayerRatio);
+			FParse::Value(FCommandLine::Get(), TEXT("NPCsToPlayerRatio="), NPCsToPlayerRatio);
 		}
 	}
 	else
 	{
-		FString DensityString, TotalPlayersString, BotsToPlayersRatioString;
-		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("density"), DensityString))
+		FString PlayerDensityString, TotalPlayersString, NPCsToPlayersRatioString;
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("player_density"), PlayerDensityString))
 		{
-			Density = FCString::Atoi(*DensityString);
+			PlayerDensity = FCString::Atoi(*PlayerDensityString);
 		}
 
 		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
@@ -121,15 +119,15 @@ void AAIGymGameMode::ParsePassedValues()
 			TotalPlayers = FCString::Atoi(*TotalPlayersString);
 		}
 
-		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("bots_to_players_ratio"), BotsToPlayersRatioString))
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("npcs_to_players_ratio"), NPCsToPlayersRatioString))
 		{
-			BotsToPlayerRatio = FCString::Atoi(*BotsToPlayersRatioString);
+			NPCsToPlayerRatio = FCString::Atoi(*NPCsToPlayersRatioString);
 		}
 	}
 
-	if (Density != 0)
+	if (PlayerDensity != 0)
 	{
-		Clusters = TotalPlayers / Density;
+		Clusters = TotalPlayers / PlayerDensity;
 	}
 }
 
@@ -178,7 +176,7 @@ void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 	if (SpacingBetweenClusters < MinimumSpacingBetweenClusters)
 	{
 		UE_LOG(LogTemp, Error, 
-			TEXT("The checkout radius of one cluster can overlap with players from another cluster - reduce density or the entity checkout radius. Current configuration:\nWorld edge length (in SpatialOS units): %d\nPlayer checkout radius (in SpatialOS units): %f\nPadding between clusters: %d\nDesired number of clusters: %d\nOptimal number of clusters: %d"),
+			TEXT("The platers' checkout radius of one cluster can overlap with players' from another cluster - reduce density or the entity checkout radius. Current configuration:\nWorld edge length (in SpatialOS units): %d\nPlayer checkout radius (in SpatialOS units): %f\nPadding between clusters: %d\nDesired number of clusters: %d\nOptimal number of clusters: %d"),
 			EdgeLength / SpatialToUnrealWorldUnitRatio, PlayerCheckoutRadius / SpatialToUnrealWorldUnitRatio, MarginBetweenClusters, SpawnPointsNum, FMath::Square(EdgeLength / MinimumSpacingBetweenClusters));
 		return;
 	}
@@ -196,7 +194,7 @@ void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 			FVector SpawnLocation = FVector(x, y, Z);
 			if (GetWorld() != NULL)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
+				UE_LOG(LogTemp, Log, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
 				SpawnPoints.Add(GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), SpawnLocation, FRotator::ZeroRotator, SpawnInfo));
 			}
 
@@ -245,7 +243,7 @@ AActor* AAIGymGameMode::FindPlayerStart_Implementation(AController* Player, cons
 	AActor* ChosenSpawnPoint = SpawnPoints[PlayersSpawned % SpawnPoints.Num()];
 	PlayerIdToSpawnPointMap.Add(PlayerUniqueID, ChosenSpawnPoint);
 
-	UE_LOG(LogTemp, Warning, TEXT("Spawning player %d at %s."), PlayerUniqueID, *ChosenSpawnPoint->GetActorLocation().ToString());
+	UE_LOG(LogTemp, Log, TEXT("Spawning player %d at %s."), PlayerUniqueID, *ChosenSpawnPoint->GetActorLocation().ToString());
 
 	PlayersSpawned++;
 

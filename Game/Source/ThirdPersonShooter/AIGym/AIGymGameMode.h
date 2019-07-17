@@ -15,16 +15,11 @@ class AAIGymGameMode : public AGameModeBase
 public:
 	AAIGymGameMode();
 
-	//virtual void Tick(float DeltaSeconds) override;
-
-	int32 MaxActorsToReplicate;
-	int32 BruhMax;
-
 private:
 	int32 Clusters;
-	int32 Density;
+	int32 PlayerDensity;
 	int32 TotalPlayers;
-	int32 BotsToPlayerRatio;
+	int32 NPCsToPlayerRatio;
 	int32 PlayersSpawned;
 
 	float PlayerCheckoutRadius;
@@ -41,9 +36,9 @@ private:
 
 	bool ShouldUseCustomSpawning();
 
-	void SpawnBots();
+	void SpawnNPCs();
 
-	void SpawnBot(FVector SpawnLocation);
+	void SpawnNPC(FVector SpawnLocation);
 
 	void ParsePassedValues();
 
