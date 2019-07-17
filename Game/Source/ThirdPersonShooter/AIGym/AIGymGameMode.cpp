@@ -1,15 +1,15 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "AIGymGameMode.h"
-#include "UObject/ConstructorHelpers.h"
-#include "ScaleTestableCharacter.h"
-#include "SpatialWorkerFlags.h"
-#include "Engine/World.h"
-#include "GameFramework/PlayerStart.h"
 #include "Classes/Components/StaticMeshComponent.h"
 #include "Classes/Engine/StaticMesh.h"
-#include "Public/Rendering/PositionVertexBuffer.h"
+#include "Engine/World.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
+#include "Public/Rendering/PositionVertexBuffer.h"
+#include "ScaleTestableCharacter.h"
+#include "SpatialWorkerFlags.h"
+#include "UObject/ConstructorHelpers.h"
 
 AAIGymGameMode::AAIGymGameMode()
 {
