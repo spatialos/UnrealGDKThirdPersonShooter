@@ -184,6 +184,12 @@ void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 	{
 		for (int32 y = -(EdgeLength / 2); y < (EdgeLength / 2); y += SpacingBetweenClusters)
 		{
+			// Avoid creating more spawn locations than needed due to ceiling of sqrt
+			if (SpawnPoints.Num() >= SpawnPointsNum)
+			{
+				break;
+			}
+			
 			// NOTE: Might have to provide SpawnCollisionHandlingOverride in case simulated players stack on top of each other and as a result can't spawn
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.Owner = this;
@@ -195,12 +201,6 @@ void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 			{
 				UE_LOG(LogTemp, Log, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
 				SpawnPoints.Add(GetWorld()->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), SpawnLocation, FRotator::ZeroRotator, SpawnInfo));
-			}
-
-			// Avoid creating more spawn locations than needed due to ceiling of sqrt
-			if (SpawnPoints.Num() >= SpawnPointsNum)
-			{
-				break;
 			}
 		}
 	}
