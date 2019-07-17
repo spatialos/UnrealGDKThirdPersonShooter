@@ -27,7 +27,7 @@ AAIGymGameMode::AAIGymGameMode()
 	static ConstructorHelpers::FClassFinder<AActor> PlayerActorBPClass(TEXT("/Game/AIGym/AIGymCharacter_BP"));
 	if (PlayerActorBPClass.Class != NULL)
 	{
-		PlayerCheckoutRadius = PlayerActorBPClass.Class.GetDefaultObject()->CheckoutRadius;
+		PlayerCheckoutRadius = FGenericPlatformMath::Sqrt(PlayerActorBPClass.Class.GetDefaultObject()->NetCullDistanceSquared);
 		DefaultPawnClass = PlayerActorBPClass.Class;
 	}
 
