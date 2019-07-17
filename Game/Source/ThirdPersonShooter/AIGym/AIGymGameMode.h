@@ -27,10 +27,17 @@ private:
 	int32 BotsToPlayerRatio;
 	int32 PlayersSpawned;
 
+	float PlayerCheckoutRadius;
+
 	TArray<AActor*> SpawnPoints;
+	
+	TSubclassOf<APawn> NPCPawnClass;
+
 	TMap<int32, AActor*> PlayerIdToSpawnPointMap;
 
 	bool bHasUpdatedMaxActorsToReplicate = false;
+
+	virtual void InitGameState() override;
 
 	bool ShouldUseCustomSpawning();
 

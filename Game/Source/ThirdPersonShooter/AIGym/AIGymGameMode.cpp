@@ -2,7 +2,8 @@
 
 #include "AIGymGameMode.h"
 #include "UObject/ConstructorHelpers.h"
-
+#include "ScaleTestableCharacter.h"
+#include "SpatialWorkerFlags.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerStart.h"
 #include "Classes/Components/StaticMeshComponent.h"
@@ -12,6 +13,29 @@
 
 AAIGymGameMode::AAIGymGameMode()
 {
+	static ConstructorHelpers::FObjectFinder<UBlueprint> NPCBPClass(TEXT("Blueprint'/Game/AIGym/AIGymNPC'"));
+	
+	if (NPCBPClass.Object) {
+		NPCPawnClass = (UClass*)NPCBPClass.Object->GeneratedClass;
+	}
+
+	PlayersSpawned = 0;
+
+	PrimaryActorTick.bCanEverTick = true;
+
+	static ConstructorHelpers::FClassFinder<AActor> PlayerActorBPClass(TEXT("/Game/AIGym/AIGymCharacter_BP"));
+	if (PlayerActorBPClass.Class != NULL)
+	{
+		PlayerCheckoutRadius = PlayerActorBPClass.Class.GetDefaultObject()->CheckoutRadius;
+		DefaultPawnClass = PlayerActorBPClass.Class;
+	}
+
+	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
+	bUseSeamlessTravel = false;
+}
+
+void AAIGymGameMode::InitGameState()
+{
 	if (ShouldUseCustomSpawning())
 	{
 		ParsePassedValues();
@@ -19,25 +43,13 @@ AAIGymGameMode::AAIGymGameMode()
 		GenerateSpawnPoints(Clusters);
 		SpawnBots();
 	}
-
-	PlayersSpawned = 0;
-
-	PrimaryActorTick.bCanEverTick = true;
-
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/AIGym/AIGymCharacter_BP"));
-	if (PlayerPawnBPClass.Class != NULL)
-	{
-		DefaultPawnClass = PlayerPawnBPClass.Class;
-	}
-
-	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
-	bUseSeamlessTravel = false;
 }
 
 bool AAIGymGameMode::ShouldUseCustomSpawning()
 {
-	//TODO: Check if a worker flag or something is passed through the command line
-	return true;
+	FString WorkerValue;
+	USpatialWorkerFlags::GetWorkerFlag(TEXT("override_spawning"), WorkerValue);
+	return (WorkerValue.Equals(TEXT("true"), ESearchCase::IgnoreCase) || FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")));
 }
 
 void AAIGymGameMode::SpawnBots()
@@ -62,18 +74,63 @@ void AAIGymGameMode::SpawnBots()
 
 void AAIGymGameMode::SpawnBot(FVector SpawnLocation)
 {
-	// TODO: Spawn a bot at the target location
+	UWorld* const World = GetWorld();
+	
 	UE_LOG(LogTemp, Warning, TEXT("Spawning a bot at %s."), *SpawnLocation.ToString());
+
+	if (World && NPCPawnClass != NULL) {
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		APawn* NPC = World->SpawnActor<APawn>(NPCPawnClass.GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator, SpawnParams);
+
+		UE_LOG(LogTemp, Warning, TEXT("Successfully spawned a bot at %s."), *SpawnLocation.ToString());
+	}
 }
 
 void AAIGymGameMode::ParsePassedValues()
 {
-	// TODO: Parse the numbers from either a worker flag or something for Unreal Native
-	Density = 1;
-	TotalPlayers = 4;
-	BotsToPlayerRatio = 2;
+	// TODO: Check if the numbers are actually parsed
+	if (FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")))
+	{
+		if (FParse::Param(FCommandLine::Get(), TEXT("PlayerDensity=")))
+		{
+			FParse::Value(FCommandLine::Get(), TEXT("PlayerDensity="), Density);
+		}
 
-	Clusters = TotalPlayers / Density;
+		if (FParse::Param(FCommandLine::Get(), TEXT("TotalPlayers=")))
+		{
+			FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
+		}
+
+		if (FParse::Param(FCommandLine::Get(), TEXT("BotsToPlayerRatio=")))
+		{
+			FParse::Value(FCommandLine::Get(), TEXT("BotsToPlayerRatio="), BotsToPlayerRatio);
+		}
+	}
+	else
+	{
+		FString DensityString, TotalPlayersString, BotsToPlayersRatioString;
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("density"), DensityString))
+		{
+			Density = FCString::Atoi(*DensityString);
+		}
+
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
+		{
+			TotalPlayers = FCString::Atoi(*TotalPlayersString);
+		}
+
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("bots_to_players_ratio"), BotsToPlayersRatioString))
+		{
+			BotsToPlayerRatio = FCString::Atoi(*BotsToPlayersRatioString);
+		}
+	}
+
+	if (Density != 0)
+	{
+		Clusters = TotalPlayers / Density;
+	}
 }
 
 void AAIGymGameMode::ClearExistingSpawnPoints()
@@ -90,20 +147,47 @@ void AAIGymGameMode::ClearExistingSpawnPoints()
 
 void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 {
-	int EdgeLength = 5000;
+	// NOTE: Should check what the entity checkout radius is and make sure it's actually complyinng with the density
 	int Z = 105;
+
+	AStaticMeshActor* Floor = GetFloor();
+	if (Floor == NULL)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Couldn't find the 'Floor' to measure the bounds of the world."));
+		return;
+	}
+
+	if (SpawnPointsNum < 1)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Can't spawn requested %d spawn points - the spawn points number should be positive"), SpawnPointsNum);
+		return;
+	}
+	
+	FBox FloorBoundingBox = Floor->GetComponentsBoundingBox();
+	
+	// Multiply the actual bounds by 0.9 to accommodate the SpatialOS world and players not going outside of bounds
+	int EdgeLength = FMath::Abs(FloorBoundingBox.Min.X - FloorBoundingBox.Max.X) * 0.9;
 
 	int SpacingBetweenClusters = FMath::CeilToInt(EdgeLength / FGenericPlatformMath::Sqrt(SpawnPointsNum));
 
-	if (SpacingBetweenClusters > 300)
+	// Provides a ratio between Spatial world units and Unreal world units
+	int SpatialToUnrealWorldUnitRatio = 100;
+	int MarginBetweenClusters = 150;
+	int MinimumSpacingBetweenClusters = PlayerCheckoutRadius * 2 + MarginBetweenClusters * SpatialToUnrealWorldUnitRatio;
+
+	if (SpacingBetweenClusters < MinimumSpacingBetweenClusters)
 	{
-		UE_LOG(LogTemp, Error, TEXT("The checkout radius is bigger than the spacing between clusters - reduce density or the entity checkout radius."));
+		UE_LOG(LogTemp, Error, 
+			TEXT("The checkout radius of one cluster can overlap with players from another cluster - reduce density or the entity checkout radius. Current configuration:\nWorld edge length (in SpatialOS units): %d\nPlayer checkout radius (in SpatialOS units): %f\nPadding between clusters: %d\nDesired number of clusters: %d\nOptimal number of clusters: %d"),
+			EdgeLength / SpatialToUnrealWorldUnitRatio, PlayerCheckoutRadius / SpatialToUnrealWorldUnitRatio, MarginBetweenClusters, SpawnPointsNum, FMath::Square(EdgeLength / MinimumSpacingBetweenClusters));
+		return;
 	}
 
 	for (int32 x = - (EdgeLength / 2); x < (EdgeLength / 2); x += SpacingBetweenClusters)
 	{
 		for (int32 y = -(EdgeLength / 2); y < (EdgeLength / 2); y += SpacingBetweenClusters)
 		{
+			// NOTE: Might have to provide SpawnCollisionHandlingOverride in case simulated players stack on top of each other and as a result can't spawn
 			FActorSpawnParameters SpawnInfo;
 			SpawnInfo.Owner = this;
 			SpawnInfo.Instigator = NULL;
@@ -123,8 +207,6 @@ void AAIGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 			}
 		}
 	}
-
-	AStaticMeshActor* Floor = GetFloor();
 }
 
 AStaticMeshActor* AAIGymGameMode::GetFloor()
@@ -146,7 +228,7 @@ AStaticMeshActor* AAIGymGameMode::GetFloor()
 
 AActor* AAIGymGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
 {
-	if (!ShouldUseCustomSpawning())
+	if (!ShouldUseCustomSpawning() || SpawnPoints.Num() == 0)
 	{
 		return Super::FindPlayerStart_Implementation(Player, IncomingName);
 	}
