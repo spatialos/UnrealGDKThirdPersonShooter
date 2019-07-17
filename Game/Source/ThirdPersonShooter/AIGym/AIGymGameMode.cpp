@@ -88,7 +88,6 @@ void AAIGymGameMode::SpawnNPC(FVector SpawnLocation)
 
 void AAIGymGameMode::ParsePassedValues()
 {
-	// TODO: Check if the numbers are actually parsed
 	if (FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")))
 	{
 		if (FParse::Param(FCommandLine::Get(), TEXT("PlayerDensity=")))
