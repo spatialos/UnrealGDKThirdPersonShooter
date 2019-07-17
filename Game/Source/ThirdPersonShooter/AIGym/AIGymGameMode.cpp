@@ -18,7 +18,8 @@ AAIGymGameMode::AAIGymGameMode()
 	if (NPCBPClass.Object) {
 		NPCPawnClass = (UClass*)NPCBPClass.Object->GeneratedClass;
 	}
-
+	
+	NPCsToPlayerRatio = 0;
 	PlayersSpawned = 0;
 
 	PrimaryActorTick.bCanEverTick = true;
