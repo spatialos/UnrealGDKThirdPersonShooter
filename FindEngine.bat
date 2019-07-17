@@ -1,3 +1,7 @@
+@echo off
+
+setlocal EnableDelayedExpansion
+
 rem Get the Unreal Engine used by this project by querying the registry for the engine association found in the .uproject.
 set UNREAL_ENGINE=""
 set UPROJECT=""
@@ -62,3 +66,7 @@ if %UNREAL_ENGINE%=="" (
     pause
     exit /b 1
 )
+
+endlocal & set UNREAL_ENGINE=%UNREAL_ENGINE%
+
+echo Unreal engine found at: %UNREAL_ENGINE%
