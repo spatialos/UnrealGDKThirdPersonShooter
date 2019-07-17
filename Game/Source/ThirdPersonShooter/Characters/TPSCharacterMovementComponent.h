@@ -49,6 +49,9 @@ public:
 	// True if movement direction is within SprintDirectionTolerance of the look direction.
 	bool IsMovingForward() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Networking")
+	void SetSmoothingMode(ENetworkSmoothingMode Mode);
+	
 private:
 	// Override whether sprint is allowed.
 	uint8 bCanSprint : 1;

@@ -73,11 +73,13 @@ public:
 	UFUNCTION(CrossServer, Reliable)
 	void TakeGunDamage(float Damage, const struct FDamageEvent& DamageEvent, AController* EventInstigator, AActor* DamageCauser);
 
+	UFUNCTION(BlueprintPure, Category = "Health")
 	FORCEINLINE float GetCurrentHealth() const
 	{
 		return CurrentHealth;
 	}
 
+	UFUNCTION(BlueprintPure, Category = "Health")
 	FORCEINLINE float GetMaxHealth() const
 	{
 		return MaxHealth;

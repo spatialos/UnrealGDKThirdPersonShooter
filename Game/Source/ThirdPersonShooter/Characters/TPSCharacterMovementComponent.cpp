@@ -185,6 +185,11 @@ bool UTPSCharacterMovementComponent::IsMovingForward() const
 	return VelocityDot > SprintDirectionTolerance;
 }
 
+void UTPSCharacterMovementComponent::SetSmoothingMode(ENetworkSmoothingMode Mode)
+{
+	NetworkSmoothingMode = Mode;
+}
+
 void FSavedMove_TPSMovement::Clear()
 {
 	Super::Clear();

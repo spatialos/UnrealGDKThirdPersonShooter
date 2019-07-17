@@ -21,7 +21,7 @@
   "bridge": {
     "worker_attribute_set": {
       "attributes": [
-        "UnrealWorker"
+        "AIWorker"
       ]
     },
     "entity_interest": {
@@ -59,10 +59,6 @@
         "-nopause",
         "-messaging",
         "-SaveToUserDir",
-        "-userdir",
-        "./",
-        "+workerType",
-        "UnrealWorker",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
         "+receptionistHost",
@@ -74,7 +70,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
         "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
@@ -96,7 +92,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "RakNet",
+        "Tcp",
         "-NoVerifyGC"
       ]
     }

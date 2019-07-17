@@ -82,7 +82,10 @@ void AInstantWeapon::BeginPlay()
 		DoFire();
 	});
 
+#if !(UE_BUILD_SHIPPING || UE_BUILD_TEST)
 	GetWorld()->DebugDrawTraceTag = kTraceTag;
+#endif
+
 }
 
 void AInstantWeapon::DoFire()

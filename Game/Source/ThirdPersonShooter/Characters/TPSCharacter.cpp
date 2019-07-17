@@ -330,10 +330,12 @@ void ATPSCharacter::StartRagdoll()
 	}
 	LocalCapsuleComponent->SetSimulatePhysics(false);
 	LocalCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
 
 	// Enable mesh collision and physics.
 	USkeletalMeshComponent* MeshComponent = GetMesh();
+	MeshComponent->bEnableUpdateRateOptimizations = false;
 	MeshComponent->SetCollisionEnabled(ECollisionEnabled::PhysicsOnly);
 	MeshComponent->SetCollisionProfileName(FName(TEXT("Ragdoll")));
 	MeshComponent->SetSimulatePhysics(true);
