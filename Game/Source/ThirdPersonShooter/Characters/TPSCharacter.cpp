@@ -529,10 +529,7 @@ void ATPSCharacter::TakeGunDamage_Implementation(float Damage, const FDamageEven
 
 void ATPSCharacter::MulticastDamageTaken_Implementation(FVector damageSource)
 {
-	if (GetNetMode() == NM_Client)
-	{
-		OnDamageTaken(damageSource);
-	}
+	OnDamageTaken(damageSource);
 }
 
 bool ATPSCharacter::IsSprinting()

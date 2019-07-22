@@ -32,13 +32,13 @@
   "load_balancing": {
     "layer_configurations": [
       {
-          "layer": "UnrealWorker",
-          "rectangle_grid": {
-              "cols": 1,
-              "rows": 1
-          },
-          "options": {
-            "manual_worker_connection_only": false
+        "layer": "UnrealWorker",
+        "rectangle_grid": {
+            "cols": 1,
+            "rows": 1
+        },
+        "options": {
+          "manual_worker_connection_only": false
         }
       },
       {
@@ -58,12 +58,8 @@
       "worker_type": "UnrealWorker",
       "flags" : [
         {
-          "name": "num_bots",
-          "value": "200"
-        },
-        {
-          "name": "bot_update_interval",
-          "value": "2"
+          "name": "enable_stat_dumps",
+          "value": "1"
         }
       ],
       "permissions": [
@@ -81,7 +77,15 @@
         },
         {
           "name": "bot_update_interval",
-          "value": "2"
+          "value": "1"
+        },
+        {
+          "name": "bots_chase_players",
+          "value": "0"
+        },
+        {
+          "name": "enable_stat_dumps",
+          "value": "1"
         }
       ],
       "permissions": [
