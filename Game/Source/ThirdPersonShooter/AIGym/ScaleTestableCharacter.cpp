@@ -1,12 +1,14 @@
 // Copyright (c) Improbable Worlds Ltd, All Rights Reserved
 
 #include "ScaleTestableCharacter.h"
+#include "Engine/Classes/GameFramework/CharacterMovementComponent.h"
 #include "Logging/LogMacros.h"
 #include "Misc/Parse.h"
 #include "PlatformTime.h"
 #include "SpatialNetDriver.h"
 #include "SpatialWorkerConnection.h"
 #include "Stats/Stats2.h"
+#include "SimPlayerBPFunctionLibrary.h"
 #include "c_worker.h"
 
 // Windows latency measurements do not build in CI.
@@ -133,7 +135,7 @@ void AScaleTestableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FParse::Param(FCommandLine::Get(), TEXT("simulatedplayer")))
+	if (FParse::Param(FCommandLine::Get(), TEXT("simulatedplayer")) || USimPlayerBPFunctionLibrary::IsSimulatedPlayer(this))
 	{
 		bIsSimulatedPlayer = true;
 	}
