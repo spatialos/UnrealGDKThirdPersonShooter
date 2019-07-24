@@ -3,6 +3,7 @@
 #include "BigGymGameMode.h"
 #include "UObject/ConstructorHelpers.h"
 
+#include "BigGymLogging.h"
 #include "EngineClasses/SpatialNetConnection.h"
 #include "EngineClasses/SpatialNetDriver.h"
 #include "Engine/World.h"
@@ -31,6 +32,8 @@ ABigGymGameMode::ABigGymGameMode()
 
 void ABigGymGameMode::InitGameState()
 {
+	Super::InitGameState();
+
 	if (ShouldUseCustomSpawning())
 	{
 		ParsePassedValues();
@@ -50,6 +53,7 @@ void ABigGymGameMode::ParsePassedValues()
 {
 	if (FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")))
 	{
+		UE_LOG(LogBigGym, Log, TEXT("Found OverrideSpawning in command line args, worker flags for custom spawning will be ignored."));
 		if (FParse::Param(FCommandLine::Get(), TEXT("TotalPlayers=")))
 		{
 			FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
@@ -81,54 +85,54 @@ void ABigGymGameMode::ClearExistingSpawnPoints()
 void ABigGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 {
 	// Spawn in the air above terrain obstacles.
-	int Z = 305;
+	const int Z = 305;
 
 	if (SpawnPointsNum < 1)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Can't spawn requested %d spawn points - the spawn points number should be at least 1"), SpawnPointsNum);
+		UE_LOG(LogBigGym, Error, TEXT("Can't spawn requested %d spawn points - the spawn points number should be at least 1"), SpawnPointsNum);
 		return;
 	}
 
-	int NumRows = FMath::CeilToInt(FGenericPlatformMath::Sqrt(SpawnPointsNum));
-	int NumCols = FMath::CeilToInt(SpawnPointsNum / (float)NumRows);
+	const int NumRows = FMath::CeilToInt(FGenericPlatformMath::Sqrt(SpawnPointsNum));
+	const int NumCols = FMath::CeilToInt(SpawnPointsNum / (float)NumRows);
 
-	int DistBetweenSpawnPoints = 300;
+	const int DistBetweenSpawnPoints = 300; // In Unreal units.
 
-	int MinX = FMath::RoundToInt(-(NumCols / 2.0) * DistBetweenSpawnPoints);
-	int MinY = FMath::RoundToInt(-(NumRows / 2.0) * DistBetweenSpawnPoints);
+	const int MinX = FMath::RoundToInt(-(NumCols / 2.0) * DistBetweenSpawnPoints);
+	const int MinY = FMath::RoundToInt(-(NumRows / 2.0) * DistBetweenSpawnPoints);
 
 	UWorld* World = GetWorld();
 	if (World == nullptr)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Cannot spawn spawnpoints, world is null"));
+		UE_LOG(LogBigGym, Error, TEXT("Cannot spawn spawnpoints, world is null"));
 		return;
 	}
 
-	int WalkRadius = 200; // More than actual radius, just to be sure.
-	int MaxXDistance = (NumCols - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
-	int MaxYDistance = (NumRows - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
-	int MaxDistanceBetweenPlayers = FMath::Sqrt(FMath::Square(MaxXDistance) + FMath::Square(MaxYDistance));
+	const int WalkRadius = 200; // In Unreal units. More than actual radius, just to be sure.
+	const int MaxXDistance = (NumCols - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
+	const int MaxYDistance = (NumRows - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
+	const int MaxDistanceBetweenPlayers = FMath::Sqrt(FMath::Square(MaxXDistance) + FMath::Square(MaxYDistance));
 
 	if (MaxDistanceBetweenPlayers >= PlayerCheckoutRadius)
 	{
-		UE_LOG(LogTemp, Error, TEXT("Maximum distance between players is larger than checkout radius. Cannot ensure players will always see each other."));
+		UE_LOG(LogBigGym, Error, TEXT("Maximum distance between players is larger than checkout radius. Cannot ensure players will always see each other."));
 	}
 
 	for (int i = 0; i < SpawnPointsNum; i++)
 	{
-		int Row = i % NumRows;
-		int Col = i / NumRows;
+		const int Row = i % NumRows;
+		const int Col = i / NumRows;
 
-		int X = MinX + Col * DistBetweenSpawnPoints;
-		int Y = MinY + Row * DistBetweenSpawnPoints;
+		const int X = MinX + Col * DistBetweenSpawnPoints;
+		const int Y = MinY + Row * DistBetweenSpawnPoints;
 
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.Owner = this;
 		SpawnInfo.Instigator = NULL;
 		SpawnInfo.bDeferConstruction = false;
 
-		FVector SpawnLocation = FVector(X, Y, Z);
-		UE_LOG(LogTemp, Log, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
+		const FVector SpawnLocation = FVector(X, Y, Z);
+		UE_LOG(LogBigGym, Log, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
 		SpawnPoints.Add(World->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), SpawnLocation, FRotator::ZeroRotator, SpawnInfo));
 	}
 }
@@ -141,10 +145,7 @@ AActor* ABigGymGameMode::FindPlayerStart_Implementation(AController* Player, con
 	}
 
 	// Use custom spawning with density controls
-	int32 PlayerUniqueID = Player->GetUniqueID();
-
-	UWorld* World = GetWorld();
-
+	const int32 PlayerUniqueID = Player->GetUniqueID();
 	if (PlayerIdToSpawnPointMap.Contains(PlayerUniqueID))
 	{
 		return PlayerIdToSpawnPointMap[PlayerUniqueID];
@@ -153,7 +154,7 @@ AActor* ABigGymGameMode::FindPlayerStart_Implementation(AController* Player, con
 	AActor* ChosenSpawnPoint = SpawnPoints[PlayersSpawned % SpawnPoints.Num()];
 	PlayerIdToSpawnPointMap.Add(PlayerUniqueID, ChosenSpawnPoint);
 
-	UE_LOG(LogTemp, Log, TEXT("Spawning player %d at %s."), PlayerUniqueID, *ChosenSpawnPoint->GetActorLocation().ToString());
+	UE_LOG(LogBigGym, Log, TEXT("Spawning player %d at %s."), PlayerUniqueID, *ChosenSpawnPoint->GetActorLocation().ToString());
 
 	PlayersSpawned++;
 
