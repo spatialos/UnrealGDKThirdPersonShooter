@@ -68,11 +68,8 @@ void ABigGymGameMode::ParsePassedValues()
 
 void ABigGymGameMode::ClearExistingSpawnPoints()
 {
-	TArray<AActor*> ExistingSpawnPoints;
-
-	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), ExistingSpawnPoints);
-
-	for (AActor* SpawnPoint : ExistingSpawnPoints)
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), SpawnPoints);
+	for (AActor* SpawnPoint : SpawnPoints)
 	{
 		SpawnPoint->Destroy();
 	}
@@ -114,6 +111,7 @@ void ABigGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 		UE_LOG(LogBigGym, Error, TEXT("Maximum distance between players is larger than checkout radius. Cannot ensure players will always see each other."));
 	}
 
+	SpawnPoints.Reset();
 	for (int i = 0; i < SpawnPointsNum; i++)
 	{
 		const int Row = i % NumRows;
