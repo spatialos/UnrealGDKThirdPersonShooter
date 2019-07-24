@@ -54,15 +54,11 @@ void ABigGymGameMode::ParsePassedValues()
 	if (FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")))
 	{
 		UE_LOG(LogBigGym, Log, TEXT("Found OverrideSpawning in command line args, worker flags for custom spawning will be ignored."));
-		if (FParse::Param(FCommandLine::Get(), TEXT("TotalPlayers=")))
-		{
-			FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
-		}
+		FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
 	}
 	else
 	{
 		FString TotalPlayersString;
-
 		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
 		{
 			TotalPlayers = FCString::Atoi(*TotalPlayersString);

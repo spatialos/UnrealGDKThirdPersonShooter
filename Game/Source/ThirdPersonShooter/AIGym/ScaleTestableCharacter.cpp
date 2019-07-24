@@ -135,7 +135,7 @@ void AScaleTestableCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (FParse::Param(FCommandLine::Get(), TEXT("simulatedplayer")) || USimPlayerBPFunctionLibrary::IsSimulatedPlayer(this))
+	if (USimPlayerBPFunctionLibrary::IsSimulatedPlayer(this))
 	{
 		bIsSimulatedPlayer = true;
 	}
