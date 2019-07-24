@@ -122,7 +122,7 @@ void ABigGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 		const int X = MinX + Col * DistBetweenSpawnPoints;
 		const int Y = MinY + Row * DistBetweenSpawnPoints;
 
-		FActorSpawnParameters SpawnInfo;
+		FActorSpawnParameters SpawnInfo{};
 		SpawnInfo.Owner = this;
 		SpawnInfo.Instigator = NULL;
 		SpawnInfo.bDeferConstruction = false;
