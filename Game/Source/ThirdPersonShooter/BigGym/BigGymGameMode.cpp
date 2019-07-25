@@ -24,6 +24,7 @@ ABigGymGameMode::ABigGymGameMode()
 		PlayerCheckoutRadius = FGenericPlatformMath::Sqrt(PlayerPawnBPClass.Class.GetDefaultObject()->NetCullDistanceSquared);
 	}
 
+	TotalPlayers = 0;
 	PlayersSpawned = 0;
 
 	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
@@ -38,7 +39,14 @@ void ABigGymGameMode::InitGameState()
 	{
 		ParsePassedValues();
 		ClearExistingSpawnPoints();
-		GenerateSpawnPoints(TotalPlayers);
+
+		SpawnPoints.Reset();
+		const int NumClusters = FMath::CeilToInt(TotalPlayers / (float)PlayerDensity);
+		GenerateSpawnPointClusters(NumClusters, SpawnPoints);
+
+		if (SpawnPoints.Num() != TotalPlayers) {
+			UE_LOG(LogBigGym, Error, TEXT("Error creating spawnpoints, number of created spawn points (%d) does not equal total players (%d)"), SpawnPoints.Num(), TotalPlayers);
+		}
 	}
 }
 
@@ -55,13 +63,26 @@ void ABigGymGameMode::ParsePassedValues()
 	{
 		UE_LOG(LogBigGym, Log, TEXT("Found OverrideSpawning in command line args, worker flags for custom spawning will be ignored."));
 		FParse::Value(FCommandLine::Get(), TEXT("TotalPlayers="), TotalPlayers);
+
+		// Set default value of PlayerDensity equal to TotalPlayers. Will be overwritten if PlayerDensity option is specified.
+		PlayerDensity = TotalPlayers;
+
+		FParse::Value(FCommandLine::Get(), TEXT("PlayerDensity="), PlayerDensity);
 	}
 	else
 	{
-		FString TotalPlayersString;
+		FString TotalPlayersString, PlayerDensityString;
 		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
 		{
 			TotalPlayers = FCString::Atoi(*TotalPlayersString);
+		}
+
+		// Set default value of PlayerDensity equal to TotalPlayers. Will be overwritten if PlayerDensity option is specified.
+		PlayerDensity = TotalPlayers;
+
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("player_density"), PlayerDensityString))
+		{
+			PlayerDensity = FCString::Atoi(*PlayerDensityString);
 		}
 	}
 }
@@ -75,24 +96,57 @@ void ABigGymGameMode::ClearExistingSpawnPoints()
 	}
 }
 
-void ABigGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
+void ABigGymGameMode::GenerateGridSettings(int DistBetweenPoints, int NumPoints, int& NumRows, int& NumCols, int& MinRelativeX, int& MinRelativeY)
 {
-	// Spawn in the air above terrain obstacles.
-	const int Z = 305;
-
-	if (SpawnPointsNum < 1)
+	if (NumPoints <= 0)
 	{
-		UE_LOG(LogBigGym, Error, TEXT("Can't spawn requested %d spawn points - the spawn points number should be at least 1"), SpawnPointsNum);
+		UE_LOG(LogBigGym, Warning, TEXT("Generating grid settings with non-postive number of points (%d)"), NumPoints);
+		NumRows = 0;
+		NumCols = 0;
+		MinRelativeX = 0;
+		MinRelativeY = 0;
 		return;
 	}
 
-	const int NumRows = FMath::CeilToInt(FGenericPlatformMath::Sqrt(SpawnPointsNum));
-	const int NumCols = FMath::CeilToInt(SpawnPointsNum / (float)NumRows);
+	NumRows = FMath::RoundToInt(FMath::Sqrt(NumPoints));
+	NumCols = FMath::CeilToInt(NumPoints / (float)NumRows);
+	int GridWidth = (NumCols - 1) * DistBetweenPoints;
+	int GridHeight = (NumRows - 1) * DistBetweenPoints;
+	MinRelativeX = FMath::RoundToInt(-GridWidth / 2.0);
+	MinRelativeY = FMath::RoundToInt(-GridHeight / 2.0);
+}
+
+void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters, TArray<AActor*>& SpawnPoints)
+{
+	const int DistBetweenClusterCenters = 40000; // 400 meters, in Unreal units.
+	int NumRows, NumCols, MinRelativeX, MinRelativeY;
+	GenerateGridSettings(DistBetweenClusterCenters, NumClusters, NumRows, NumCols, MinRelativeX, MinRelativeY);
+
+	UE_LOG(LogBigGym, Log, TEXT("Creating player cluster grid of %d rows by %d columns"), NumRows, NumCols);
+
+	int NumSpawnPointsLeftToSpawn = TotalPlayers;
+	for (int i = 0; i < NumClusters; i++)
+	{
+		const int Row = i % NumRows;
+		const int Col = i / NumRows;
+
+		const int ClusterCenterX = MinRelativeX + Col * DistBetweenClusterCenters;
+		const int ClusterCenterY = MinRelativeY + Row * DistBetweenClusterCenters;
+
+		const int NumSpawnPointsToSpawn = FGenericPlatformMath::Min(PlayerDensity, NumSpawnPointsLeftToSpawn);
+		GenerateSpawnPoints(ClusterCenterX, ClusterCenterY, NumSpawnPointsToSpawn, SpawnPoints);
+		NumSpawnPointsLeftToSpawn -= NumSpawnPointsToSpawn;
+	}
+}
+
+void ABigGymGameMode::GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPointsNum, TArray<AActor*>& SpawnPoints)
+{
+	// Spawn in the air above terrain obstacles (Unreal units).
+	const int Z = 305;
 
 	const int DistBetweenSpawnPoints = 300; // In Unreal units.
-
-	const int MinX = FMath::RoundToInt(-(NumCols / 2.0) * DistBetweenSpawnPoints);
-	const int MinY = FMath::RoundToInt(-(NumRows / 2.0) * DistBetweenSpawnPoints);
+	int NumRows, NumCols, MinRelativeX, MinRelativeY;
+	GenerateGridSettings(DistBetweenSpawnPoints, SpawnPointsNum, NumRows, NumCols, MinRelativeX, MinRelativeY);
 
 	UWorld* World = GetWorld();
 	if (World == nullptr)
@@ -105,20 +159,18 @@ void ABigGymGameMode::GenerateSpawnPoints(int SpawnPointsNum)
 	const int MaxXDistance = (NumCols - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
 	const int MaxYDistance = (NumRows - 1) * DistBetweenSpawnPoints + 2 * WalkRadius;
 	const int MaxDistanceBetweenPlayers = FMath::Sqrt(FMath::Square(MaxXDistance) + FMath::Square(MaxYDistance));
-
 	if (MaxDistanceBetweenPlayers >= PlayerCheckoutRadius)
 	{
 		UE_LOG(LogBigGym, Error, TEXT("Maximum distance between players is larger than checkout radius. Cannot ensure players will always see each other."));
 	}
 
-	SpawnPoints.Reset();
 	for (int i = 0; i < SpawnPointsNum; i++)
 	{
 		const int Row = i % NumRows;
 		const int Col = i / NumRows;
 
-		const int X = MinX + Col * DistBetweenSpawnPoints;
-		const int Y = MinY + Row * DistBetweenSpawnPoints;
+		const int X = CenterX + MinRelativeX + Col * DistBetweenSpawnPoints;
+		const int Y = CenterY + MinRelativeY + Row * DistBetweenSpawnPoints;
 
 		FActorSpawnParameters SpawnInfo{};
 		SpawnInfo.Owner = this;
