@@ -110,8 +110,8 @@ void ABigGymGameMode::GenerateGridSettings(int DistBetweenPoints, int NumPoints,
 
 	NumRows = FMath::RoundToInt(FMath::Sqrt(NumPoints));
 	NumCols = FMath::CeilToInt(NumPoints / (float)NumRows);
-	int GridWidth = (NumCols - 1) * DistBetweenPoints;
-	int GridHeight = (NumRows - 1) * DistBetweenPoints;
+	const int GridWidth = (NumCols - 1) * DistBetweenPoints;
+	const int GridHeight = (NumRows - 1) * DistBetweenPoints;
 	MinRelativeX = FMath::RoundToInt(-GridWidth / 2.0);
 	MinRelativeY = FMath::RoundToInt(-GridHeight / 2.0);
 }
