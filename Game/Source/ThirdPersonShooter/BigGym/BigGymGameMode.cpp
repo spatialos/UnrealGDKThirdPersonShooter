@@ -24,9 +24,9 @@ ABigGymGameMode::ABigGymGameMode()
 		PlayerCheckoutRadius = FGenericPlatformMath::Sqrt(PlayerPawnBPClass.Class.GetDefaultObject()->NetCullDistanceSquared);
 	}
 
-	static ConstructorHelpers::FObjectFinder<UBlueprint> NPCBPClass(TEXT("Blueprint'/Game/AIGym/AIGymNPC_BP'"));
-	if (NPCBPClass.Object) {
-		NPCPawnClass = (UClass*)NPCBPClass.Object->GeneratedClass;
+	static ConstructorHelpers::FClassFinder<APawn> NPCBPClass(TEXT("/Game/AIGym/AIGymNPC_BP"));
+	if (NPCBPClass.Class != NULL) {
+		NPCPawnClass = NPCBPClass.Class;
 	}
 
 	TotalPlayers = 0;
