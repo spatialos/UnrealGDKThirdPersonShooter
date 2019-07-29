@@ -41,6 +41,6 @@ private:
 	void ClearExistingSpawnPoints();
 	// Generates a grid of points centered at (0, 0), as square-like as possible. A row has a fixed y-value, and a column a fixed x-value.
 	void GenerateGridSettings(int DistBetweenPoints, int NumPoints, int& NumRows, int& NumCols, int& MinRelativeX, int& MinRelativeY);
-	void GenerateSpawnPointClusters(int NumClusters, TArray<AActor*>& SpawnPoints);
-	void GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPointsNum, TArray<AActor*>& SpawnPoints);
+	void GenerateSpawnPointClusters(int NumClusters);
+	void GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPointsNum);
 };

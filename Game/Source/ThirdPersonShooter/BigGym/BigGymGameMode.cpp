@@ -37,16 +37,21 @@ void ABigGymGameMode::InitGameState()
 
 	if (ShouldUseCustomSpawning())
 	{
+		UE_LOG(LogBigGym, Log, TEXT("Enabling custom density spawning."));
 		ParsePassedValues();
 		ClearExistingSpawnPoints();
 
 		SpawnPoints.Reset();
 		const int NumClusters = FMath::CeilToInt(TotalPlayers / (float)PlayerDensity);
-		GenerateSpawnPointClusters(NumClusters, SpawnPoints);
+		GenerateSpawnPointClusters(NumClusters);
 
 		if (SpawnPoints.Num() != TotalPlayers) {
 			UE_LOG(LogBigGym, Error, TEXT("Error creating spawnpoints, number of created spawn points (%d) does not equal total players (%d)"), SpawnPoints.Num(), TotalPlayers);
 		}
+	}
+	else
+	{
+		UE_LOG(LogBigGym, Log, TEXT("Custom density spawning disabled."));
 	}
 }
 
@@ -71,6 +76,7 @@ void ABigGymGameMode::ParsePassedValues()
 	}
 	else
 	{
+		UE_LOG(LogBigGym, Log, TEXT("Using worker flags to load custom spawning parameters."));
 		FString TotalPlayersString, PlayerDensityString;
 		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
 		{
@@ -116,7 +122,7 @@ void ABigGymGameMode::GenerateGridSettings(int DistBetweenPoints, int NumPoints,
 	MinRelativeY = FMath::RoundToInt(-GridHeight / 2.0);
 }
 
-void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters, TArray<AActor*>& SpawnPoints)
+void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters)
 {
 	const int DistBetweenClusterCenters = 40000; // 400 meters, in Unreal units.
 	int NumRows, NumCols, MinRelativeX, MinRelativeY;
@@ -134,12 +140,12 @@ void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters, TArray<AActor*
 		const int ClusterCenterY = MinRelativeY + Row * DistBetweenClusterCenters;
 
 		const int NumSpawnPointsToSpawn = FGenericPlatformMath::Min(PlayerDensity, NumSpawnPointsLeftToSpawn);
-		GenerateSpawnPoints(ClusterCenterX, ClusterCenterY, NumSpawnPointsToSpawn, SpawnPoints);
+		GenerateSpawnPoints(ClusterCenterX, ClusterCenterY, NumSpawnPointsToSpawn);
 		NumSpawnPointsLeftToSpawn -= NumSpawnPointsToSpawn;
 	}
 }
 
-void ABigGymGameMode::GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPointsNum, TArray<AActor*>& SpawnPoints)
+void ABigGymGameMode::GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPointsNum)
 {
 	// Spawn in the air above terrain obstacles (Unreal units).
 	const int Z = 305;
