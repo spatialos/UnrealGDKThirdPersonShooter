@@ -24,7 +24,14 @@ ABigGymGameMode::ABigGymGameMode()
 		PlayerCheckoutRadius = FGenericPlatformMath::Sqrt(PlayerPawnBPClass.Class.GetDefaultObject()->NetCullDistanceSquared);
 	}
 
+	static ConstructorHelpers::FObjectFinder<UBlueprint> NPCBPClass(TEXT("Blueprint'/Game/AIGym/AIGymNPC_BP'"));
+	if (NPCBPClass.Object) {
+		NPCPawnClass = (UClass*)NPCBPClass.Object->GeneratedClass;
+	}
+
 	TotalPlayers = 0;
+	TotalNPCs = 0;
+	NumPlayerClusters = 0;
 	PlayersSpawned = 0;
 
 	// Seamless Travel is not currently supported in SpatialOS [UNR-897]
@@ -45,12 +52,13 @@ void ABigGymGameMode::CheckInitCustomSpawning()
 		ClearExistingSpawnPoints();
 
 		SpawnPoints.Reset();
-		const int NumClusters = FMath::CeilToInt(TotalPlayers / (float)PlayerDensity);
-		GenerateSpawnPointClusters(NumClusters);
+		GenerateSpawnPointClusters(NumPlayerClusters);
 
 		if (SpawnPoints.Num() != TotalPlayers) {
 			UE_LOG(LogBigGym, Error, TEXT("Error creating spawnpoints, number of created spawn points (%d) does not equal total players (%d)"), SpawnPoints.Num(), TotalPlayers);
 		}
+
+		SpawnNPCs(TotalNPCs);
 	}
 	else
 	{
@@ -78,11 +86,13 @@ void ABigGymGameMode::ParsePassedValues()
 		PlayerDensity = TotalPlayers;
 
 		FParse::Value(FCommandLine::Get(), TEXT("PlayerDensity="), PlayerDensity);
+
+		FParse::Value(FCommandLine::Get(), TEXT("TotalNPCs="), TotalNPCs);
 	}
 	else
 	{
 		UE_LOG(LogBigGym, Log, TEXT("Using worker flags to load custom spawning parameters."));
-		FString TotalPlayersString, PlayerDensityString;
+		FString TotalPlayersString, PlayerDensityString, TotalNPCsString;
 		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
 		{
 			TotalPlayers = FCString::Atoi(*TotalPlayersString);
@@ -95,7 +105,14 @@ void ABigGymGameMode::ParsePassedValues()
 		{
 			PlayerDensity = FCString::Atoi(*PlayerDensityString);
 		}
+
+		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_npcs"), TotalNPCsString))
+		{
+			TotalNPCs = FCString::Atoi(*TotalNPCsString);
+		}
 	}
+
+	NumPlayerClusters = FMath::CeilToInt(TotalPlayers / (float)PlayerDensity);
 }
 
 void ABigGymGameMode::ClearExistingSpawnPoints()
@@ -134,8 +151,6 @@ void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters)
 	GenerateGridSettings(DistBetweenClusterCenters, NumClusters, NumRows, NumCols, MinRelativeX, MinRelativeY);
 
 	UE_LOG(LogBigGym, Log, TEXT("Creating player cluster grid of %d rows by %d columns"), NumRows, NumCols);
-
-	int NumSpawnPointsLeftToSpawn = TotalPlayers;
 	for (int i = 0; i < NumClusters; i++)
 	{
 		const int Row = i % NumRows;
@@ -144,9 +159,7 @@ void ABigGymGameMode::GenerateSpawnPointClusters(int NumClusters)
 		const int ClusterCenterX = MinRelativeX + Col * DistBetweenClusterCenters;
 		const int ClusterCenterY = MinRelativeY + Row * DistBetweenClusterCenters;
 
-		const int NumSpawnPointsToSpawn = FGenericPlatformMath::Min(PlayerDensity, NumSpawnPointsLeftToSpawn);
-		GenerateSpawnPoints(ClusterCenterX, ClusterCenterY, NumSpawnPointsToSpawn);
-		NumSpawnPointsLeftToSpawn -= NumSpawnPointsToSpawn;
+		GenerateSpawnPoints(ClusterCenterX, ClusterCenterY, PlayerDensity);
 	}
 }
 
@@ -187,11 +200,46 @@ void ABigGymGameMode::GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPoi
 		SpawnInfo.Owner = this;
 		SpawnInfo.Instigator = NULL;
 		SpawnInfo.bDeferConstruction = false;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 		const FVector SpawnLocation = FVector(X, Y, Z);
 		UE_LOG(LogBigGym, Log, TEXT("Creating a new PlayerStart at location %s."), *SpawnLocation.ToString());
 		SpawnPoints.Add(World->SpawnActor<APlayerStart>(APlayerStart::StaticClass(), SpawnLocation, FRotator::ZeroRotator, SpawnInfo));
 	}
+}
+
+void ABigGymGameMode::SpawnNPCs(int NumNPCs)
+{
+	for (int32 i = 0; i < NumNPCs; i++)
+	{
+		int32 Cluster = i % NumPlayerClusters;
+		int32 SpawnPointIndex = Cluster * PlayerDensity;
+		AActor* SpawnPoint = SpawnPoints[SpawnPointIndex];
+		SpawnNPC(SpawnPoint->GetActorLocation());
+	}
+}
+
+void ABigGymGameMode::SpawnNPC(FVector SpawnLocation)
+{
+	UWorld* const World = GetWorld();
+	if (World == nullptr)
+	{
+		UE_LOG(LogBigGym, Error, TEXT("Error spawning NPC, World is null"));
+		return;
+	}
+
+	if (NPCPawnClass == nullptr)
+	{
+		UE_LOG(LogBigGym, Error, TEXT("Error spawning NPC, NPCPawnClass is not set."));
+		return;
+	}
+
+	UE_LOG(LogBigGym, Log, TEXT("Spawning NPC at %s"), *SpawnLocation.ToString());
+	FActorSpawnParameters SpawnInfo{};
+	//SpawnInfo.Owner = this;
+	//SpawnInfo.Instigator = NULL;
+	SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	World->SpawnActor<APawn>(NPCPawnClass->GetDefaultObject()->GetClass(), SpawnLocation, FRotator::ZeroRotator, SpawnInfo);
 }
 
 AActor* ABigGymGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
