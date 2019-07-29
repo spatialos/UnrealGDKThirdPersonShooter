@@ -29,14 +29,15 @@ private:
 	bool bHasUpdatedMaxActorsToReplicate = false;
 
 	// Custom spawning - density controls
+	bool bInitializedCustomSpawnParameters = false;
 	int32 TotalPlayers;
 	int32 PlayerDensity;
 	int32 PlayersSpawned;
 	float PlayerCheckoutRadius;
 	TArray<AActor*> SpawnPoints;
 	TMap<int32, AActor*> PlayerIdToSpawnPointMap;
-	virtual void InitGameState() override;
 	bool ShouldUseCustomSpawning();
+	void CheckInitCustomSpawning();
 	void ParsePassedValues();
 	void ClearExistingSpawnPoints();
 	// Generates a grid of points centered at (0, 0), as square-like as possible. A row has a fixed y-value, and a column a fixed x-value.

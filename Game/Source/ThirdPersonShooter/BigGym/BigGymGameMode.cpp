@@ -31,9 +31,12 @@ ABigGymGameMode::ABigGymGameMode()
 	bUseSeamlessTravel = false;
 }
 
-void ABigGymGameMode::InitGameState()
+void ABigGymGameMode::CheckInitCustomSpawning()
 {
-	Super::InitGameState();
+	if (bInitializedCustomSpawnParameters)
+	{
+		return;
+	}
 
 	if (ShouldUseCustomSpawning())
 	{
@@ -53,6 +56,8 @@ void ABigGymGameMode::InitGameState()
 	{
 		UE_LOG(LogBigGym, Log, TEXT("Custom density spawning disabled."));
 	}
+
+	bInitializedCustomSpawnParameters = true;
 }
 
 bool ABigGymGameMode::ShouldUseCustomSpawning()
@@ -191,6 +196,8 @@ void ABigGymGameMode::GenerateSpawnPoints(int CenterX, int CenterY, int SpawnPoi
 
 AActor* ABigGymGameMode::FindPlayerStart_Implementation(AController* Player, const FString& IncomingName)
 {
+	CheckInitCustomSpawning();
+
 	if (!ShouldUseCustomSpawning() || SpawnPoints.Num() == 0)
 	{
 		return Super::FindPlayerStart_Implementation(Player, IncomingName);
