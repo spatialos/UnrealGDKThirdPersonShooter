@@ -26,7 +26,8 @@ public class ThirdPersonShooter : ModuleRules
                 "HTTP",
                 "GameplayAbilities",
                 "GameplayTags",
-                "GameplayTasks"
+                "GameplayTasks",
+                "NavigationSystem"
             });
 	}
 }

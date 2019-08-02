@@ -340,45 +340,46 @@ void ATPSCharacter::StartRagdoll()
 	MeshComponent->SetCollisionProfileName(FName(TEXT("Ragdoll")));
 	MeshComponent->SetSimulatePhysics(true);
 
-	// Gather list of child components of the capsule.
-	TArray<USceneComponent*> ComponentsToMove;
-	int NumChildren = LocalCapsuleComponent->GetNumChildrenComponents();
-	for (int i = 0; i < NumChildren; ++i)
+	if (IsLocallyControlled())
 	{
-		USceneComponent* Component = LocalCapsuleComponent->GetChildComponent(i);
-		if (Component != nullptr && Component != MeshComponent)
+		// Gather list of child components of the capsule.
+		TArray<USceneComponent*> ComponentsToMove;
+		int NumChildren = LocalCapsuleComponent->GetNumChildrenComponents();
+		for (int i = 0; i < NumChildren; ++i)
 		{
-			ComponentsToMove.Add(Component);
+			USceneComponent* Component = LocalCapsuleComponent->GetChildComponent(i);
+			if (Component != nullptr && Component != MeshComponent)
+			{
+				ComponentsToMove.Add(Component);
+			}
 		}
-	}
 
-	SetRootComponent(MeshComponent);
+		SetRootComponent(MeshComponent);
 
-	// Move the capsule's former child components over to the mesh.
-	for (USceneComponent* Component : ComponentsToMove)
-	{
-		Component->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-	}
+		// Move the capsule's former child components over to the mesh.
+		for (USceneComponent* Component : ComponentsToMove)
+		{
+			Component->AttachToComponent(MeshComponent, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		}
 
-	// Fix up the camera to a "death view".
-	if (GetNetMode() == NM_Client)
-	{
-		USpringArmComponent* LocalCameraBoom = GetCameraBoom();
-
-		// Enable lag on the spring arm to smooth movement, counters sporadic movement of the ragdoll.
-		LocalCameraBoom->bEnableCameraLag = true;
-		LocalCameraBoom->bEnableCameraRotationLag = true;
-		// Change the camera boom so it's looking down on the ragdoll from slightly further away.
-		LocalCameraBoom->bUsePawnControlRotation = false;
-		LocalCameraBoom->bInheritPitch = false;
-		LocalCameraBoom->bInheritRoll = false;
-		LocalCameraBoom->bInheritYaw = false;
-		LocalCameraBoom->SocketOffset = FVector::ZeroVector;  // Zero out the over-the-shoulder offset.
-		LocalCameraBoom->TargetOffset = FVector(0, 0, 50);  // Offset slightly up so the camera target doesn't collide with the floor.
-		LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
-		LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
-		LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
-
+		// Fix up the camera to a "death view".
+		if (USpringArmComponent* LocalCameraBoom = GetCameraBoom())
+		{
+			// Enable lag on the spring arm to smooth movement, counters sporadic movement of the ragdoll.
+			LocalCameraBoom->bEnableCameraLag = true;
+			LocalCameraBoom->bEnableCameraRotationLag = true;
+			// Change the camera boom so it's looking down on the ragdoll from slightly further away.
+			LocalCameraBoom->bUsePawnControlRotation = false;
+			LocalCameraBoom->bInheritPitch = false;
+			LocalCameraBoom->bInheritRoll = false;
+			LocalCameraBoom->bInheritYaw = false;
+			LocalCameraBoom->SocketOffset = FVector::ZeroVector;  // Zero out the over-the-shoulder offset.
+			LocalCameraBoom->TargetOffset = FVector(0, 0, 50);  // Offset slightly up so the camera target doesn't collide with the floor.
+			LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
+			LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
+			LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
+		}
+		
 		ShowRespawnScreen();
 	}
 }

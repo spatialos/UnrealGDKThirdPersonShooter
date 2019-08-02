@@ -13,5 +13,10 @@ UCLASS()
 class THIRDPERSONSHOOTER_API UOffloadingFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
-	
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"))
+	static void DisableNavMesh(UObject* WorldContextObject);
+
+	UFUNCTION(BlueprintCallable)
+	static int GetNumBotsFromCommandLine();
 };

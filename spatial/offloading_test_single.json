@@ -32,13 +32,13 @@
   "load_balancing": {
     "layer_configurations": [
       {
-          "layer": "UnrealWorker",
-          "rectangle_grid": {
-              "cols": 1,
-              "rows": 1
-          },
-          "options": {
-            "manual_worker_connection_only": false
+        "layer": "UnrealWorker",
+        "rectangle_grid": {
+            "cols": 1,
+            "rows": 1
+        },
+        "options": {
+          "manual_worker_connection_only": false
         }
       }
     ]
@@ -49,11 +49,11 @@
       "flags" : [
         {
           "name": "num_bots",
-          "value": "200"
+          "value": "0"
         },
         {
           "name": "bot_update_interval",
-          "value": "1"
+          "value": "0.1"
         },
         {
           "name": "bots_chase_players",

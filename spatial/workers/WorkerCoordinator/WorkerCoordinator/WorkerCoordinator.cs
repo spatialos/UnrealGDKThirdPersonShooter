@@ -27,7 +27,7 @@ namespace WorkerCoordinator
 		private const string START_DELAY_ARG = "coordinator_start_delay_millis";
 		private const string WORKER_NAME_ARG = "<IMPROBABLE_WORKER_ID>";
 
-		private const string SIMULATED_PLAYER_FILENAME = "StartWorker.sh";
+		private const string SIMULATED_PLAYER_FILENAME = "StartSimulatedClient.sh";
 
 		private static Stack<Process> SimulatedPlayerList = new Stack<Process>();
 		private static Logger Logger = new Logger("/improbable/logs/WorkerCoordinator.log");

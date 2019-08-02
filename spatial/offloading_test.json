@@ -59,7 +59,7 @@
       "flags" : [
         {
           "name": "enable_stat_dumps",
-          "value": "1"
+          "value": "0"
         }
       ],
       "permissions": [
@@ -73,11 +73,11 @@
       "flags" : [
         {
           "name": "num_bots",
-          "value": "200"
+          "value": "0"
         },
         {
           "name": "bot_update_interval",
-          "value": "1"
+          "value": "0.1"
         },
         {
           "name": "bots_chase_players",
@@ -85,7 +85,7 @@
         },
         {
           "name": "enable_stat_dumps",
-          "value": "1"
+          "value": "0"
         }
       ],
       "permissions": [
