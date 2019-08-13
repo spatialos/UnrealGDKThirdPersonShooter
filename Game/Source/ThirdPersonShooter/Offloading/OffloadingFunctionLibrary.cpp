@@ -20,10 +20,10 @@ void UOffloadingFunctionLibrary::DisableNavMesh(UObject* WorldContextObject)
 	
 }
 
-int UOffloadingFunctionLibrary::GetNumBotsFromCommandLine()
+int UOffloadingFunctionLibrary::GetNumBotsFromCommandLine(const FString& Arg)
 {
 	const TCHAR* CommandLine = FCommandLine::Get();
 	int Result = 0;
-	FParse::Value(CommandLine, TEXT("num_bots"), Result);
+	FParse::Value(CommandLine, *Arg, Result);
 	return Result;
 }

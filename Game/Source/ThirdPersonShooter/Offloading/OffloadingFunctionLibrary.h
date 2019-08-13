@@ -18,5 +18,5 @@ class THIRDPERSONSHOOTER_API UOffloadingFunctionLibrary : public UBlueprintFunct
 	static void DisableNavMesh(UObject* WorldContextObject);
 
 	UFUNCTION(BlueprintCallable)
-	static int GetNumBotsFromCommandLine();
+	static int GetNumBotsFromCommandLine(const FString& Arg);
 };
