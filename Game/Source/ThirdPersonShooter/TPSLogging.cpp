@@ -2,11 +2,12 @@
 
 #include "TPSLogging.h"
 
+#include "Connection/SpatialWorkerConnection.h"
 #include "CoreMinimal.h"
 #include "Engine/NetDriver.h"
 #include "GameFramework/Actor.h"
 #include "SpatialNetDriver.h"
-#include "Connection/SpatialWorkerConnection.h"
+#include "SpatialPackageMapClient.h"
 
 
 DEFINE_LOG_CATEGORY(LogTPS);
