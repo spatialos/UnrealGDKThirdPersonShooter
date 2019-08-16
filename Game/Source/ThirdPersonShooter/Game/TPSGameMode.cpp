@@ -9,7 +9,6 @@
 #include "TPSLogging.h"
 #include "Teams/TPSTeamPlayerStart.h"
 #include "UObject/ConstructorHelpers.h"
-#include "UI/TPSHUD.h"
 
 ATPSGameMode::ATPSGameMode()
 {
@@ -24,8 +23,6 @@ ATPSGameMode::ATPSGameMode()
 	{
 		UE_LOG(LogTPS, Error, TEXT("[TPSGameMode]: Couldn't find default Pawn blueprint class: %s"), DefaultPawnBPPath);
 	}
-
-	HUDClass = ATPSHUD::StaticClass();
 
 	const TCHAR* DefaultPlayerControllerBPPath = TEXT("/Game/Characters/TPSPlayerController_BP");
 	const ConstructorHelpers::FClassFinder<APlayerController> PlayerControllerBPClass(DefaultPlayerControllerBPPath);

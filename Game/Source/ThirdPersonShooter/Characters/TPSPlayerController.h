@@ -66,6 +66,7 @@ private:
 	void ClientJoinResults(const bool bJoinSucceeded);
 
 	// [server] Causes the character to respawn.
+	UFUNCTION(BlueprintCallable)
 	void RespawnCharacter();
 
 	// [server] Deletes the character.
@@ -114,10 +115,6 @@ private:
 	// The instance of the Login UI class to allow player choice interaction.
 	UPROPERTY(Transient)
 	class UTPSLoginUI* TPSLoginUI;
-
-	// Character respawn delay, in seconds.
-	UPROPERTY(EditDefaultsOnly, Category = "Respawn")
-	float RespawnCharacterDelay;
 
 	// Time for which to keep the character's body around before deleting it.
 	UPROPERTY(EditDefaultsOnly, Category = "Respawn")

@@ -7,7 +7,6 @@
 #include "Game/TPSGameMode.h"
 #include "Game/TPSGameState.h"
 #include "TPSLogging.h"
-#include "UI/TPSHUD.h"
 #include "UI/TPSLoginUI.h"
 #include "UI/TPSScoreboard.h"
 #include "UI/TPSUI.h"
@@ -22,7 +21,6 @@ ATPSPlayerController::ATPSPlayerController()
 	, TPSUI(nullptr)
 	, Scoreboard(nullptr)
 	, TPSLoginUI(nullptr)
-	, RespawnCharacterDelay(5.0f)
 	, DeleteCharacterDelay(15.0f)
 	, PawnToDelete(nullptr)
 {
@@ -102,18 +100,11 @@ void ATPSPlayerController::KillCharacter(const ATPSCharacter* Killer)
 
 	// TODO: timers won't persist across worker boundary migrations, and neither will PawnToDelete
 	GetWorldTimerManager().SetTimer(DeleteCharacterTimerHandle, this, &ATPSPlayerController::DeleteCharacter, DeleteCharacterDelay);
-	GetWorldTimerManager().SetTimer(RespawnTimerHandle, this, &ATPSPlayerController::RespawnCharacter, RespawnCharacterDelay);
 }
 
 void ATPSPlayerController::SetPlayerUIVisible(bool bIsVisible)
 {
 	check(GetNetMode() == NM_Client);
-
-	ATPSHUD* HUD = Cast<ATPSHUD>(GetHUD());
-	if (HUD != nullptr)
-	{
-		HUD->SetDrawCrosshair(bIsVisible);
-	}
 
 	if (bIsVisible)
 	{

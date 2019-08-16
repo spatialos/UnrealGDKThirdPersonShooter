@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Teams/TPSTeams.h"
 #include "Weapon.generated.h"
 
 
@@ -30,11 +31,40 @@ public:
 	class ATPSCharacter* GetOwningCharacter() const;
 	void SetOwningCharacter(class ATPSCharacter* NewCharacter);
 
+	// Indicates which team this Gun is associated with
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, ReplicatedUsing = OnRep_Team)
+	ETPSTeam Team;
+
+	// Change the color of this gun to match their owners team
+	UFUNCTION()
+	void UpdateTeamColor();
+
+	// [server] Sets the Weapon's Team value.
+	void SetTeam(ETPSTeam NewTeam);
+
+	// Returns the current value of Team.
+	ETPSTeam GetTeam() const;
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	EWeaponState GetWeaponState() const;
 	void SetWeaponState(EWeaponState NewState);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team Appearance")
+	UMaterialInstance* NoneTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team Appearance")
+	UMaterialInstance* RedTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team Appearance")
+	UMaterialInstance* BlueTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team Appearance")
+	UMaterialInstance* YellowTeamMaterial;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Team Appearance")
+	UMaterialInstance* PurpleTeamMaterial;
 	
 private:
 	EWeaponState CurrentState;
@@ -47,7 +77,10 @@ private:
 	class ATPSCharacter* OwningCharacter;
 
 	// Weapon mesh.
-	UPROPERTY(VisibleAnywhere, Category = "Weapons", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapons", meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* Mesh;
+
+	UFUNCTION()
+	void OnRep_Team();
 	
 };

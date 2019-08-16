@@ -15,7 +15,7 @@ void UTPSScoreboard::UpdateTeamScores(const TArray<FTeamScore>& TeamScores)
 
 	for (const FTeamScore& TeamScore : TeamScores)
 	{
-		if (TeamScore.Team == ETPSTeam::Team_None || TeamScore.Team > ETPSTeam::Team_MAX)
+		if (TeamScore.Team == ETPSTeam::Team_None || TeamScore.Team > ETPSTeam::Team_Purple)
 		{
 			// Skip invalid teams.
 			continue;

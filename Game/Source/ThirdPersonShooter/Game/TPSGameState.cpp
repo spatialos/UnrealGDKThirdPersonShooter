@@ -14,7 +14,7 @@ ATPSGameState::ATPSGameState()
 
 void ATPSGameState::AddPlayer_Implementation(ETPSTeam Team, const FString& Player)
 {
-	if (Team == ETPSTeam::Team_None || Team > ETPSTeam::Team_MAX)
+	if (Team == ETPSTeam::Team_None || Team >= ETPSTeam::Team_Overflow)
 	{
 		// Ignore invalid teams.
 		return;
@@ -29,7 +29,7 @@ void ATPSGameState::AddPlayer_Implementation(ETPSTeam Team, const FString& Playe
 void ATPSGameState::AddDeath_Implementation(const FString& KillerName, ETPSTeam KillerTeam, const FString& VictimName, ETPSTeam VictimTeam)
 {
 	// Ignore invalid teams.
-	if (VictimTeam >= ETPSTeam::Team_MIN && VictimTeam <= ETPSTeam::Team_MAX)
+	if (VictimTeam > ETPSTeam::Team_None && VictimTeam < ETPSTeam::Team_Overflow)
 	{
 		FName VictimKey(*VictimName);
 		if (!PlayerScores.Contains(VictimKey))
@@ -40,7 +40,7 @@ void ATPSGameState::AddDeath_Implementation(const FString& KillerName, ETPSTeam 
 	}
 
 	// Ignore invalid teams.
-	if (KillerTeam >= ETPSTeam::Team_MIN && KillerTeam <= ETPSTeam::Team_MAX)
+	if (KillerTeam > ETPSTeam::Team_None && KillerTeam < ETPSTeam::Team_Overflow)
 	{
 		FName KillerKey(*KillerName);
 		if (!PlayerScores.Contains(KillerKey))
@@ -82,9 +82,9 @@ void ATPSGameState::BeginPlay()
 	if (HasAuthority() && TeamScores.Num() == 0)
 	{
 		// Initialize team scores for all possible teams.
-		const uint32 TeamMin = static_cast<uint32>(ETPSTeam::Team_MIN);
-		const uint32 TeamMax = static_cast<uint32>(ETPSTeam::Team_MAX);
-		for (uint32 i = TeamMin; i <= TeamMax; ++i)
+		const uint32 TeamMin = static_cast<uint32>(ETPSTeam::Team_None);
+		const uint32 TeamMax = static_cast<uint32>(ETPSTeam::Team_Overflow);
+		for (uint32 i = TeamMin+1; i < TeamMax; ++i)
 		{
 			FTeamScore TeamScore;
 			TeamScore.Team = static_cast<ETPSTeam>(i);

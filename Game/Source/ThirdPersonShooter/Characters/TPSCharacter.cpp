@@ -41,8 +41,8 @@ ATPSCharacter::ATPSCharacter(const FObjectInitializer& ObjectInitializer)
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
-	GetCharacterMovement()->JumpZVelocity = 600.f;
-	GetCharacterMovement()->AirControl = 0.2f;
+	GetCharacterMovement()->JumpZVelocity = 1000.f;
+	GetCharacterMovement()->AirControl = 0.3f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -110,42 +110,40 @@ void ATPSCharacter::UpdateTeamColor()
 {
 	check(NoneTeamMaterial != nullptr);
 	check(RedTeamMaterial != nullptr);
-	check(GreenTeamMaterial != nullptr);
 	check(BlueTeamMaterial != nullptr);
 	check(PurpleTeamMaterial != nullptr);
 	check(YellowTeamMaterial != nullptr);
-	check(BlackTeamMaterial != nullptr);
-	check(WhiteTeamMaterial != nullptr);
+	check(NoneTeamLodMaterial != nullptr);
+	check(RedTeamLodMaterial != nullptr);
+	check(BlueTeamLodMaterial != nullptr);
+	check(PurpleTeamLodMaterial != nullptr);
+	check(YellowTeamLodMaterial != nullptr);
 
 	USkeletalMeshComponent* CharacterMesh = GetMesh();
 
 	switch (Team)
 	{
 	case ETPSTeam::Team_Red:
-		CharacterMesh->SetMaterial(0, RedTeamMaterial);
-		break;
-	case ETPSTeam::Team_Green:
-		CharacterMesh->SetMaterial(0, GreenTeamMaterial);
+		CharacterMesh->SetMaterial(2, RedTeamMaterial);
+		CharacterMesh->SetMaterial(0, RedTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Blue:
-		CharacterMesh->SetMaterial(0, BlueTeamMaterial);
+		CharacterMesh->SetMaterial(2, BlueTeamMaterial);
+		CharacterMesh->SetMaterial(0, BlueTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Purple:
-		CharacterMesh->SetMaterial(0, PurpleTeamMaterial);
+		CharacterMesh->SetMaterial(2, PurpleTeamMaterial);
+		CharacterMesh->SetMaterial(0, PurpleTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_Yellow:
-		CharacterMesh->SetMaterial(0, YellowTeamMaterial);
-		break;
-	case ETPSTeam::Team_Black:
-		CharacterMesh->SetMaterial(0, BlackTeamMaterial);
-		break;
-	case ETPSTeam::Team_White:
-		CharacterMesh->SetMaterial(0, WhiteTeamMaterial);
+		CharacterMesh->SetMaterial(2, YellowTeamMaterial);
+		CharacterMesh->SetMaterial(0, YellowTeamLodMaterial);
 		break;
 	case ETPSTeam::Team_None:
 	default:
 		// If team value has not yet replicated, use the temporary colors
-		CharacterMesh->SetMaterial(0, NoneTeamMaterial);
+		CharacterMesh->SetMaterial(2, NoneTeamMaterial);
+		CharacterMesh->SetMaterial(0, NoneTeamLodMaterial);
 		break;
 	}
 }
@@ -172,7 +170,6 @@ void ATPSCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerInput
 	PlayerInputComponent->BindAction("Sprint", IE_Released, this, &ATPSCharacter::StopSprinting);
 
 	PlayerInputComponent->BindAction("Interact", IE_Pressed, this, &ATPSCharacter::Interact);
-	PlayerInputComponent->BindAction("SpawnCube", IE_Pressed, this, &ATPSCharacter::SpawnCube);
 	PlayerInputComponent->BindAction("DebugResetCharacter", IE_Pressed, this, &ATPSCharacter::DebugResetCharacter);
 
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &ATPSCharacter::StartFire);
@@ -217,7 +214,6 @@ void ATPSCharacter::Interact()
 
 	FCollisionQueryParams TraceParams = FCollisionQueryParams(FName(TEXT("TPS_Trace")), true, this);
 	TraceParams.bTraceComplex = true;
-	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = false;
 
 	FHitResult HitResult(ForceInit);
@@ -243,16 +239,6 @@ void ATPSCharacter::Interact()
 	}
 }
 
-void ATPSCharacter::SpawnCube()
-{
-	if (IgnoreActionInput())
-	{
-		return;
-	}
-
-	ServerSpawnCube();
-}
-
 void ATPSCharacter::SpawnStarterWeapon()
 {
 	if (!HasAuthority())
@@ -271,6 +257,7 @@ void ATPSCharacter::SpawnStarterWeapon()
 	AWeapon* StartWeapon = GetWorld()->SpawnActor<AWeapon>(StarterWeaponTemplate, GetActorTransform(), SpawnParams);
 	StartWeapon->SetOwningCharacter(this);
 	StartWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, kRightGunSocketName);
+	StartWeapon->SetTeam(Team);
 
 	UE_LOG(LogTPS, Log, TEXT("Set weapon for character %s to %s"), *this->GetName(), *StartWeapon->GetName());
 	EquippedWeapon = StartWeapon;
@@ -389,6 +376,8 @@ void ATPSCharacter::StartRagdoll()
 		LocalCameraBoom->SetRelativeLocation(FVector(0, 0, 97));  // Places it at the character mesh's root bone.
 		LocalCameraBoom->SetRelativeRotation(FRotator(300, 0, 0));  // Look down on the character.
 		LocalCameraBoom->TargetArmLength = 500;  // Extend the arm length slightly.
+
+		ShowRespawnScreen();
 	}
 }
 
@@ -429,25 +418,6 @@ AWeapon* ATPSCharacter::GetEquippedWeapon() const
 	return EquippedWeapon;
 }
 
-bool ATPSCharacter::ServerSpawnCube_Validate()
-{
-	return true;
-}
-
-void ATPSCharacter::ServerSpawnCube_Implementation()
-{
-	if (TestCubeTemplate == nullptr)
-	{
-		return;
-	}
-
-	FVector CameraCenter = GetFollowCamera()->GetComponentLocation();
-	FVector SpawnLocation = CameraCenter + GetFollowCamera()->GetForwardVector() * InteractDistance;
-	FTransform SpawnTranform(FRotator::ZeroRotator, SpawnLocation);
-
-	GetWorld()->SpawnActor<AActor>(TestCubeTemplate, SpawnTranform);
-}
-
 bool ATPSCharacter::DebugResetCharacter_Validate()
 {
 	return true;
@@ -471,6 +441,7 @@ void ATPSCharacter::OnRep_CurrentHealth()
 		{
 			UE_LOG(LogTPS, Warning, TEXT("Couldn't find a player controller for character: %s"), *this->GetName());
 		}
+		OnHealthUpdated(CurrentHealth, MaxHealth);
 	}
 }
 
@@ -504,7 +475,7 @@ FVector ATPSCharacter::GetLineTraceDirection() const
 
 FString ATPSCharacter::GetPlayerName() const
 {
-	if (ATPSPlayerState* PS = Cast<ATPSPlayerState>(PlayerState))
+	if (ATPSPlayerState* PS = GetPlayerState<ATPSPlayerState>())
 	{
 		return PS->GetPlayerName();
 	}
@@ -546,9 +517,19 @@ void ATPSCharacter::TakeGunDamage_Implementation(float Damage, const FDamageEven
 	int32 DamageDealt = FMath::Min(static_cast<int32>(Damage), CurrentHealth);
 	CurrentHealth -= DamageDealt;
 
+	MulticastDamageTaken(DamageCauser->GetActorLocation());
+
 	if (CurrentHealth <= 0)
 	{
 		Die(Killer);
+	}
+}
+
+void ATPSCharacter::MulticastDamageTaken_Implementation(FVector damageSource)
+{
+	if (GetNetMode() == NM_Client)
+	{
+		OnDamageTaken(damageSource);
 	}
 }
 

@@ -6,17 +6,15 @@
 static const TCHAR* kTeamNames[]{
 	TEXT("No Team"),
 	TEXT("Red Team"),
-	TEXT("Green Team"),
 	TEXT("Blue Team"),
 	TEXT("Yellow Team"),
 	TEXT("Purple Team"),
-	TEXT("Black Team"),
-	TEXT("White Team"),
+	TEXT("Overflow Team"),
 };
 
 FString TPSTeamName(ETPSTeam Team)
 {
-	if (Team > ETPSTeam::Team_MAX)
+	if (Team > ETPSTeam::Team_Purple)
 	{
 		return TEXT("UNKNOWN TEAM");
 	}

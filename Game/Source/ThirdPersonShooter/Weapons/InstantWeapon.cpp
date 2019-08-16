@@ -21,7 +21,6 @@ AInstantWeapon::AInstantWeapon()
 	ShotBaseDamage = 10.0f;
 	HitValidationTolerance = 50.0f;
 	DamageTypeClass = UDamageType::StaticClass();  // generic damage type
-	HitFXTemplate = nullptr;
 	ShotVisualizationDelayTolerance = FTimespan::FromMilliseconds(3000.0f);
 	bDrawDebugLineTrace = false;
 }
@@ -100,11 +99,12 @@ void AInstantWeapon::DoFire()
 	if (DoLineTrace(HitInfo))
 	{
 		ServerDidHit(HitInfo);
-		SpawnHitFX(HitInfo);  // Spawn the hit fx locally
+		SpawnFX(HitInfo, true);  // Spawn the hit fx locally
 	}
 	else
 	{
 		ServerDidMiss(HitInfo);
+		SpawnFX(HitInfo, false);  // Spawn the hit fx locally
 	}
 
 	if (IsBurstFire())
@@ -128,7 +128,6 @@ bool AInstantWeapon::DoLineTrace(FInstantHitInfo& OutHitInfo)
 
 	FCollisionQueryParams TraceParams;
 	TraceParams.bTraceComplex = true;
-	TraceParams.bTraceAsyncScene = true;
 	TraceParams.bReturnPhysicalMaterial = false;
 	TraceParams.AddIgnoredActor(this);
 	TraceParams.AddIgnoredActor(Character);
@@ -151,6 +150,7 @@ bool AInstantWeapon::DoLineTrace(FInstantHitInfo& OutHitInfo)
 
 	if (!bDidHit)
 	{
+		OutHitInfo.Location = TraceEnd;
 		return false;
  	}
 	
@@ -160,21 +160,21 @@ bool AInstantWeapon::DoLineTrace(FInstantHitInfo& OutHitInfo)
 	return true;
 }
 
-void AInstantWeapon::NotifyClientsOfHit(const FInstantHitInfo& HitInfo)
+void AInstantWeapon::NotifyClientsOfHit(const FInstantHitInfo& HitInfo, bool impact)
 {
 	check(GetNetMode() < NM_Client);
 
-	MulticastNotifyHit(HitInfo);
+	MulticastNotifyHit(HitInfo, impact);
 }
 
-void AInstantWeapon::SpawnHitFX(const FInstantHitInfo& HitInfo)
+void AInstantWeapon::SpawnFX(const FInstantHitInfo& HitInfo, bool impact)
 {
-	if (GetNetMode() < NM_Client || HitFXTemplate == nullptr)
+	if (GetNetMode() < NM_Client)
 	{
 		return;
 	}
-
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFXTemplate, HitInfo.Location, FRotator::ZeroRotator, true);
+	
+	AInstantWeapon::OnRenderShot(HitInfo.Location, impact);
 }
 
 bool AInstantWeapon::ValidateHit(const FInstantHitInfo& HitInfo)
@@ -252,7 +252,7 @@ void AInstantWeapon::ServerDidHit_Implementation(const FInstantHitInfo& HitInfo)
 
 	if (bDoNotifyHit)
 	{
-		NotifyClientsOfHit(HitInfo);
+		NotifyClientsOfHit(HitInfo, true);
 	}
 }
 
@@ -264,6 +264,13 @@ bool AInstantWeapon::ServerDidMiss_Validate(const FInstantHitInfo& HitInfo)
 void AInstantWeapon::ServerDidMiss_Implementation(const FInstantHitInfo& HitInfo)
 {
 	UE_LOG(LogTPS, Verbose, TEXT("Shot missed"));
+	if (!GetOwningCharacter()->CanFire())
+	{
+		UE_LOG(LogTPS, Verbose, TEXT("%s server: rejected shot because character is unable to fire"), *this->GetName());
+		return;
+	}
+
+	NotifyClientsOfHit(HitInfo, false);
 }
 
 void AInstantWeapon::ClearTimerIfRunning()
@@ -284,12 +291,12 @@ void AInstantWeapon::StopFiring()
 	ClearTimerIfRunning();
 }
 
-void AInstantWeapon::MulticastNotifyHit_Implementation(FInstantHitInfo HitInfo)
+void AInstantWeapon::MulticastNotifyHit_Implementation(FInstantHitInfo HitInfo, bool impact)
 {
 	// Make sure we're a client, and we're not the client that owns this gun (they will have already played the effect locally).
 	if (GetNetMode() != NM_DedicatedServer &&
 		(GetOwningCharacter() == nullptr || !GetOwningCharacter()->IsLocallyControlled()))
 	{
-		SpawnHitFX(HitInfo);
+		SpawnFX(HitInfo, impact);
 	}
 }

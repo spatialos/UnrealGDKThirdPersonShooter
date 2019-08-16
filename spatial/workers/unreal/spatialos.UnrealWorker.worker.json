@@ -51,7 +51,6 @@
       "artifact_name": "UnrealEditor@Windows.zip",
       "command": "StartEditor.bat",
       "arguments": [
-        "ThirdPersonExampleMap",
         "-server",
         "-stdout",
         "-nowrite",
@@ -84,7 +83,6 @@
       "arguments": [
         "${IMPROBABLE_WORKER_ID}",
         "${IMPROBABLE_LOG_FILE}",
-        "ThirdPersonExampleMap",
         "+appName",
         "${IMPROBABLE_PROJECT_NAME}",
         "+receptionistHost",

@@ -10,10 +10,12 @@ static const FSavedMove_Character::CompressedFlags FLAG_WantsToSprint = FSavedMo
 
 UTPSCharacterMovementComponent::UTPSCharacterMovementComponent(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
-	, SprintSpeedMultiplier(1.5f)
-	, SprintAccelerationMultiplier(1.5f)
-	, SprintDirectionTolerance(0.7f)
+	, bCanSprint(true)
+	, bWantsToSprint(false)
 	, bShouldOrientToControlRotation(false)
+	, SprintSpeedMultiplier(2.0f)
+	, SprintAccelerationMultiplier(2.0f)
+	, SprintDirectionTolerance(0.7f)
 {}
 
 void UTPSCharacterMovementComponent::UpdateFromCompressedFlags(uint8 Flags)
@@ -114,6 +116,12 @@ FRotator UTPSCharacterMovementComponent::ComputeOrientToMovementRotation(const F
 	return Acceleration.GetSafeNormal().Rotation();
 }
 
+void UTPSCharacterMovementComponent::SetSprintEnabled(bool bSprintEnabled)
+{
+	bCanSprint = bSprintEnabled;
+}
+
+
 void UTPSCharacterMovementComponent::SetWantsToSprint(bool bSprinting)
 {
 	bWantsToSprint = bSprinting;
@@ -121,7 +129,11 @@ void UTPSCharacterMovementComponent::SetWantsToSprint(bool bSprinting)
 
 bool UTPSCharacterMovementComponent::IsSprinting() const
 {
-	return static_cast<bool>(bWantsToSprint) && IsMovingForward();
+	return 
+		static_cast<bool>(bCanSprint)
+		&& static_cast<bool>(bWantsToSprint) 
+		&& IsMovingForward()
+		&& !IsCrouching();
 }
 
 float UTPSCharacterMovementComponent::GetMaxSpeed() const

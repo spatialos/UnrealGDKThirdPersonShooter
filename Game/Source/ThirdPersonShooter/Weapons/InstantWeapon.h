@@ -61,6 +61,9 @@ public:
 
 	const AActor* GetWeilder() const { return GetAttachmentReplication().AttachParent; }
 
+	UFUNCTION(BlueprintImplementableEvent, Category = "Weapons")
+	void OnRenderShot(const FVector Location, bool impact);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -73,10 +76,10 @@ private:
 	bool DoLineTrace(FInstantHitInfo& OutHitInfo);
 
 	// [server] Notifies clients of a hit.
-	void NotifyClientsOfHit(const FInstantHitInfo& HitInfo);
+	void NotifyClientsOfHit(const FInstantHitInfo& HitInfo, bool impact);
 
 	// [client] Spawns the hit FX in the world.
-	void SpawnHitFX(const FInstantHitInfo& HitInfo);
+	void SpawnFX(const FInstantHitInfo& HitInfo, bool impact);
 
 	// [server] Validates the hit. Returns true if it's valid, false otherwise.
 	bool ValidateHit(const FInstantHitInfo& HitInfo);
@@ -92,7 +95,7 @@ private:
 
 	// Notifies all clients that a shot hit something. Used for visualizing shots on the client.
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastNotifyHit(FInstantHitInfo HitInfo);
+	void MulticastNotifyHit(FInstantHitInfo HitInfo, bool impact);
 
 	// Returns true if the weapon is a burst-fire weapon.
 	FORCEINLINE bool IsBurstFire()
@@ -143,10 +146,6 @@ private:
 	// Type of damage to send to hit actors.
 	UPROPERTY(EditAnywhere, Category = "Weapons")
 	TSubclassOf<UDamageType> DamageTypeClass;
-
-	// Template for the particle system to spawn in the world on hits.
-	UPROPERTY(EditAnywhere, Category = "Weapons")
-	class UParticleSystem* HitFXTemplate;
 
 	// Tolerance, in seconds, after which we will no longer visualize a shot notification.
 	UPROPERTY(EditAnywhere, Category = "Weapons")
