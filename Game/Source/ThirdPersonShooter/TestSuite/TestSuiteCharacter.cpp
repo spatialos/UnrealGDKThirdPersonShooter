@@ -68,12 +68,6 @@ void ATestSuiteCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	UWorld* World = GetWorld();
-	if (World && GetNetMode() == NM_DedicatedServer)
-	{
-		TestRunner = World->SpawnActor<AGDKTestRunner>();
-	}
-
 	if (AbilitySystem)
 	{
 		if (HasAuthority())
@@ -223,6 +217,16 @@ void ATestSuiteCharacter::PossessedBy(AController* NewController)
 {
 	Super::PossessedBy(NewController);
 	AbilitySystem->RefreshAbilityActorInfo();
+
+	if (TestRunner == nullptr)
+	{
+		UWorld* World = GetWorld();
+		if (World && GetNetMode() == NM_DedicatedServer)
+		{
+			TestRunner = World->SpawnActor<AGDKTestRunner>();
+			TestRunner->SetOwner(NewController);
+		}
+	}
 }
 
 void ATestSuiteCharacter::OnRep_Controller()

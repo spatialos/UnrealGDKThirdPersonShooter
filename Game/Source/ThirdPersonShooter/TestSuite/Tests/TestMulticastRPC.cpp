@@ -56,14 +56,20 @@ void ATestMulticastRPC::Server_TearDown()
 	// No tear down required for MultiCast RPC
 }
 
+void ATestMulticastRPC::SendServerRPCs()
+{
+	Server_ReportMulticastResult(BroadcastReceiveValue);
+}
+
 void ATestMulticastRPC::MulticastRPC_Implementation(int32 StartingValue)
 {
 	StartingValue++;
+	BroadcastReceiveValue = StartingValue;
 	
 	// If we are the server then all we need to do is to validate that the call has been executed correctly. 
 	if (GetNetMode() != NM_DedicatedServer)
 	{
-		Server_ReportMulticastResult(StartingValue);
+		bReadyToSendServerRPCs = true;
 	}
 	else
 	{
@@ -80,4 +86,6 @@ void ATestMulticastRPC::Server_ReportMulticastResult_Implementation(int32 NewVal
 {
 	check(NewValue == (BroadcastValue + 1));
 	RPCResponseCount++;
+	CurrentRunnerIndex++;
+	SetupNewGDKRunner();
 }

@@ -45,6 +45,10 @@ public:
 
 	virtual void SendTestResponseRPCImpl() override;
 
+	virtual void SendServerRPCs() override;
+
+	void SetReadyForServerRPCs();
+
 private:
 
 	UPROPERTY()

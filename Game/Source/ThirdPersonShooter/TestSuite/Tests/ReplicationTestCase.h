@@ -51,6 +51,8 @@ protected:
 	virtual void SendTestResponseRPCImpl()
 	PURE_VIRTUAL(AReplicationTestCase::SendTestResponseRPCImpl(), );
 
+	virtual void SendServerRPCs() override;
+
 private:
 
 	UPROPERTY(ReplicatedUsing = OnRep_TestBookend)

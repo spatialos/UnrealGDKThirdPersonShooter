@@ -4,7 +4,9 @@
 
 #include "UnrealNetwork.h"
 #include "GameFramework/GameModeBase.h"
+#include "Engine/World.h"
 
+#include "TestSuite/TestSuiteCharacter.h"
 #include "TestSuite/Tests/TestIntReplication.h"
 #include "TestSuite/Tests/TestFloatReplication.h"
 #include "TestSuite/Tests/TestBoolReplication.h"
@@ -105,30 +107,38 @@ void AGDKTestRunner::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & Ou
 	DOREPLIFETIME_CONDITION(AGDKTestRunner, bIsRunning, COND_None);
 }
 
-bool AGDKTestRunner::Server_SignalClientReady_Validate()
+bool AGDKTestRunner::Server_SignalClientReady_Validate(AGDKTestRunner* SendingTestRunner)
 {
 	return true;
 }
 
-void AGDKTestRunner::Server_SignalClientReady_Implementation()
+void AGDKTestRunner::Server_SignalClientReady_Implementation(AGDKTestRunner* SendingTestRunner)
 {
-	ReadyClientsCount++;
-
-	UWorld* World = GetWorld();
-	if (!World)
+	if(SendingTestRunner == this)
 	{
-		return;
-	}
+		ReadyClientsCount++;
+		UE_LOG(LogTemp, Log, TEXT("Server_SignalClientReady_Implementation: ReadyClientsCount: %d"), ReadyClientsCount);
 
-	AGameModeBase* GameMode = World->GetAuthGameMode();
-	if (!GameMode || !(ReadyClientsCount == GameMode->GetNumPlayers()))
+		UWorld* World = GetWorld();
+		if (!World)
+		{
+			return;
+		}
+
+		AGameModeBase* GameMode = World->GetAuthGameMode();
+		if (!GameMode || !(ReadyClientsCount == GameMode->GetNumPlayers()))
+		{
+			return;
+		}
+
+		// Start the new test case as we are ready
+		CurrentTestIndex = 0;
+		TestCases[CurrentTestIndex]->Server_StartTest();
+	}
+	else
 	{
-		return;
+		SendingTestRunner->Server_SignalClientReady_Implementation(SendingTestRunner);
 	}
-
-	// Start the new test case as we are ready
-	CurrentTestIndex = 0;
-	TestCases[CurrentTestIndex]->Server_StartTest();
 }
 
 void AGDKTestRunner::Server_SetupTestCases()
@@ -166,20 +176,12 @@ void AGDKTestRunner::Server_TearDownTestCases()
 
 void AGDKTestRunner::OnRep_TestCases()
 {
-	// Local workaround to allow every client to call server RPCs. This simplifies our testing suite immensely.
 	bool bReadyForTests = true;
 	if (GetNetMode() == NM_Client)
 	{
-		AActor* PlayerController = GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(nullptr);
-		SetOwner(PlayerController);
-
 		for (auto TestCase : TestCases)
 		{
-			if (TestCase != nullptr)
-			{
-				TestCase->SetOwner(PlayerController);
-			}
-			else
+			if (TestCase == nullptr)
 			{
 				bReadyForTests = false;
 			}
@@ -188,6 +190,37 @@ void AGDKTestRunner::OnRep_TestCases()
 
 	if (TestCases.Num() > 0 && bReadyForTests)
 	{
-		Server_SignalClientReady();
+		GetOwnedTestRunnerOnThisClient()->Server_SignalClientReady(this);
 	}
+}
+
+template<typename T>
+void AGDKTestRunner::AddTestCase()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	T* TestCase = World->SpawnActor<T>();
+	AGDKTestCase* GDKTestCase = Cast<AGDKTestCase>(TestCase);
+	check(GDKTestCase);
+
+	TArray<AGDKTestRunner*> Runners;
+	for (auto It = World->GetPlayerControllerIterator(); It; It++)
+	{
+		ATestSuiteCharacter* Character = Cast<ATestSuiteCharacter>((*It)->GetPawn());
+		check(Character);
+		Runners.Add(Character->TestRunner);
+	}
+	GDKTestCase->InitializeGDKTestRunnersForThisTestCase(Runners);
+	TestCases.Add(GDKTestCase);
+}
+
+AGDKTestRunner * AGDKTestRunner::GetOwnedTestRunnerOnThisClient()
+{
+	ATestSuiteCharacter* Character = Cast<ATestSuiteCharacter>(GetWorld()->GetFirstLocalPlayerFromController()->GetPlayerController(GetWorld())->GetPawn());
+	check(Character);
+	return Character->TestRunner;
 }

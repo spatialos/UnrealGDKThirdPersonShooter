@@ -7,6 +7,7 @@
 #include "UnrealNetwork.h"
 #include "SpatialNetDriver.h"
 #include "SpatialPackageMapClient.h"
+#include "GeneralProjectSettings.h"
 
 #include <improbable/c_worker.h>
 
@@ -226,12 +227,15 @@ void ATestTArrayReplication::ValidateRPC_Server(const TArray<int>& TestPODArray,
 	// Validate Dynamically created UObjects in the array
 	check(TestDynamicallyCreatedActors.Num() == 1);
 
-	//Get the net driver
+	// If using Spatial - get the net driver
 	USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetWorld()->GetNetDriver());
-	check(NetDriver);
-	Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestDynamicallyCreatedActors[0]);
-	Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(DynamicallyCreatedArray[0]);
-	check(RPCEntityId == ServerEntityId);
+	if (NetDriver)
+	{
+		check(NetDriver);
+		Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestDynamicallyCreatedActors[0]);
+		Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(DynamicallyCreatedArray[0]);
+		check(RPCEntityId == ServerEntityId);
+	}
 
 	// Validate TArray with structs
 	check(TestArrayOfStructs.Num() == 2);

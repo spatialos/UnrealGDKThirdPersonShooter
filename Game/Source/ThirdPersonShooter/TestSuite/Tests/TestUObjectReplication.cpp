@@ -139,12 +139,14 @@ void ATestUObjectReplication::ValidateRPC_Server(ATestActor*  TestDynamicallyCre
 												 const UTestUObject* TestConstObj)
 {
 	// Validate Dynamically created UObject
-	//Get the net driver
+	// If running with Spatial - Get the net driver
 	USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetWorld()->GetNetDriver());
-	check(NetDriver);
-	Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestDynamicallyCreatedActor);
-	Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(DynamicallyCreatedActor);
-	check(RPCEntityId == ServerEntityId);
+	if (NetDriver)
+	{
+		Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestDynamicallyCreatedActor);
+		Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(DynamicallyCreatedActor);
+		check(RPCEntityId == ServerEntityId);
+	}
 
 	// TODO: UNR-238 Add tests.
 

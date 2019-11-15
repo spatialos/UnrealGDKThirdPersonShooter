@@ -20,7 +20,7 @@ void UTestComponent::OnRep_TestProperty()
 {
 	auto Owner = Cast<ATestStaticComponentReplication>(GetOwner());
 	check(Owner);
-	Owner->Server_ReportReplication(TestProperty);
+	Owner->SetReadyForServerRPCs();
 }
 
 ATestStaticComponentReplication::ATestStaticComponentReplication()
@@ -62,4 +62,14 @@ void ATestStaticComponentReplication::SendTestResponseRPCImpl()
 {
 	// ILB - Send test response on UTestComponent::OnRep_TestProperty instead so we're certain the TestProperty
 	// has been replicated by that point.
+}
+
+void ATestStaticComponentReplication::SendServerRPCs()
+{
+	Server_ReportReplication(TestComponent->TestProperty);
+}
+
+void ATestStaticComponentReplication::SetReadyForServerRPCs()
+{
+	bReadyToSendServerRPCs = true;
 }

@@ -268,12 +268,14 @@ void ATestUStructReplication::ValidateRPC_Server(const FSimpleTestStruct& TestPO
 	// Validate Dynamically created actors
 	check(TestUStructWithDynamicallyCreatedActor.DynamicallyCreatedActor->IsA(ATestActor::StaticClass()));
 
-	//Get the net driver
+	// If running with Spatial - Get the net driver
 	USpatialNetDriver* NetDriver = Cast<USpatialNetDriver>(GetWorld()->GetNetDriver());
-	check(NetDriver);
-	Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestUStructWithDynamicallyCreatedActor.DynamicallyCreatedActor);
-	Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(UStructWithDynamicallyCreatedActor.DynamicallyCreatedActor);
-	check(RPCEntityId == ServerEntityId);
+	if (NetDriver)
+	{
+		Worker_EntityId RPCEntityId = NetDriver->PackageMap->GetEntityIdFromObject(TestUStructWithDynamicallyCreatedActor.DynamicallyCreatedActor);
+		Worker_EntityId ServerEntityId = NetDriver->PackageMap->GetEntityIdFromObject(UStructWithDynamicallyCreatedActor.DynamicallyCreatedActor);
+		check(RPCEntityId == ServerEntityId);
+	}
 
 	// Validate UStruct with Netserialize
 	check(TestUStructWithNetSerialize.MyInt == 42);

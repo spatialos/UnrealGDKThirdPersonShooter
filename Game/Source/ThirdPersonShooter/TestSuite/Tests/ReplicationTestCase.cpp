@@ -2,7 +2,6 @@
 
 #include "ReplicationTestCase.h"
 
-#include "GDKTestRunner.h"
 #include "GameFramework/GameModeBase.h"
 #include "UnrealNetwork.h"
 
@@ -11,6 +10,7 @@ AReplicationTestCase::AReplicationTestCase()
 {
 	PrimaryActorTick.bCanEverTick = true;
 	bReplicates = true;
+	bAlwaysRelevant = true;
 }
 
 void AReplicationTestCase::Tick(float DeltaTime)
@@ -55,13 +55,7 @@ void AReplicationTestCase::Server_TearDown()
 
 void AReplicationTestCase::OnRep_TestBookend()
 {
-	UE_LOG(LogSpatialGDKTests, Log, TEXT("TestCase %s: Validating replication"), *TestName);
-
-	ValidateClientReplicationImpl();
-
-	UE_LOG(LogSpatialGDKTests, Log, TEXT("TestCase %s: Replication successful on client, sending response RPC"), *TestName);
-
-	SendTestResponseRPCImpl();
+	bReadyToSendServerRPCs = true;
 }
 
 void AReplicationTestCase::SignalReplicationSetup()
@@ -74,7 +68,20 @@ void AReplicationTestCase::SignalReplicationSetup()
 void AReplicationTestCase::SignalResponseRecieved()
 {
 	RPCResponseCount++;
+	CurrentRunnerIndex++;
+	SetupNewGDKRunner();
 	UE_LOG(LogSpatialGDKTests, Log, TEXT("TestCase %s: Response RPC recieved from a client"), *TestName);
+}
+
+void AReplicationTestCase::SendServerRPCs()
+{
+	UE_LOG(LogSpatialGDKTests, Log, TEXT("TestCase %s: Validating replication"), *TestName);
+
+	ValidateClientReplicationImpl();
+
+	UE_LOG(LogSpatialGDKTests, Log, TEXT("TestCase %s: Replication successful on client, sending response RPC"), *TestName);
+
+	SendTestResponseRPCImpl();
 }
 
 void AReplicationTestCase::GetLifetimeReplicatedProps(TArray< FLifetimeProperty > & OutLifetimeProps) const

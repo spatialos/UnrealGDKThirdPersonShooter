@@ -49,7 +49,7 @@ public:
 
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
-	void Server_SignalClientReady();
+	void Server_SignalClientReady(AGDKTestRunner* SendingTestRunner);
 
 	void Server_SetupTestCases();
 
@@ -60,6 +60,8 @@ private:
 
 	template<typename T>
 	void AddTestCase();
+
+	AGDKTestRunner* GetOwnedTestRunnerOnThisClient();
 
 	UPROPERTY(ReplicatedUsing = OnRep_TestCases)
 	TArray<AGDKTestCase*> TestCases;
@@ -73,17 +75,3 @@ private:
 	UPROPERTY()
 	int ReadyClientsCount;
 };
-
-template<typename T>
-void AGDKTestRunner::AddTestCase()
-{ 
-	UWorld* World = GetWorld();
-	if (!World)
-	{
-		return;
-	}
-
-	T* TestCase = World->SpawnActor<T>();
-	check(TestCase);
-	TestCases.Add(TestCase);
-}

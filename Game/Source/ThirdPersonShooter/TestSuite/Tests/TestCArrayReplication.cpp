@@ -44,6 +44,7 @@ bool ATestCArrayReplication::Server_ReportReplication_Validate()
 
 void ATestCArrayReplication::Server_ReportReplication_Implementation()
 {
+	UE_LOG(LogTemp, Log, TEXT("Server_ReportReplication_Implementation called."));
 	SignalResponseRecieved();
 }
 
@@ -136,7 +137,7 @@ void ATestCArrayReplication::ValidateClientReplicationImpl()
 
 void ATestCArrayReplication::SendTestResponseRPCImpl()
 {
-	Server_ReportReplication();
+	// Empty due to the deferred execution
 }
 
 void ATestCArrayReplication::OnRep_DynamicallyCreatedArray()

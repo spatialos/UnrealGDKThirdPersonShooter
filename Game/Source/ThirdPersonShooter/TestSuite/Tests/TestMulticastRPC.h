@@ -22,6 +22,8 @@ public:
 
 	virtual void Server_TearDown() override;
 
+	virtual void SendServerRPCs() override;
+
 protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
@@ -33,6 +35,8 @@ protected:
 private:
 
 	int32 BroadcastValue;
+
+	int32 BroadcastReceiveValue;
 
 	uint32 RPCResponseCount;
 
