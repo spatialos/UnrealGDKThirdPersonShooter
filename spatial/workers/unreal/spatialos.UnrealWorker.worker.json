@@ -55,7 +55,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "Tcp",
+        "Kcp",
         "-abslog=${IMPROBABLE_LOG_FILE}",
         "-NoVerifyGC"
       ]
@@ -77,7 +77,7 @@
         "+workerId",
         "${IMPROBABLE_WORKER_ID}",
         "+linkProtocol",
-        "Tcp",
+        "Kcp",
         "-NoVerifyGC"
       ]
     }
