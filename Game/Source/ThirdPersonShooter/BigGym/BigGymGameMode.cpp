@@ -10,7 +10,7 @@
 #include "Interop/Connection/SpatialWorkerConnection.h"
 #include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
-#include "SpatialWorkerFlags.h"
+#include "SpatialStatics.h"
 
 ABigGymGameMode::ABigGymGameMode()
 {
@@ -71,7 +71,7 @@ void ABigGymGameMode::CheckInitCustomSpawning()
 bool ABigGymGameMode::ShouldUseCustomSpawning()
 {
 	FString WorkerValue;
-	USpatialWorkerFlags::GetWorkerFlag(TEXT("override_spawning"), WorkerValue);
+	USpatialStatics::GetWorkerFlag(this, TEXT("override_spawning"), WorkerValue);
 	return (WorkerValue.Equals(TEXT("true"), ESearchCase::IgnoreCase) || FParse::Param(FCommandLine::Get(), TEXT("OverrideSpawning")));
 }
 
@@ -93,7 +93,7 @@ void ABigGymGameMode::ParsePassedValues()
 	{
 		UE_LOG(LogBigGym, Log, TEXT("Using worker flags to load custom spawning parameters."));
 		FString TotalPlayersString, PlayerDensityString, TotalNPCsString;
-		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_players"), TotalPlayersString))
+		if (USpatialStatics::GetWorkerFlag(this, TEXT("total_players"), TotalPlayersString))
 		{
 			TotalPlayers = FCString::Atoi(*TotalPlayersString);
 		}
@@ -101,12 +101,12 @@ void ABigGymGameMode::ParsePassedValues()
 		// Set default value of PlayerDensity equal to TotalPlayers. Will be overwritten if PlayerDensity option is specified.
 		PlayerDensity = TotalPlayers;
 
-		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("player_density"), PlayerDensityString))
+		if (USpatialStatics::GetWorkerFlag(this, TEXT("player_density"), PlayerDensityString))
 		{
 			PlayerDensity = FCString::Atoi(*PlayerDensityString);
 		}
 
-		if (USpatialWorkerFlags::GetWorkerFlag(TEXT("total_npcs"), TotalNPCsString))
+		if (USpatialStatics::GetWorkerFlag(this, TEXT("total_npcs"), TotalNPCsString))
 		{
 			TotalNPCs = FCString::Atoi(*TotalNPCsString);
 		}
